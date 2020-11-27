@@ -5,21 +5,21 @@
     <meta charset="utf-8">
     <title>Fermi LAT Light Curve Repository</title>
 
-    <script type="text/javascript" src="./js/d3.min.js"></script>
-    <script type="text/javascript" src="./js/d3.geo.projection.min.js"></script>
+    <script type="text/javascript" charset="UTF-8" src="./js/d3.min.js"></script>
+    <script type="text/javascript" charset="UTF-8" src="./js/d3.geo.projection.min.js"></script>
     <!-- <script type="text/javascript" src="./js/celestial.min.js"></script> -->
-    <script type="text/javascript" src="./js/celestial.js"></script>
-    <script language="javascript" type="text/javascript" src="./js/astro.js"></script>
+    <script type="text/javascript" charset="UTF-8" src="./js/celestial.js"></script>
+    <script type="text/javascript" charset="UTF-8" src="./js/astro.js"></script>
     <!-- <script language="javascript" type="text/javascript" src="./js/astro.dates.js"></script> -->
-    <script language="javascript" type="text/javascript" src="./js/astro.coords.js"></script>
-    <script type="text/javascript" src="./js/ephemeris.js"></script>
+    <script type="text/javascript" charset="UTF-8" src="./js/astro.coords.js"></script>
+    <script type="text/javascript" charset="UTF-8" src="./js/ephemeris.js"></script>
 
     <!-- jQuery -->
-    <script type="text/javascript" src="./js/jquery-1.12.0.min.js"></script>
+    <script type="text/javascript" charset="UTF-8" src="./js/jquery-1.12.0.min.js"></script>
     <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script> -->
 
     <!-- Chart.js -->
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.4.0/Chart.min.js"></script>    
+    <script type="text/javascript" charset="UTF-8" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.4.0/Chart.min.js"></script>
 
     <!-- Bootstrap compiled and minified JavaScript -->
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
@@ -56,7 +56,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ion-rangeslider/2.3.1/js/ion.rangeSlider.min.js"></script>
   
     <!-- Moment.js -->
-    <script src="./js/moment.js"></script>
+    <script charset="UTF-8" src="./js/moment.js"></script>
 
 </head>
 
@@ -305,7 +305,7 @@
 
 <body>
 
-  <script type="text/javascript">
+  <script type="text/javascript" charset="UTF-8">
 
         var canvas;
         var selection;
@@ -1718,8 +1718,11 @@
 
             console.log('Querying the 2FAV database...')
 
-            // Setup the URL
+            // Setup the URL (localhost for testing)
             URL = "http://localhost/~kocevski/FAVADataPortal/queryDB_2FAV_sqlite.php?typeOfRequest=MapData"; 
+            
+            // Setup the URL (FSSC)
+            URL = "https://fermi.gsfc.nasa.gov/ssc/data/access/lat/FAVA/queryDB_2FAV.php?typeOfRequest=MapData"
 
             var ra_urlEncoded = encodeURIComponent(0);
             var dec_urlEncoded = encodeURIComponent(0);
@@ -3543,7 +3546,8 @@
                                     var ASSOC1 = point.ASSOC1
 
                                     var data_subdirectory = point.Source_Name.substring(6,8)
-                                    var catalog_source_name = point.Source_Name.replace('-','m').replace('.','d').replace(' ','_').replace('+','p')
+                                    // var catalog_source_name = point.Source_Name.replace('-','m').replace('.','d').replace(' ','_').replace('+','p')
+                                    var catalog_source_name = point.Source_Name.replace(' ','_')
 
                                     var link_spectrum_4FGL = "./data/4FGL/4FGL-DR2_spec_v23/" + data_subdirectory + '/' + catalog_source_name + '_spec.pdf'
                                     var link_lightcurve_4FGL = "./data/4FGL/4FGL-DR2_flux_v23/" + data_subdirectory + '/' + catalog_source_name + '_lc.pdf'
