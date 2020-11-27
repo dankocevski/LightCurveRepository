@@ -1,0 +1,182 @@
+/*	FSSC Website Global CSS					*/
+/*	Name: NASA.css							*/
+/*	Author: J.D. Myers						*/
+
+/*body {
+	background: #000 url('../img/star_bkgd.jpg') repeat left top;
+	color: #2a2a2a;
+	font-size: 12px;
+	line-height: 15px;
+	font-family: Arial, Helvetica, sans-serif;
+}*/
+
+/* Page Container */
+
+#page-container {
+	width: 100%;
+	height: 100%;
+	margin: 0 auto;
+	padding: 8px 0;
+	/*background: transparent url('../img/top_bkgd.jpg') no-repeat center top;*/
+	text-align: center;
+	overflow: visible;
+	z-index: 1;
+}
+
+#page-container-plain {
+	width: 100%;
+	height: 100%;
+	margin: 0 10px;
+	padding: 8px 0;
+	/*background: #f8f8f8;*/
+	text-align: left;
+	overflow: visible;
+}
+
+#nasa-banner-plain {
+	clear: both;
+	width: 1650px;
+	height: 98px;
+	margin: 0 0 8px 0;
+	color: #fdfdfd;
+	/*background: #2e2e2e;*/
+	text-align: left;
+	vertical-align: middle;
+}
+
+#nasa-banner a,
+#nasa-banner-full a,
+#nasa-banner-plain a {
+	color: #fdfdfd;
+}
+
+#nasa-banner a:hover,
+#nasa-banner-full a:hover,
+#nasa-banner-plain a:hover {
+    color: #999;
+    text-decoration: none;
+}
+
+#nasa-banner .nasa-logo,
+#nasa-banner-full .nasa-logo,
+#nasa-banner-plain .nasa-logo {
+	float: left;
+	width: 140px;
+	height: 98px;
+	background: #1d1d1d;
+	text-align: center;
+}
+
+#nasa-banner #nasa-affiliation,
+#nasa-banner-full #nasa-affiliation,
+#nasa-banner-plain #nasa-affiliation {
+	float: left;
+	/*width: 522px;*/
+	width: 1221px;	
+	height: 98px;
+	background: #2e2e2e;
+	text-align: left;
+}
+
+#nasa-banner #nasa-affiliation h1,
+#nasa-banner-full #nasa-affiliation h1,
+#nasa-banner-plain #nasa-affiliation h1 {
+	margin: 0;
+	padding: 31px 0 3px 13px;
+	border: none;
+	color: #fdfdfd;
+	font-size: 18px;
+	line-height: 1;
+	font-weight: normal;
+	letter-spacing: normal;
+	text-shadow: none;
+}
+
+#nasa-banner #nasa-affiliation h2,
+#nasa-banner-full #nasa-affiliation h2,
+#nasa-banner-plain #nasa-affiliation h2 {
+	margin: 0;
+	padding-left: 13px;
+	border: none;
+	color: #fdfdfd;
+	font-size: 14px;
+	line-height: 1;
+	font-weight: normal;
+	letter-spacing: normal;
+}
+
+#nasa-banner #nasa-search-links,
+#nasa-banner-full #nasa-search-links,
+#nasa-banner-plain #nasa-search-links {
+	/*float: left;*/
+	float: right;	
+	width: 289px;
+	height: 98px;
+	background: #2e2e2e;
+	font-size: 12px;
+	line-height: 1;
+}
+
+#nasa-banner #nasa-search-links #search-wrapper,
+#nasa-banner-full #nasa-search-links #search-wrapper,
+#nasa-banner-plain #nasa-search-links #search-wrapper {
+	margin: 25px 15px 0 0;
+}
+
+#nasa-banner #nasa-search-links #search-wrapper label#search-label,
+#nasa-banner-full #nasa-search-links #search-wrapper label#search-label,
+#nasa-banner-plain #nasa-search-links #search-wrapper label#search-label {
+	float: left;
+	width: 50px;
+	height: 12px;
+	padding: 5px 5px 5px 0;
+	border-right: none;
+	font-size: 12px;
+	line-height: 1;
+}
+
+#nasa-banner #nasa-search-links #search-wrapper input#search,
+#nasa-banner-full #nasa-search-links #search-wrapper input#search,
+#nasa-banner-plain #nasa-search-links #search-wrapper input#search {
+	float: left;
+	width: 162px;
+	height: 14px;
+	padding: 2px;
+	border: 2px solid #c0c0c0;
+}
+
+#nasa-banner #nasa-search-links #search-wrapper input#search-img,
+#nasa-banner-full #nasa-search-links #search-wrapper input#search-img,
+#nasa-banner-plain #nasa-search-links #search-wrapper input#search-img {
+	float: left;
+	width: 49px;
+}
+
+#nasa-banner #nasa-search-links #header-links,
+#nasa-banner-full #nasa-search-links #header-links,
+#nasa-banner-plain #nasa-search-links #header-links {
+	clear: both;
+	padding: 10px 15px 10px 0;
+	text-align: right;
+}
+
+/* Mission Banner */
+
+#mission-banner {
+	clear: both;
+	width: 952px;
+	height: 100px;
+	margin: 8px auto 0px auto;
+	color: #1f1f1f;
+	background: #f8f8f8;
+}
+
+#mission-banner-full,
+#mission-banner-plain  {
+	clear: both;
+	width: 952px;
+	height: 100px;
+	margin: 8px auto 0px 0px;
+	color: #1f1f1f;
+	background: #f8f8f8;
+}
