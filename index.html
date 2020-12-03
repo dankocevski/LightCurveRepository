@@ -5108,196 +5108,196 @@
         <!-- sidebar start here -->
         <div class="col-xs-2" style="width:330px;margin-left:10px;">
 
-        <!-- Light Curve Generator start here -->       
-        <div class="panel panel-default">
-            <div class="panel-heading">
-                <h3 class="panel-title">Catalog Search</h3>
-             </div>
-             <div class="panel-body">
+            <!-- Light Curve Generator start here -->       
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Catalog Search</h3>
+                 </div>
+                 <div class="panel-body">
 
-                    <div class="row-small-gutter">
-                      <div class="col-xs-4">
-                        <label for="ex1">RA:</label>
-                        <input id="ra_input" class="form-control" type="text" placeholder="">
+                        <div class="row-small-gutter">
+                          <div class="col-xs-4">
+                            <label for="ex1">RA:</label>
+                            <input id="ra_input" class="form-control" type="text" placeholder="">
+                          </div>
+                          <div class="col-xs-4">
+                            <label for="ex2">Dec:</label>
+                            <input id="dec_input" class="form-control" type="text" placeholder="">
+                          </div>
+                          <div class="col-xs-4">
+                            <label for="ex1">Radius:</label>
+                            <input id="radius_input" class="form-control" type="text" placeholder="" data-toggle="tooltip" data-placement="top" title="Tooltip on top">
+                          </div>                              
+                        </div>
+
+                        <div class="row-small-gutter" style="margin-top:70px; margin-bottom:135px">
+                          <div class="col-xs-12">
+                                <label for="ex1">Keyword:</label>
+                                <input id="keyword_input" class="form-control" id="ex1" type="text" placeholder="">
+                            </div>
+                        </div>
+
+                        <div class="row-small-gutter" style="margin-top:70px;">
+                            <div style="float:right; margin-top:15px; margin-right:0px">
+                                <button type="submit" name="searchButton" id="search_button"  class="btn btn-primary">Search</button>
+                            </div>
+                        </div>
+
+                        <div class="row-small-gutter">
+                            <div style="float:right; margin-top:15px; margin-right:0px">
+                                <button type="submit" name="clearButton" id="clear_button" class="btn btn-default" disabled>Clear</button>
+                            </div>
+                        </div>
+
+                </div>
+            </div>
+            <!-- Light Curve Generator ends here -->    
+
+            <!-- Map options panel start here -->       
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Map Options</h3>
+                </div>
+                <div class="panel-body">
+                        
+                      <div class="row">
+                        <div class="col-sm-4" style="margin-left:5px">
+                          <p>Coordinate System:</p>
+                        </div>
+                        <div class="col-sm-6" style="margin-left:10px">
+                          
+                            <div class="dropdown">
+                                <button style="width:130px" class="btn btn-default dropdown-toggle transform" type="button" data-toggle="dropdown">Galactic <span class="caret"></span></button>
+                                <ul class="dropdown-menu transform" style="width:10px">
+                                    <li id="galactic" class="active"><a href="#">Galactic</a></li>
+                                    <li id="equatorial"><a href="#">Equatorial</a></li>
+                                </ul>
+                            </div>
+
+                        </div>
+                      </div>   
+
+                      <div class="row" style="margin-top:0px">
+                        <div class="col-sm-4" style="margin-left:5px">
+                          <p>Celestial Projection:</p>
+                        </div>
+                        <div class="col-sm-6" style="margin-left:10px">
+                          
+                            <div class="dropdown">
+                                <button style="width:130px" class="btn btn-default dropdown-toggle projection" type="button" data-toggle="dropdown">Aitoff <span class="caret"></span></button>
+                                <ul class="dropdown-menu projection" style="width:10px">
+                                    <li id="aitoff" class="active"><a href="#">Aitoff</a></li>
+                                    <li id="mollweide"><a href="#">Mollweide</a></li>
+                                    <li id="stereographic"><a href="#">Stereographic</a></li>
+                                    <li id="equirectangular"><a href="#">Equirectangular</a></li>
+                                    <li id="orthographic"><a href="#">Othographic</a></li>
+                                </ul>
+                            </div>
+
+                        </div>
+                      </div>                      
+
+                      <label for="name">Coordinate Planes:</label>
+
+                      <div class="row-small-gutter">
+
+                        <div class="col-sm-6">
+                            <label class="checkbox-inline" for="equator-label"><input class="map-overlay lines" type="checkbox" value="" id="equatorial" checked>Equatorial</label>
+                        </div>
+                        <div class="col-sm-5">
+                            <label class="checkbox-inline" for="ecliptic-label"><input class="map-overlay lines" type="checkbox" value="" id="ecliptic" checked>Ecliptic</label>
+                        </div>
                       </div>
-                      <div class="col-xs-4">
-                        <label for="ex2">Dec:</label>
-                        <input id="dec_input" class="form-control" type="text" placeholder="">
+                      <div class="row-small-gutter">
+                        <div class="col-sm-6">
+                            <label class="checkbox-inline" for="galactic-label"><input class="map-overlay lines" type="checkbox" value="" id="galactic" checked>Galactic</label>
+                        </div>
+                        <div class="col-sm-5">
+                            <label class="checkbox-inline" for="supergalactic-label"><input class="map-overlay lines" type="checkbox" id="supergalactic" value="">Supergalactic</label>
+                        </div>
                       </div>
-                      <div class="col-xs-4">
-                        <label for="ex1">Radius:</label>
-                        <input id="radius_input" class="form-control" type="text" placeholder="" data-toggle="tooltip" data-placement="top" title="Tooltip on top">
-                      </div>                              
-                    </div>
-
-                    <div class="row-small-gutter" style="margin-top:70px; margin-bottom:135px">
-                      <div class="col-xs-12">
-                            <label for="ex1">Keyword:</label>
-                            <input id="keyword_input" class="form-control" id="ex1" type="text" placeholder="">
+                      <div style="margin-top:50px">
+                        <label for="name">Overlays:</label>
+                      </div>
+                      <div class="row-small-gutter">
+                        <div class="col-sm-6">
+                            <label class="checkbox-inline"><input class="map-overlay popup" type="checkbox" id="tooltip" value="" checked>Source Info</label>
                         </div>
-                    </div>
-
-                    <div class="row-small-gutter" style="margin-top:70px;">
-                        <div style="float:right; margin-top:15px; margin-right:0px">
-                            <button type="submit" name="searchButton" id="search_button"  class="btn btn-primary">Search</button>
+                        <div class="col-sm-5">
+                            <label class="checkbox-inline" id="lines-ecliptic-show"><input class="map-overlay lines" type="checkbox" value="" id="graticule" checked>Grid Lines</label>
                         </div>
-                    </div>
-
-                    <div class="row-small-gutter">
-                        <div style="float:right; margin-top:15px; margin-right:0px">
-                            <button type="submit" name="clearButton" id="clear_button" class="btn btn-default" disabled>Clear</button>
+                      </div>
+                      <div class="row-small-gutter">
+                        <div class="col-sm-6">
+                            <label class="checkbox-inline"><input class="map-overlay data" type="checkbox" id="constellations" value="">Constellations</label>
                         </div>
-                    </div>
+                        <div class="col-sm-5">
+                            <label class="checkbox-inline"><input class="map-overlay data" type="checkbox" id="mw" value="">Milky Way</label>
+                        </div>                            
+                      </div>
+                      <div class="row-small-gutter">
+                        <div class="col-sm-6">
+                            <label class="checkbox-inline"><input class="map-overlay sun" type="checkbox" id="sun" checked value="">Sun</label>
+                        </div>
+                        <div class="col-sm-5">
+                            <label class="checkbox-inline"><input , class="map-overlay moon" type="checkbox" id="moon" value="">Moon</label>
+                        </div>                            
+                      </div>                  
+                      <div style="margin-top:70px">
+                        <label for="name">4FGL Marker Size:</label>
+                      </div>
+                      <div class="row-small-gutter">
+                        <div class="col-sm-6">
+                            <label class="checkbox-inline"><input class="map-overlap markersize" type="checkbox" id="marker_size_varindex" value="" checked>Variability Index</label>
+                        </div>
+                        <div class="col-sm-5">
+                            <label class="checkbox-inline" id="lines-ecliptic-show"><input class="map-overlap markersize" type="checkbox" value="" id="marker_size_sig">Significance</label>
+                        </div>
+                      </div>
+                      <div style="margin-top:30px">
+                        <label for="name">4FGL Source Options:</label>
+                      </div>
+                      <div class="row-small-gutter">
+                        <div class="col-sm-12">
+                            <label class="checkbox-inline"><input class="map-overlap show_only_variable" type="checkbox" id="show_only_variable_sources" value="" checked>Hide Non-Variable Sources</label>
+                        </div>
+                      </div>                  
 
+                </div>
             </div>
-        </div>
-        <!-- Light Curve Generator ends here -->    
+            <!-- Map options panel ends here -->       
 
+            <!-- Demographics panel start here -->   
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Data Overlays</h3>
+                </div>
+                <!-- <div class="panel-body"> -->
 
-        <!-- Map options panel start here -->       
-        <div class="panel panel-default">
-            <div class="panel-heading">
-                <h3 class="panel-title">Map Options</h3>
+                  <!-- List group -->
+                <ul class="list-group">
+                    <li class="list-group-item">
+                            LAT Point Source Catalog (4FGL)<BR><small><a href="https://ui.adsabs.harvard.edu/abs/2020ApJS..247...33A/abstract">Abdollahi et al. 2020</a> - 5523 Sources</small>
+                            <label class="switch" style="float:right; margin-top:-12px"><input id="4FGL_switch" type="checkbox" checked><span class="slider round primary"></span></label>
+                    </li>                       
+                    <li class="list-group-item">
+                            FAVA Flare Catalog (2FAV)<BR><small><a href="https://fermi.gsfc.nasa.gov/ssc/data/access/lat/fava_catalog/">Abdollahi et al. 2017</a> - 4309 Flares</small>
+                            <label class="switch" style="float:right; margin-top:-12px"><input id="2FAV_switch" type="checkbox"><span class="slider round red"></span></label>
+                    </li>
+                    <li class="list-group-item">
+                            2nd LAT GRB Catalog (2FLGC)<BR><small><a href="https://iopscience.iop.org/article/10.3847/1538-4357/ab1d4e/pdf">Ajello 2019</a> - 150 Detections</small>
+                            <label class="switch" style="float:right; margin-top:-12px"><input id='2FLGC_switch' type="checkbox"><span class="slider round green"></span></label>
+                    </li>                                 
+                    <li class="list-group-item">
+                            IceCube Neutrino Alerts<BR><small><a href="https://gcn.gsfc.nasa.gov/amon.html">GCN/AMON Notices</a> - 47 Events</small>
+                            <label class="switch" style="float:right; margin-top:-12px"><input id='IceCube_switch'  type="checkbox"><span class="slider round orange"></span></label>
+                    </li>               
+
+                </ul>
+
+                <!-- </div> -->
             </div>
-            <div class="panel-body">
-                    
-                  <div class="row">
-                    <div class="col-sm-4" style="margin-left:5px">
-                      <p>Coordinate System:</p>
-                    </div>
-                    <div class="col-sm-6" style="margin-left:10px">
-                      
-                        <div class="dropdown">
-                            <button style="width:130px" class="btn btn-default dropdown-toggle transform" type="button" data-toggle="dropdown">Galactic <span class="caret"></span></button>
-                            <ul class="dropdown-menu transform" style="width:10px">
-                                <li id="galactic" class="active"><a href="#">Galactic</a></li>
-                                <li id="equatorial"><a href="#">Equatorial</a></li>
-                            </ul>
-                        </div>
 
-                    </div>
-                  </div>   
-
-                  <div class="row" style="margin-top:0px">
-                    <div class="col-sm-4" style="margin-left:5px">
-                      <p>Celestial Projection:</p>
-                    </div>
-                    <div class="col-sm-6" style="margin-left:10px">
-                      
-                        <div class="dropdown">
-                            <button style="width:130px" class="btn btn-default dropdown-toggle projection" type="button" data-toggle="dropdown">Aitoff <span class="caret"></span></button>
-                            <ul class="dropdown-menu projection" style="width:10px">
-                                <li id="aitoff" class="active"><a href="#">Aitoff</a></li>
-                                <li id="mollweide"><a href="#">Mollweide</a></li>
-                                <li id="stereographic"><a href="#">Stereographic</a></li>
-                                <li id="equirectangular"><a href="#">Equirectangular</a></li>
-                                <li id="orthographic"><a href="#">Othographic</a></li>
-                            </ul>
-                        </div>
-
-                    </div>
-                  </div>                      
-
-                  <label for="name">Coordinate Planes:</label>
-
-                  <div class="row-small-gutter">
-
-                    <div class="col-sm-6">
-                        <label class="checkbox-inline" for="equator-label"><input class="map-overlay lines" type="checkbox" value="" id="equatorial" checked>Equatorial</label>
-                    </div>
-                    <div class="col-sm-5">
-                        <label class="checkbox-inline" for="ecliptic-label"><input class="map-overlay lines" type="checkbox" value="" id="ecliptic" checked>Ecliptic</label>
-                    </div>
-                  </div>
-                  <div class="row-small-gutter">
-                    <div class="col-sm-6">
-                        <label class="checkbox-inline" for="galactic-label"><input class="map-overlay lines" type="checkbox" value="" id="galactic" checked>Galactic</label>
-                    </div>
-                    <div class="col-sm-5">
-                        <label class="checkbox-inline" for="supergalactic-label"><input class="map-overlay lines" type="checkbox" id="supergalactic" value="">Supergalactic</label>
-                    </div>
-                  </div>
-                  <div style="margin-top:50px">
-                    <label for="name">Overlays:</label>
-                  </div>
-                  <div class="row-small-gutter">
-                    <div class="col-sm-6">
-                        <label class="checkbox-inline"><input class="map-overlay popup" type="checkbox" id="tooltip" value="" checked>Source Info</label>
-                    </div>
-                    <div class="col-sm-5">
-                        <label class="checkbox-inline" id="lines-ecliptic-show"><input class="map-overlay lines" type="checkbox" value="" id="graticule" checked>Grid Lines</label>
-                    </div>
-                  </div>
-                  <div class="row-small-gutter">
-                    <div class="col-sm-6">
-                        <label class="checkbox-inline"><input class="map-overlay data" type="checkbox" id="constellations" value="">Constellations</label>
-                    </div>
-                    <div class="col-sm-5">
-                        <label class="checkbox-inline"><input class="map-overlay data" type="checkbox" id="mw" value="">Milky Way</label>
-                    </div>                            
-                  </div>
-                  <div class="row-small-gutter">
-                    <div class="col-sm-6">
-                        <label class="checkbox-inline"><input class="map-overlay sun" type="checkbox" id="sun" checked value="">Sun</label>
-                    </div>
-                    <div class="col-sm-5">
-                        <label class="checkbox-inline"><input , class="map-overlay moon" type="checkbox" id="moon" value="">Moon</label>
-                    </div>                            
-                  </div>                  
-                  <div style="margin-top:70px">
-                    <label for="name">4FGL Marker Size:</label>
-                  </div>
-                  <div class="row-small-gutter">
-                    <div class="col-sm-6">
-                        <label class="checkbox-inline"><input class="map-overlap markersize" type="checkbox" id="marker_size_varindex" value="" checked>Variability Index</label>
-                    </div>
-                    <div class="col-sm-5">
-                        <label class="checkbox-inline" id="lines-ecliptic-show"><input class="map-overlap markersize" type="checkbox" value="" id="marker_size_sig">Significance</label>
-                    </div>
-                  </div>
-                  <div style="margin-top:30px">
-                    <label for="name">4FGL Source Options:</label>
-                  </div>
-                  <div class="row-small-gutter">
-                    <div class="col-sm-12">
-                        <label class="checkbox-inline"><input class="map-overlap show_only_variable" type="checkbox" id="show_only_variable_sources" value="" checked>Hide Non-Variable Sources</label>
-                    </div>
-                  </div>                  
-
-            </div>
-        </div>
-        <!-- Map options panel ends here -->       
-
-        <!-- Demographics panel start here -->   
-        <div class="panel panel-default">
-            <div class="panel-heading">
-                <h3 class="panel-title">Data Overlays</h3>
-            </div>
-            <!-- <div class="panel-body"> -->
-
-              <!-- List group -->
-            <ul class="list-group">
-                <li class="list-group-item">
-                        LAT Point Source Catalog (4FGL)<BR><small><a href="">Abdollahi et al. 2020</a> - 5523 Sources</small>
-                        <label class="switch" style="float:right; margin-top:-12px"><input id="4FGL_switch" type="checkbox" checked><span class="slider round primary"></span></label>
-                </li>                       
-                <li class="list-group-item">
-                        FAVA Flare Catalog (2FAV)<BR><small><a href="https://fermi.gsfc.nasa.gov/ssc/data/access/lat/fava_catalog/">Abdollahi et al. 2017</a> - 4309 Flares</small>
-                        <label class="switch" style="float:right; margin-top:-12px"><input id="2FAV_switch" type="checkbox"><span class="slider round red"></span></label>
-                </li>
-                <li class="list-group-item">
-                        2nd LAT GRB Catalog (2FLGC)<BR><small><a href="https://iopscience.iop.org/article/10.3847/1538-4357/ab1d4e/pdf">Ajello 2019</a> - 150 Detections</small>
-                        <label class="switch" style="float:right; margin-top:-12px"><input id='2FLGC_switch' type="checkbox"><span class="slider round green"></span></label>
-                </li>                                 
-                <li class="list-group-item">
-                        IceCube Neutrino Alerts<BR><small><a href="https://gcn.gsfc.nasa.gov/amon.html">GCN/AMON Notices</a> - 47 Events</small>
-                        <label class="switch" style="float:right; margin-top:-12px"><input id='IceCube_switch'  type="checkbox"><span class="slider round orange"></span></label>
-                </li>               
-
-            </ul>
-
-            <!-- </div> -->
-        </div>
         </div>
         <!-- sidebar ends here -->
 
@@ -5345,18 +5345,7 @@
                                     <label style="margin-right:5px; font-weight: normal !important;">Sun/Moon Date: </label>
                                     <input style="width:100px" type="value" id="input_sundate" class="form-control input sun date" value="">
                                 </div>
-<!--                                 <div class="form-group" style="margin-left:10px">
-                                    <div class="dropdown">
-                                        <button style="margin-left:5px; width:75px" class="btn btn-default btn dropdown-toggle date-format" type="button" data-toggle="dropdown">MJD <span class="caret"></span></button>
-                                        <ul class="dropdown-menu date-format" style="width:10px; margin-left:-80px;">
-                                            <li id="MJD" class="active"><a href="#" onclick="return false;">MJD</a></li>
-                                            <li id="MET"><a href="" onclick="return false;">MET</a></li>
-                                        </ul>
-                                    </div>
-                                </div> -->
-                                <!-- <div class="form-group" style="margin-left:10px">
-                                    <button type="submit" name="searchButton" id="search_button"  class="btn btn-primary">Search</button>
-                                </div> -->
+
                             </form>
                             </center>
                         </div>
@@ -5543,6 +5532,7 @@
             </div> <!-- /.modal-content -->
         </div> <!-- /.modal-dialog -->
     </div> <!-- /.modal -->  
+
 
 
 </body>

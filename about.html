@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <meta charset="utf-8">
+    <title>Fermi LAT Light Curve Repository</title>
+
+    <!-- jQuery -->
+    <script type="text/javascript" charset="UTF-8" src="./js/jquery-1.12.0.min.js"></script>
+
+    <!-- Bootstrap compiled and minified JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+    <!-- Chart.js -->
+    <script type="text/javascript" charset="UTF-8" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.4.0/Chart.min.js"></script>
+
+    <!-- Bootstrap compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+    <!-- Bootstrap Optional theme -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+
+    <!-- Reset css -->
+    <link rel="stylesheet" hrmouseef="./css/reset.css" type="text/css" />
+
+    <!-- NASA theme -->
+    <link rel="stylesheet" href="./css/NASA.css">
+    
+</head>
+
+
+<!-- custom css -->
+<style type="text/css">
+
+    p {  
+      text-indent: 2.0em;  
+    }  
+</style>
+
+<script>
+
+    var data_4FGL;
+    var classifications_4FGL;
+    var classifications_LRC
+    var colors = ['#0d47a1','#007E33', '#FF8800','#CC0000','#9933CC','#0d47a1','#00C851','#ffbb33','#ff4444','#aa66cc','#00695c','#2BBBAD','#3F729B']
+
+
+
+
+    function countSourceTypes() {
+
+        classifications_4FGL = {}
+        classifications_LCR = {}
+
+        console.log(data_4FGL.length)
+        for (var i=0, size=data_4FGL.length; i<size; i++) {
+
+            var key = data_4FGL[i].CLASS1
+            var variability_index = parseFloat(data_4FGL[i].Variability_Index)
+
+            // Convert all of the classification to upper case
+            key = key.toUpperCase();
+
+            if (key.length === 0) {
+                key = 'Unknown'
+            }
+
+            if (key in classifications_4FGL) {
+                classifications_4FGL[key] = classifications_4FGL[key] + 1
+            } else {
+                classifications_4FGL[key] = 1
+            }
+
+            if (variability_index >= 18.49) {
+
+                if (key in classifications_LCR) {
+                    classifications_LCR[key] = classifications_LCR[key] + 1
+                } else {
+                    classifications_LCR[key] = 1
+                }
+            }
+
+        }
+
+
+        console.log(classifications_4FGL)
+        console.log(classifications_LCR)
+
+
+    }
+
+
+    function get4FGLData() {
+
+        console.log('Querying the 4FGL database...')
+
+        // Setup the URL
+        URL = "queryDB.php?typeOfRequest=SourceList&catalog=4FGL&magicWord=130427A"; 
+
+        // Print out the final URL
+        console.log(URL);
+
+        // Perform an ajax request
+        $.ajax({url: URL, success: function(responseText){
+
+            // Get the data
+            try {
+                data_4FGL = JSON.parse(responseText);
+                console.log("4FGL data length = " + data_4FGL.length)
+            } catch (error) {
+                console.log('Error parsing query response.')
+                $('#main').hide()
+                return;
+            }
+
+            if (data_4FGL.length === 0) {
+                alert('Your search found no results!')
+                
+            } else {
+
+                console.log(data_4FGL)
+
+            }
+
+            countSourceTypes()
+
+            fillDoughnutPlots()
+
+
+        }});
+    }
+
+    function fillDoughnutPlots() {
+
+
+        try {
+            window.myDoughnut1.destroy();
+        } catch(err) {
+            //
+        }
+
+        // Create random data
+        var randomScalingFactor = function() {
+            return Math.round(Math.random() * 100);
+        };
+
+        // Configure the detector distribution plot
+        var config1 = {
+            type: 'doughnut',
+            data: {
+                datasets: [{
+                    data: Object.values(classifications_4FGL),
+                    // data: classificationOccurance,
+                    backgroundColor: colors,
+                    label: 'Dataset 1'
+                }],
+
+                labels: Object.keys(classifications_4FGL)
+                // labels: classificationsUnique
+            },
+            options: {
+                responsive: true,
+                legend: {
+                    display: true,
+                    position: 'bottom',                                 
+                    labels: { 
+                        fontSize: 12,
+                        boxWidth: 10,
+                        usePointStyle: false,
+                        fullWidth: false,
+                        fontFamily: 'Helvetica Neue',
+                        fontColor: '#333333'
+                    }
+                },
+                title: {
+                    display: true,
+                    text: '4FGL Classification Distribution',
+                    fontFamily: 'Helvetica Neue',
+                    fontColor: '#333333',
+                    fontSize: 14
+
+                },
+                animation: {
+                    animateScale: true,
+                    animateRotate: true
+                },
+                layout: {
+                    padding: {
+                        top: 0
+                    }
+                }
+            }
+        };
+
+        var config2 = {
+            type: 'doughnut',
+            data: {
+                datasets: [{
+                    data: Object.values(classifications_LCR),
+                    // data: classificationOccurance,
+                    backgroundColor: colors,
+                    label: 'Dataset 1'
+                }],
+
+                labels: Object.keys(classifications_LCR)
+            },
+            options: {
+                responsive: true,
+                legend: {
+                    display: true,
+                    position: 'bottom',                                 
+                    labels: { 
+                        fontSize: 12,
+                        boxWidth: 10,
+                        usePointStyle: false,
+                        fullWidth: false,
+                        fontFamily: 'Helvetica Neue',
+                        fontColor: '#333333'
+                    }
+                },
+                title: {
+                    display: true,
+                    text: 'LCR Classification Distribution',
+                    fontFamily: 'Helvetica Neue',
+                    fontColor: '#333333',
+                    fontSize: 14
+
+                },
+                animation: {
+                    animateScale: true,
+                    animateRotate: true
+                },
+                layout: {
+                    padding: {
+                        top: 0
+                    }
+                }
+            }
+        };
+
+
+        // Create the detector distribution plot
+        var ctx1 = document.getElementById('chart-area_1').getContext('2d');
+        window.myDoughnut1 = new Chart(ctx1, config1);
+
+        var ctx2 = document.getElementById('chart-area_2').getContext('2d');
+        window.myDoughnut2 = new Chart(ctx2, config2);
+    }
+
+
+    // Query the database when the page is finished loading
+    $(function() {
+
+
+        get4FGLData()
+
+        // countSourceTypes()
+
+        // Fill the doughnut plot
+        // fillDoughnutPlots();
+
+        
+
+
+    })
+
+
+</script>
+
+<body>
+
+
+    <!-- main starts here -->       
+    <div id="main" style="width:2000px;">    
+
+        <!-- Start NASA Container -->
+        <div id="nasa-container" style="margin:8px 0 0 10px">
+
+            <!-- Start NASA Banner -->
+            <div id="nasa-banner-plain">
+
+                <!-- Left - Logo -->
+                <div class="nasa-logo">
+                    <a href="http://www.nasa.gov/"><img src="http://fermi.gsfc.nasa.gov/ssc/inc/img/nasa_logo.gif" width="140" height="98" border="0" alt="NASA Logo"></a>
+                </div>
+            
+                <!-- Middle - Affiliations -->
+                <div id="nasa-affiliation">
+                    <h1><a href="http://www.nasa.gov/">National Aeronautics and Space Administration</a></h1>
+                    <h2><a href="http://www.nasa.gov/goddard">Goddard Space Flight Center</a></h2>
+                </div>
+                
+                <!-- Right - Search and Links -->
+                <div id="nasa-search-links">
+                    <div id="header-links">
+                        <a href="/ssc/">FSSC</a> &bull; <a href="http://heasarc.gsfc.nasa.gov/">HEASARC</a> &bull; <a href="http://science.gsfc.nasa.gov/">Sciences and Exploration</a>
+                    </div>
+                </div>
+
+            </div>
+            <!-- End NASA Banner -->
+        <!-- End NASA Container -->
+        </div>
+
+        <!-- LCR header starts here -->
+        <div style="margin-left:0px">
+            <div style="float: left; padding-top:12px; padding-left:25px"><img middle; style="width: 100%; height: 100%" src="./img/Fermi_Small.png"></div>
+            <div style="margin-left: 25px;padding-left: 75px; padding-bottom:20px; padding-top: 5px">
+                <H2>Fermi LAT Light Curve Repository (LCR)</H2>
+            </div>
+        </div>
+        <!-- Header ends here -->
+
+        <!-- sidebar start here -->
+        <div class="col-xs-2" style="width:330px; margin-left:10px; display:none">
+
+            <!-- Light Curve Generator start here -->       
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Source Demographics</h3>
+                 </div>
+                 <div class="panel-body" style="height:600px;">
+                    <center>
+                        <!-- Detector distribution plot beings here -->
+                        <div id="canvas-holder1" style="width:108%; padding:10px 0 0 0px; margin-left:-9px">
+                            <canvas id="chart-area_1"></canvas>
+                        </div>
+                        <!-- Detector distribution plot ends here -->
+
+                        <!-- Detector distribution plot beings here -->
+                        <div id="canvas-holder2" style="width:100%; padding:10px 0 0 0px">
+                            <canvas id="chart-area_2"></canvas>
+                        </div>
+                        <!-- Detector distribution plot ends here -->
+                    </center>
+                </div>
+            </div>
+            <!-- Light Curve Generator ends here -->    
+
+
+        </div>
+        <!-- sidebar ends here -->
+
+        <!-- Content panel starts here -->
+        <!-- <div class="col-xs-7" style="width:1330px; margin-left:-15px"> -->
+        <div class="col-xs-7" style="width:1650px; margin-left:10px">
+            <div class="panel panel-default">
+                <div class="panel-heading"><h3 class="panel-title">About the Light Curve Repository</div>
+
+                    <!-- <div style="width:400px; height:675px; float:right; border:1px solid #ddd; margin:5px 5px 5px 15px; border-radius: 4px;"> -->
+                    <div class="panel panel-default" style="width:450px; height:550px; float:right; margin:10px 10px 10px 15px;">
+                        <div class="panel-body">
+                            <img src="./img/4FGL_J0237.8+2848.jpg" width="100%">
+                            <B>Figure 1:</B> A model map for a single time bin of the region surrounding 4FGL J0237.8+2848, which contains 15 other variable sources within a 12 deg radius, highlighting the need to model all variable sources within the region surrounding the source of interest.
+                        </div>
+                    </div>
+
+                    <div style="margin:10px">
+
+                        <B>Motivation:</B><BR>
+
+                        The Fermi Large Area Telescope (LAT) Light Curve Repository (LCR) is a database of multi-cadence flux calibrated light curves for over 1300 sources deemed variable in the 10 year Fermi LAT point source (4FGL) catalog <a href="https://ui.adsabs.harvard.edu/abs/2020ApJS..247...33A/abstract">(Abdollahi et al. 2020)</a>.  The light curves hosted by the LCR cover the entire ongoing Fermi mission duration and include data binned at 3 day, 1 week, and 1 month intervals and are continually updated as new data becomes available. The high duty cycle and long-term monitoring of the gamma-ray sky has made the LAT an important tool in the study of time-domain astronomy, provided the identification and regular monitoring of thousands of transient and variable sources. The LCR is intended to serve as a resource to the time-domain and multi-messenger communities by allowing users to quickly search the LAT data to identify correlated variability and flaring emission episodes from gamma-ray sources. 
+
+                        <BR><BR>
+                        <B>Sample Selection:</B><BR>
+
+                        The LCR provides light curves for all sources in the 4FGL catalog that exhibit a variability index greater than 18.49, where the variability index can be thought of as a proxy to the average fractional variability with dF/F measured on timescales of 1 year. As defined in the 4FGL catalog, sources with a variability index greater than 18.48 over 12 intervals are estimated to have a < 1% chance of being a steady source. The resulting sample consists of 1327 sources, or roughly 26% of the 4FGL catalog. A vast majority of these sources are blazars, with flat spectrum radio quasars, BL Lacs, and blazars candidates of unknown type making up roughly 40%, 30%, and 24% of the repository sample respectively. Generating 3 day, 1 week, and 1 month light curves for each of these sources for over 11 years of data requires the analysis of over 2.7 million individual time bins.
+
+
+                        <BR><BR>
+                        <B>Analysis Technique:</B><BR>
+
+                        The characterization of LAT sources is typically performed using a maximum likelihood analysis (<a href="http://arxiv.org/abs/0902.1340">Abdo et al. 2009, ApJS, 183, 46</a>), in which a model describing the point sources and diffuse and isotropic gamma-ray emission in a given region of the sky are jointly optimized to best describe the observed count distribution.  The flux determinations in the light curves provided by the LCR are obtained by performing an <a href="https://fermi.gsfc.nasa.gov/ssc/data/analysis/scitools/likelihood_tutorial.html">unbinned likelihood</a> analysis, in which the full spatial and spectral information of each count is used in the maximum likelihood optimization.  The analysis is performed using the P8_SOURCE event selection over an energy range covering 100 MeV - 100 GeV.
+                        <BR>
+                        &nbsp&nbsp&nbsp&nbsp&nbsp Figure 1 shows a model map for a single time bin of the region surrounding 4FGL J0237.8+2848, which contains 15 other variable sources within a 12 deg radius (roughly correseponding to the <a href="https://www.slac.stanford.edu/exp/glast/groups/canda/lat_Performance.htm">95% LAT PSF</a> at 100 MeV). The source flux for each time bin is fit while simultaneously accounting for the flux variations from all of the other variable sources within the region of interest, which are left free to vary in the model of the region. An iterative fitting strategy, which varies the required fit tolerance, is also employed to minimize the number of bins in which the likelihood fit does not successfully convergence.  The resulting best fit flux determination (or upper limit) and spectral shape are reported by the LCR. 
+                        <BR>
+                        &nbsp&nbsp&nbsp&nbsp&nbsp For a relatively small number of counts, an <a href="https://fermi.gsfc.nasa.gov/ssc/data/analysis/scitools/likelihood_tutorial.html">unbinned likelihood</a> analysis can be performed rapidly, but as the number of counts increases, the time to perform the analysis can become prohibitive. This limitation becomes increasingly burdensome when the need arises to perform source characterization over a large number of time bins. <a href="https://fermi.gsfc.nasa.gov/ssc/data/analysis/scitools/binned_likelihood_tutorial.html">Binned likelihood</a> analysis can help alleviate some of these issues, but since information is lost when binning data, there exists a trade off between between the number of bins to use (e.g. computing time) and the accuracy of the final results. The LCR tackles the computational overhead by parallelizing the process of performing a full unbinned likelihood analysis. In order to produce a high cadence light curve over the entire lifetime of the mission in a reasonable amount of time, the LCR distributes the analysis of each light curve bin to a separate node in a computer cluster hosted at the SLAC National Accelerator Center. The parallelization allows for thousands of time bins to be analyzed simultaneously, with the net effect of drastically reducing the time it takes to generate mission duration light curves. Figure 2 shows the resulting 3-day light curve covering over 11 years of LAT data for the source 4FGL J0237.8+2848.
+
+                        <BR><BR>
+
+                        <!-- <div class="panel panel-default"> -->
+<!--                         <div>
+                            <center>
+                                <img src="./img/4FGL_J0237.8+2848_lc.jpg" width="65%">
+                                <BR>
+                                <B>Figure 2:</B> An example 3-day light curve covering over 11 years of LAT data for the source 4FGL J0237.8+2848 at the center of Figure 1.
+                            </center>
+                        </div> -->
+
+                        <div class="panel panel-default" style="width:1300px; height:425px; margin:10px 10px 10px 125px;">
+                            <div class="panel-body">
+                              <center>
+                                    <img src="./img/4FGL_J0237.8+2848_lc.jpg" width="90%">
+                                    <BR>
+                                    <B>Figure 2:</B> An example 3-day light curve covering over 11 years of LAT data for the source 4FGL J0237.8+2848 at the center of Figure 1.
+                                </center>
+                            </div>
+                        </div>
+
+                        <BR>
+                        <B>Analysis Details:</B><BR>
+
+                        <div style='margin-left:10px; margin-top:10px'>
+                            <table class="table table-striped table-bordered" style="width:500px;">
+                                <tr>
+                                    <td>Time bins</td>
+                                    <td>3 day, 1 week, and 1 month</td> 
+                                </tr>
+                                <tr>
+                                    <td>Energy bin</td>
+                                    <td>100 MeV - 100 GeV</td> 
+                                </tr>
+                                <tr>
+                                    <td>Event selection</td>
+                                    <td>P8_SOURCE</td> 
+                                </tr>
+                                <tr>
+                                    <td>Instrument response function</td>
+                                    <td>P8R3_SOURCE_V2</td> 
+                                </tr>
+                                <tr>
+                                    <td><a href="https://fermi.gsfc.nasa.gov/ssc/data/access/lat/BackgroundModels.html">Galactic interstellar emission model<a></td>
+                                    <td><a href="https://fermi.gsfc.nasa.gov/ssc/data/analysis/software/aux/4fgl/gll_iem_v06.fits">gll_iem_v06.fits</a></td> 
+                                </tr>
+                                <tr>
+                                    <td><a href="https://fermi.gsfc.nasa.gov/ssc/data/access/lat/BackgroundModels.html">Isotropic spectral template</a></td>
+                                    <td><a href="https://fermi.gsfc.nasa.gov/ssc/data/analysis/software/aux/iso_P8R3_SOURCE_V2.txt">iso_P8R3_SOURCE_V2</a></td> 
+                                </tr>
+                                <tr>
+                                    <td><a href="https://fermi.gsfc.nasa.gov/ssc/data/access/lat/8yr_catalog/">4FGL catalog</a></td>
+                                    <td><a href="https://fermi.gsfc.nasa.gov/ssc/data/access/lat/8yr_catalog/gll_psc_v20.fit">gll_psc_v20.fit</a></td> 
+                                </tr>
+                            </table>
+                        </div>
+
+                        <B>The Light Curve Repository versus the Fermi All-Sky Variability Analysis</B><BR>
+                        The LCR is based on the successful <a href="https://fermi.gsfc.nasa.gov/ssc/data/access/lat/FAVA/">Fermi All-sky Variability Analysis</a> (FAVA), which has been extremely effective at identifying transient sources in the LAT data. FAVA is a photometric technique that searches for flaring sources by comparing the observed flux from a region of the sky to the expected flux based on the observed long-term average emission collected over the course of the Fermi mission. This analysis has the advantage of being independent of any model for the diffuse gamma-ray emission and does make any assumptions about the spectral shape of the gamma-ray sources as is required in a traditional likelihood analysis. Although very effective at detecting flaring emission, FAVA is less effective for the long-term characterization of a source, especially for those near other variable sources.  Because of the large PSF of the LAT (as much as a 12° 95% containment radius at 100 MeV when using P8R3_SOURCE_V2) care must be taken in interpreting emission excesses at a particular location in the sky, as emission from a nearby flaring source will be detected over a large region of the sky. The LCR provides light curves generated through a full likelihood analysis of the source and surrounding region, providing calibrated flux and photon index measurements for each time bin that take into account variability from nearby sources.  Therefore, while FAVA is an effective flare detection method, the LCR is intended to be a resource for long baseline source characterization.
+
+                        <!-- <BR><BR> -->
+                        <!-- <B>Analysis Caveats:</B><span class="label label-danger" style="margin-left:5px">Important!</span><BR> -->
+                        <!-- It is important to remember that FAVA is a photometric technique.  Because of the large PSF of the LAT (as much as 12&deg; 95% containment radius at 100 MeV when using P8R3_SOURCE_V2) care must be taken in interpreting emission excesses at a particular location in the sky, as emission from a flaring source will be detected over a large region of the sky.  Therefore, users of the light curve generator are encouraged to consult the accompanying flare map to check the percise location of the flare associated with any excess emission found near the user's coordiantes of interest.   -->
+
+                        <BR><BR>
+                        <B>Credits:</B><BR>
+                        The LCR is currently maintained by Daniel Kocevski (NASA MSFC), with analysis assistance from Jean Ballet (CEA Saclay) and Benoit Lott (CNRS/IN2P3, Université de Bordeaux).  The website interface was designed by Daniel Kocevski, using the <a href="http://http://www.highcharts.com">Highcharts</a> and <a href="https://github.com/ofrohn/d3-celestial">D3-Celestial</a> javascript plotting libraries, and the <a href="http://getbootstrap.com">Bootstrap</a> toolkit.                          
+                        <BR><BR>                        
+                        <B>Further Reading:</B><BR>
+                        <a href="https://iopscience.iop.org/article/10.3847/1538-4365/ab6bcb">Fermi Large Area Telescope Fourth Source Catalog</a> -  <i>Abdollahi et al. 2020, ApJS, 247, 33A </i><BR>
+                        <a href="https://fermi.gsfc.nasa.gov/ssc/data/analysis/documentation/Cicerone/">The Fermi LAT Cicerone</a> - <i>Abdollahi et al. 2017 ApJ, 846 34</i><BR>
+
+                        <a href="https://fermi.gsfc.nasa.gov/ssc/data/analysis/scitools/likelihood_tutorial.html">An Unbinned Likelihood Tutorial</a> - A full tutorial on the use of unbinned likelihood analysis to analyze Fermi LAT data. 
+                    </div>                        
+                </div>  
+
+            </div>
+        </div>
+        <!-- Content panel ends here --> 
+
+        <!-- </div> -->
+
+         <!-- footer starts here --> 
+        <div class="col-md-12" id="footer">
+            <div id="footer-content">
+                <p>
+                    <hr>
+                    Fermi LAT Light Curve Repository - Support Contact:<a href="mailto:daniel.kocevski@nasa.gov"> Daniel Kocevski</a>
+                    <BR>
+                    <BR>
+                </p>
+            </div>
+        </div>
+        <!-- footer ends here -->
+    </div>
+    <!-- Main ends here -->
+
+
+</body>
+</html>
+
