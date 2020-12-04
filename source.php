@@ -1970,7 +1970,35 @@
 			    </div>
 				<!-- Download panel ends here -->
 
+	            <!-- Related resources start here -->      
+	            <div class="panel panel-default" style="height: 225px;">
+	                <div class="panel-heading">
+	                    <h3 class="panel-title">Related Resources</h3>
+	                 </div>
+	                    <center>
+	                        <table class="table table-striped">
+	                        <!-- <table class="table"> -->
+	                          <tbody>           
+	                                <tr><td><a href="https://fermi.gsfc.nasa.gov/ssc/">The Fermi Science Support Center</a></td></tr>
+	                                <tr><td><a href="https://fermi.gsfc.nasa.gov/ssc/data/access/lat/FAVA/">Fermi All-Sky Variability Analysis (FAVA)</a></td></tr>           
+	                                <tr><td><a href="https://fermi.gsfc.nasa.gov/ssc/data/analysis/scitools/">Fermi LAT & GBM Analysis Tutorials</a></td></tr>
+	                                <tr><td><a href="https://fermi.gsfc.nasa.gov/ssc/data/access/">Fermi LAT & GBM Data Access</a></td></tr>
+	                                <tr><td><a href="about.html">About the Light Curve Repository</a></td></tr>      
+	                          </tbody>
+	                        </table>  
+	                    </center>
+	            </div>
+	            <!-- Related resources ends here -->   
 
+	            <!-- Citation request start here -->    
+	            <div class="panel panel-default">   
+	                <div class="panel-heading">
+	                    Please reference <a href="">Kocevski et al. 2020</a> for use of any results presented in the Fermi LAT Light Curve Repository.
+	                </div>
+	            </div>
+	            <!--  Citation request ends here -->   
+
+            
 			</div>
 			<!-- sidebar ends here -->
 
