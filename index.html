@@ -1899,7 +1899,7 @@
                     var left_percentage = 100 * (mjd-mjd_min)/(mjd_max-mjd_min) 
                     left_percentage = left_percentage.toFixed(2)
 
-                    var html_data = '<span class="irs-grid-pol IceCube" style="left:' + left_percentage + '%; background-color:rgb(215,120,18, 1); width:1.25px; height:200px; top:50px"</span>'
+                    var html_data = '<span class="irs-grid-pol IceCube" style="left:' + left_percentage + '%; background-color:rgb(215,120,18, 1); width:1.25px; height:200px; top:50px; position:absolute; z-index:100"</span>'
                     $('.irs-line').append(html_data)
 
                 }
@@ -1917,7 +1917,7 @@
                     var left_percentage = 100 * (met-MET_min)/(MET_max-MET_min) 
                     left_percentage = left_percentage.toFixed(2)
 
-                    var html_data = '<span class="irs-grid-pol 2FLGC" style="left:' + left_percentage + '%; background-color:rgb(57,142,68, 1); width:1.25px; height:200px; top:50px"</span>'
+                    var html_data = '<span class="irs-grid-pol 2FLGC" style="left:' + left_percentage + '%; background-color:rgb(57,142,68, 1); width:1.25px; height:200px; top:50px; position:absolute; z-index:101"</span>'
                     $('.irs-line').append(html_data)
 
                 }
@@ -1968,7 +1968,7 @@
 
                     var width = 1.90625
                     var width = 2.75
-                    var html_data = '<span class="irs-grid-pol 2FAV" style="display:block;left:' + left_percentage + '%; background-color:rgb(233,165,166,1); width:' + width + 'px; height:200px; top:' + top_margin + 'px"</span>'
+                    var html_data = '<span class="irs-grid-pol 2FAV" style="display:block;left:' + left_percentage + '%; background-color:rgb(233,165,166,1); width:' + width + 'px; height:200px; top:' + top_margin + 'px; position:absolute; z-index:99"</span>'
                     $('.irs-line').append(html_data)
 
                 }
