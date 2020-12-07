@@ -3552,9 +3552,8 @@
                                     var ASSOC1 = point.ASSOC1
 
                                     var data_subdirectory = point.Source_Name.substring(6,8)
-                                    // var catalog_source_name = point.Source_Name.replace('-','m').replace('.','d').replace(' ','_').replace('+','p')
-                                    var catalog_source_name = point.Source_Name.replace(' ','_')
-
+                                    var catalog_source_name = point.Source_Name.replace('-','m').replace('.','d').replace(' ','_').replace('+','p')
+                                   
                                     var link_spectrum_4FGL = "./data/4FGL/4FGL-DR2_spec_v23/" + data_subdirectory + '/' + catalog_source_name + '_spec.pdf'
                                     var link_lightcurve_4FGL = "./data/4FGL/4FGL-DR2_flux_v23/" + data_subdirectory + '/' + catalog_source_name + '_lc.pdf'
                                     var link_lightcurves_LCR = "./source.php?source_name=" + catalog_source_name
