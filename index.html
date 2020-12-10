@@ -2559,6 +2559,7 @@
             table_columns = ['GCNNAME', 'GRBDATE', 'GRBMET', 'RA', 'DEC', 'ERR', 'GBMT90', 'LIKE_BEST_TS_GRB', 'LIKE_BEST_FLUX_ENE', 'LIKE_BEST_FLUENCE_ENE']
 
             var number_of_displayed_sources = 0
+            var number_of_offline_notices = 0
 
             // Loop through each data entry and add columns to the corresponding row entry
             for (var i=0, size=data.length; i<size; i++) {
@@ -2579,12 +2580,17 @@
                             var gcnname = source[key]
 
                             if (gcnname.includes('A') === false && gcnname.includes('B') === false && gcnname.includes('C') === false) {
-                                gcnname = parseInt(source[key]).toString()
-                                gcnname = '0' + gcnname 
+                                                                
+                                if (parseInt(source[key]) < 91128) {
+                                    gcnname = parseInt(source[key]).toString()
+                                    gcnname = '0' + gcnname
+                                }
                             }       
 
+                            var link = 'https://gcn.gsfc.nasa.gov/other/' + gcnname + '.gcn3'
+
                             row[++j] ='<td class="' + key + '" style="text-align: center;">';
-                            row[++j] = '<a href=#>' + 'GRB ' + gcnname + '</a>';
+                            row[++j] = '<a href="' + link + '">' + 'GRB ' + gcnname + '</a>';
 
                         } else if (key === 'Date') {
 
@@ -2594,12 +2600,23 @@
                         } else if (key === 'GBMT90' || key === 'LIKE_BEST_TS_GRB') {
 
                             row[++j] ='<td class="' + key + '" style="text-align: center;">';
-                            row[++j] = parseFloat(source[key]).toFixed(2); ;  
+
+                            if (source[key] != null) {
+                                row[++j] = parseFloat(source[key]).toFixed(2);
+                            } else {
+                                row[++j] = null;
+                                number_of_offline_notices = number_of_offline_notices + 1
+                            } 
 
                         } else if (key === 'LIKE_BEST_FLUX_ENE' || key === 'LIKE_BEST_FLUENCE_ENE') {
 
                             row[++j] ='<td class="' + key + '" style="text-align: center;">';
-                            row[++j] = parseFloat(source[key]).toExponential(3);  
+
+                            if (source[key] != null) {
+                                row[++j] = parseFloat(source[key]).toExponential(3); 
+                            } else {
+                                row[++j] = null;
+                            }  
 
                         } else {
 
@@ -2629,6 +2646,10 @@
 
             // Update the table range display
             $('#table_range_2FLGC')[0].innerHTML = 'Showing ' + number_of_displayed_sources + ' of ' + data.length + ' Sources'
+
+            // Update the number of detections
+            $('#number_of_LAT_detections')[0].innerHTML = data.length
+
         }
 
        // Fill the 2FAV table
@@ -2718,6 +2739,8 @@
 
                     number_of_displayed_sources = number_of_displayed_sources + 1
 
+                } else {
+                    console.log('skipping ' + source)
                 }
             }
 
@@ -2732,7 +2755,10 @@
             $("#loadingSpinnerImage").hide();
 
             // Update the table range display
-            $('#table_range_IceCube')[0].innerHTML = 'Showing ' + number_of_displayed_sources+ ' of ' + data.length + ' Sources'
+            $('#table_range_IceCube')[0].innerHTML = 'Showing ' + number_of_displayed_sources + ' of ' + data.length + ' Sources'
+
+            // Update the number of detections
+            $('#number_of_icecube_detections')[0].innerHTML = data.length
 
         }
 
@@ -5299,11 +5325,12 @@
                             <label class="switch" style="float:right; margin-top:-12px"><input id="2FAV_switch" type="checkbox"><span class="slider round red"></span></label>
                     </li>
                     <li class="list-group-item">
-                            2nd LAT GRB Catalog (2FLGC)<BR><small><a href="https://iopscience.iop.org/article/10.3847/1538-4357/ab1d4e/pdf">Ajello 2019</a> - 150 Detections</small>
+                            2nd LAT GRB Catalog (2FLGC)<BR><small><a href="https://iopscience.iop.org/article/10.3847/1538-4357/ab1d4e/pdf">Ajello 2019</a>/<a href="https://gcn.gsfc.nasa.gov/fermi_grbs.html">GCN</a> - <span id=number_of_LAT_detections>150</span> Detections</small>
+                            <!-- <BR><small><a href="https://gcn.gsfc.nasa.gov/admin/fermi_lat_offline_announce.txt">GCN Notices</a><span id=number_of_offline_notices> - 0 Detections<span></small> -->
                             <label class="switch" style="float:right; margin-top:-12px"><input id='2FLGC_switch' type="checkbox"><span class="slider round green"></span></label>
                     </li>                                 
                     <li class="list-group-item">
-                            IceCube Neutrino Alerts<BR><small><a href="https://gcn.gsfc.nasa.gov/amon.html">GCN/AMON Notices</a> - 47 Events</small>
+                            IceCube Neutrino Alerts<BR><small><a href="https://gcn.gsfc.nasa.gov/amon.html">GCN/AMON Notices</a> - <span id=number_of_icecube_detections>47</span> Events</small>
                             <label class="switch" style="float:right; margin-top:-12px"><input id='IceCube_switch'  type="checkbox"><span class="slider round orange"></span></label>
                     </li>               
 
