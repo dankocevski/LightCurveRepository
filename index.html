@@ -3578,11 +3578,13 @@
                                     var ASSOC1 = point.ASSOC1
 
                                     var data_subdirectory = point.Source_Name.substring(6,8)
+                                    console.log(point.Source_Name)
                                     var catalog_source_name = point.Source_Name.replace('-','m').replace('.','d').replace(' ','_').replace('+','p')
-                                   
+                                    var source_name_url = point.Source_Name.replace(' ','_')
+
                                     var link_spectrum_4FGL = "./data/4FGL/4FGL-DR2_spec_v23/" + data_subdirectory + '/' + catalog_source_name + '_spec.pdf'
                                     var link_lightcurve_4FGL = "./data/4FGL/4FGL-DR2_flux_v23/" + data_subdirectory + '/' + catalog_source_name + '_lc.pdf'
-                                    var link_lightcurves_LCR = "./source.php?source_name=" + catalog_source_name
+                                    var link_lightcurves_LCR = "./source.php?source_name=" + source_name_url
                                     var link_lightcurves_FAVA = "https://fermi.gsfc.nasa.gov/ssc/data/access/lat/FAVA/LightCurve.php?ra=" + RAJ2000 + '&dec=' + DEJ2000
 
                                     var onclick_small_window = "onclick=\"window.open(this.href,'targetWindow','width=800px, height=650px'); return false;"
