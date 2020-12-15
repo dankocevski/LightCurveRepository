@@ -473,7 +473,7 @@
             }
 
             // Construct the query statement 
-            $queryStatement = 'SELECT Source_Name, ASSOC1, RAJ2000, DEJ2000, GLON, GLAT, Signif_Avg, Flux1000, Unc_Flux1000, Energy_Flux100, Unc_Energy_Flux100, SpectrumType, PL_Index, LP_Index, PLEC_Index, Variability_Index, CLASS1 FROM Catalog_4FGL ' . $CLASSTYPE . $NAME ;
+            $queryStatement = 'SELECT Source_Name, ASSOC_FGL, ASSOC1, RAJ2000, DEJ2000, GLON, GLAT, Signif_Avg, Flux1000, Unc_Flux1000, Energy_Flux100, Unc_Energy_Flux100, SpectrumType, PL_Index, LP_Index, PLEC_Index, Variability_Index, CLASS1 FROM Catalog_4FGL ' . $CLASSTYPE . $NAME ;
 
             // Add the order by statement
             $queryStatement = $queryStatement . ' order by RAJ2000;';

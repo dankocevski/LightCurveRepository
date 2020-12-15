@@ -96,6 +96,27 @@
         pointer-events: none;
     }
 
+    #selection_locked {
+        border: solid;
+        border-radius: 15px;
+        border-width: 1px;
+        border-color: red;
+        background-color: red;
+/*        border-color: rgba(57, 66, 100, .80);
+        background-color: rgba(57, 66, 100, .80);*/
+        opacity: 0.25;
+        position: absolute;
+        height: 15px;
+        width: 15px;    
+        top: 100px;
+        visibility: hidden;
+        overflow: hidden;
+        overflow-x: hidden;
+        overflow-y: hidden;
+        pointer-events: none;
+    }
+
+
     /* The selection tool tip */
     #tooltip_map {
         border: solid;
@@ -366,6 +387,8 @@
         var row_selector_has_changed = false;
         var showSun = true
         var showMoon = false
+        var user_double_clicked = false
+        var lock_selection = false
 
         var months = {'1':'Jan', '2':'Feb', '3':'Mar', '4':'Apr', '5':'May', '6':'Jun', '7':'Jul', '8':'Aug', '9':'Sep', '10':'Oct', '11':'Nov', '12':'Dec'}
         // var months = {'1':'January', '2':'Feburary', '3':'March', '4':'April', '5':'May', '6':'June', '7':'July', '8':'August', '9':'September', '10':'October', '11':'November', '12':'December'}
@@ -918,7 +941,6 @@
                             } else {
                                 // var r = Math.pow(parseInt(source.Signif_Avg) * 1, 0.25)/1.25;
                                 var r = Math.pow(parseInt(source.Signif_Avg) * 0.2, 0.4);
-
                             }
 
 
@@ -933,7 +955,16 @@
 
                         if (Celestial.zoomBy() >= 16.0) {
                             Celestial.setTextStyle(labelStyle);
-                            Celestial.context.fillText(source.Source_Name, point[0] + r + 7.5, point[1] + r - 7.5);
+
+                            if ($("#marker_label_name")[0].checked === true) {
+                                Celestial.context.fillText(source.Source_Name, point[0] + r + 7.5, point[1] + r - 7.5);
+                            } else if ($("#marker_label_assoc")[0].checked === true) {
+                                Celestial.context.fillText(source.ASSOC1, point[0] + r + 7.5, point[1] + r - 7.5);
+                            } else if ($("#marker_label_class")[0].checked === true) {
+                                Celestial.context.fillText(source.CLASS1, point[0] + r + 7.5, point[1] + r - 7.5);
+                            } else if ($("#marker_label_3FGL")[0].checked === true) {
+                                Celestial.context.fillText(source.ASSOC_FGL, point[0] + r + 7.5, point[1] + r - 7.5);
+                            }
 
                         } 
 
@@ -3465,6 +3496,247 @@
             // get4FGLData()
         }
 
+        function findNearestSource(event) {
+
+            if (isMouseDown === false && isMapAnimating === false && show_tooltip === true) {
+
+                $(this).css('cursor', 'auto');
+
+                // Prevent default mouse behaviour
+                event.preventDefault();
+
+                // Get the canvas offset
+                var bounds = canvas.getBoundingClientRect()
+                var x_canvasOffset = bounds.left
+                var y_canvasOffset = bounds.top
+
+                // Get the mouse coordinates within the canvas
+                var x_mouseWithinCanvas = event.clientX - x_canvasOffset 
+                var y_mouseWithinCanvas = event.clientY - y_canvasOffset 
+                mouseCoordsWithinCanvas = [x_mouseWithinCanvas,y_mouseWithinCanvas];
+
+                // Get the offset between the relative and absolute mouse position within the page
+                var x_scrollOffset = event.pageX-event.clientX
+                var y_scrollOffset = event.pageY-event.clientY
+
+                // Define a custom selection offset
+                var x_customSelectionOffset = 29.5
+                var y_customSelectionOffset = 47.5
+
+                var i;
+                var distances = new Array();
+                
+                if (typeof points !== 'undefined') {
+
+                    for (i=0; i<points.length; i++) {
+
+                        var point = points[i]
+
+                        var distance = Math.sqrt( Math.pow(mouseCoordsWithinCanvas[0] - point.xCanvas, 2) + Math.pow(mouseCoordsWithinCanvas[1] - point.yCanvas, 2) );
+
+                        if (distance < 10 && point.active) {
+
+                            // Show the selection
+                            selection.style.visibility = "visible";
+                            selection.style.position = "absolute";   
+
+                            // selection.style.left = (point.xCanvas) + x_canvasOffset + x_scrollOffset - x_customSelectionOffset + "px";
+                            // selection.style.top = (point.yCanvas) + y_canvasOffset + y_scrollOffset - y_customSelectionOffset  + "px";
+                            selection.style.left = (point.xCanvas) + x_customSelectionOffset + "px";
+                            selection.style.top = (point.yCanvas)  + y_customSelectionOffset + "px"
+
+                            // Lock the selection if the user double clicked
+                            if (user_double_clicked === true) {
+                                lock_selection = true
+
+                                // Change the color of the selection
+                                // selection.style.borderColor = 'rgba(128, 0, 0, 1)'
+                                selection.style.borderColor = 'DarkRed'
+                                // selection.style.backgroundColor = 'rgba(128, 0, 0, 1)'
+                                selection.style.backgroundColor = 'transparent'
+                                selection.style.borderWidth = '2px'
+                                selection.style.opacity = "0.6"
+
+                            } else {
+
+
+                                lock_selection = false
+                            }
+
+                            // Check to see if a row element is selected. If so, de-select it.
+                            if ( (previousRowElement != null) && (!previousRowElement.is($(this))) ) {
+                                previousRowElement.css({ "background-color": previousRowBackgroundColor });
+                            }
+
+                            // Extact information from a 3FGL point
+                            if (point.catalog.includes('FGL')) {
+
+                                var Source_Name = point.Source_Name
+                                var RAJ2000 = point.RAJ2000.toFixed(2).toString()
+                                var DEJ2000 = point.DEJ2000.toFixed(2).toString()
+                                var CLASS1 = point.CLASS1
+                                var ASSOC1 = point.ASSOC1
+
+                                var data_subdirectory = point.Source_Name.substring(6,8)
+                                var catalog_source_name = point.Source_Name.replace('-','m').replace('.','d').replace(' ','_').replace('+','p')
+                                var source_name_url = point.Source_Name.replace(' ','_')
+
+                                var link_spectrum_4FGL = "./data/4FGL/4FGL-DR2_spec_v23/" + data_subdirectory + '/' + catalog_source_name + '_spec.pdf'
+                                var link_lightcurve_4FGL = "./data/4FGL/4FGL-DR2_flux_v23/" + data_subdirectory + '/' + catalog_source_name + '_lc.pdf'
+                                var link_lightcurves_LCR = "./source.php?source_name=" + source_name_url
+                                var link_lightcurves_FAVA = "https://fermi.gsfc.nasa.gov/ssc/data/access/lat/FAVA/LightCurve.php?ra=" + RAJ2000 + '&dec=' + DEJ2000
+
+                                var onclick_small_window = "onclick=\"window.open(this.href,'targetWindow','width=800px, height=650px'); return false;"
+                                var onclick_full_window = "onclick=\"window.open(this.href,'targetWindow'); return false;"
+
+                                var innerHTML =  point.Source_Name
+                                innerHTML =  innerHTML + '<BR>RA: ' + point.RAJ2000.toFixed(2).toString()
+                                innerHTML =  innerHTML + ', Dec: ' + point.DEJ2000.toFixed(2).toString()
+                                innerHTML =  innerHTML + '<BR>Variability Index: ' + parseFloat(point.Variability_Index).toFixed(2).toString()
+                                innerHTML =  innerHTML + '<BR>Classification: ' + point.CLASS1
+                                innerHTML =  innerHTML + '<BR>Association: ' + point.ASSOC1
+                                innerHTML =  innerHTML + '<BR><p></p><a href="' + link_lightcurve_4FGL + '"' + onclick_small_window + '">4FGL Light Curve</a>' 
+                                innerHTML =  innerHTML + ' | <a href="' + link_spectrum_4FGL + '"' + onclick_small_window + '">4FGL Spectrum</a>'
+
+                                // Add the LCR link
+                                if (parseFloat(point.Variability_Index) > 18.48) {
+                                    innerHTML =  innerHTML +'<BR><a href="' + link_lightcurves_LCR + '">LCR Light Curves</a>'
+                                } else {
+                                    innerHTML =  innerHTML +'<BR><font color="gray">LCR Light Curves</font>'
+                                }
+
+                                // Add the FAVA link
+                                innerHTML =  innerHTML + ' | <a href="' + link_lightcurves_FAVA + '"' + onclick_full_window + '"">FAVA Light Curves</a>'
+
+
+                                // Define a custom tooltip offset
+                                var x_customTooltipOffset = 95
+                                // var y_customTooltipOffset = 115
+                                var y_customTooltipOffset = 125
+
+                                // Show the tooltip
+                                tooltip_map.style.visibility = "visible";
+                                tooltip_map.innerHTML = innerHTML;
+                                tooltip_map.style.left = (point.xCanvas) - x_customTooltipOffset + "px";
+                                tooltip_map.style.top = (point.yCanvas) - y_customTooltipOffset + "px";
+
+
+                            // Extact information from a 3FGL point
+                            } else if (point.catalog.includes('IceCube')) {
+
+                                var energy
+                                if (point.ENERGY === null) {
+                                    energy = ""
+                                } else {
+                                    energy = point.ENERGY + ' TeV'
+                                }
+
+                                var innerHTML =  point.NOTICE_TYPE
+                                innerHTML =  innerHTML + '<BR>Date: ' + point.DISCOVERY_DATE + ' Time: ' + point.DISCOVERY_TIME
+                                innerHTML =  innerHTML + '<BR>RA: ' + point.SRC_RA.toFixed(2).toString()
+                                innerHTML =  innerHTML + ', Dec: ' + point.SRC_DEC.toFixed(2).toString()
+                                innerHTML =  innerHTML + '<BR>Error: ' + (point.SRC_ERROR/60.).toFixed(2).toString() + ' deg'
+                                innerHTML =  innerHTML + '<BR>Energy: ' + energy
+                                innerHTML =  innerHTML + '<BR>Link: ' + '<a href="' + point.URL + '">' + point.URL.split('/')[4] + '</a>'
+
+                                // Define a custom tooltip offset
+                                var x_customTooltipOffset = 75
+                                var y_customTooltipOffset = 105
+
+                                // Show the tooltip
+                                tooltip_map.style.visibility = "visible";
+                                tooltip_map.innerHTML = innerHTML;
+                                tooltip_map.style.left = (point.xCanvas) - x_customTooltipOffset + "px";
+                                tooltip_map.style.top = (point.yCanvas) - y_customTooltipOffset + "px";
+
+                            } else if (point.catalog.includes('2FLGC')) {
+
+                                var innerHTML =  'GRB ' + point.GCNNAME
+                                innerHTML =  innerHTML + '<BR>Date: ' + point.GRBDATE.split(' ')[0] + ' Time: ' + point.GRBDATE.split(' ')[1]
+                                innerHTML =  innerHTML + '<BR>RA: ' + point.RA.toFixed(2).toString()
+                                innerHTML =  innerHTML + ', Dec: ' + point.DEC.toFixed(2).toString()
+                                innerHTML =  innerHTML + '<BR>Error: ' + (point.ERR).toString() + ' deg'
+                                // innerHTML =  innerHTML + '<BR>Event Number: ' + point.EVENT_NUM
+                                innerHTML =  innerHTML + '<BR>TS: ' + parseFloat(point.LIKE_BEST_TS_GRB).toFixed(2).toString()
+                                innerHTML =  innerHTML + '<BR>Link: ' + '<a href="' + '#' + '">' + 'GRB ' + point.GRBNAME + '</a>'
+
+                                // Define a custom tooltip offset
+                                var x_customTooltipOffset = 75
+                                var y_customTooltipOffset = 105
+
+                                // Show the tooltip
+                                tooltip_map.style.visibility = "visible";
+                                tooltip_map.innerHTML = innerHTML;
+                                tooltip_map.style.left = (point.xCanvas) - x_customTooltipOffset + "px";
+                                tooltip_map.style.top = (point.yCanvas) - y_customTooltipOffset + "px";
+
+                            } else if (point.catalog.includes('2FAV')) {
+
+                                var week_number = point.flareID.split("_")[0]
+                                var flare_number = point.flareID.split("_")[1]
+                                var link = "https://fermi.gsfc.nasa.gov/ssc/data/access/lat/FAVA/SourceReport.php?week=" + week_number + "&flare=" + flare_number
+
+                                var innerHTML =  'FAVA ' + week_number + '_' + flare_number
+                                innerHTML =  innerHTML + '<BR>Date: ' + point.dateStart
+                                innerHTML =  innerHTML + '<BR>RA: ' + parseFloat(point.best_ra).toFixed(2).toString()
+                                innerHTML =  innerHTML + ', Dec: ' + parseFloat(point.best_dec).toFixed(2).toString()
+                                innerHTML =  innerHTML + '<BR>Error: ' + parseFloat(point.best_r95).toString() + ' deg'
+                                innerHTML =  innerHTML + '<BR>Link: <a href="' + link + '">FAVA Source Report</a>'
+
+                                // Define a custom tooltip offset
+                                var x_customTooltipOffset = 55
+                                var y_customTooltipOffset = 95
+
+                                // Show the tooltip
+                                tooltip_map.style.visibility = "visible";
+                                tooltip_map.innerHTML = innerHTML;
+                                tooltip_map.style.left = (point.xCanvas) - x_customTooltipOffset + "px";
+                                tooltip_map.style.top = (point.yCanvas) - y_customTooltipOffset + "px";
+
+                            }
+
+
+                        } 
+                    }  
+                }
+            }
+
+            // Get the canvas offset
+            var bounds = canvas.getBoundingClientRect()
+            var x_canvasOffset = bounds.left
+            var y_canvasOffset = bounds.top
+            
+            // Get the mouse coordinates within the canvas
+            var x_mouseWithinCanvas = event.clientX - x_canvasOffset
+            var y_mouseWithinCanvas = event.clientY - y_canvasOffset 
+
+            // Define a custom selection offset
+            var x_customSelectionOffset = 7.5
+            var y_customSelectionOffset = 7.5
+
+            // Get the coordinates associated with the current mouse position
+            coordinates_projection = Celestial.mapProjection.invert([x_mouseWithinCanvas, y_mouseWithinCanvas]);
+
+            var radec_coordinates;
+            if (typeof coordinates_projection !== 'undefined') {
+
+                if (config.transform.includes('galactic')) {
+                    coordinates = astrojs.coords.galactic2equatorial(coordinates_projection[0],coordinates_projection[1]);
+                    radec_coordinates = [coordinates.ra, coordinates.dec]
+                } else {
+                    radec_coordinates = coordinates_projection
+                }
+
+                $("#cursor_coordinates")[0].innerHTML = "RA: " + radec_coordinates[0].toFixed(2) + ", Dec: " + radec_coordinates[1].toFixed(2)
+            } else {
+
+                $("#cursor_coordinates")[0].innerHTML = "RA: --, Dec: --"
+
+                tooltip_map.style.visibility = "hidden";
+                selection.style.visibility = "hidden";                    
+            }
+        };
+
         // Query the database when the page is finished loading
         $(function() {
 
@@ -3499,249 +3771,62 @@
             canvas.id = "map_canvas"
 
             canvas.onmousedown = function(event) {
-                selection.style.visibility = "hidden";
-                tooltip_map.style.visibility = "hidden";
                 isMouseDown = true;
             }
 
             canvas.onmouseup = function(event) {
 
                 isMouseDown = false;
+
+                // Hide the selection and tooltip and reset the locking variables
+                if (lock_selection === true) {
+                    selection.style.visibility = "hidden";
+                    tooltip_map.style.visibility = "hidden";
+
+                    selection.style.borderColor = 'rgba(57, 66, 100, .80)'
+                    selection.style.backgroundColor = 'rgba(57, 66, 100, .80)'
+                    selection.style.borderWidth = '1px'
+                    selection.style.opacity = "0.25"
+
+                    user_double_clicked = false
+                    lock_selection = false
+                }
             };           
 
             canvas.addEventListener('wheel',function(event){
-                event.preventDefault();
+                // event.preventDefault();
                 selection.style.visibility = "hidden";
                 tooltip_map.style.visibility = "hidden";
             }, false);
 
+            // Display the tooltip for sources under the mouse coordintes
             canvas.onmousemove = function(event) {
 
-                if (isMouseDown === false && isMapAnimating === false && show_tooltip === true) {
-
-                    $(this).css('cursor', 'auto');
-
-                    // Prevent default mouse behaviour
-                    event.preventDefault();
-
-                    // Get the canvas offset
-                    var bounds = canvas.getBoundingClientRect()
-                    var x_canvasOffset = bounds.left
-                    var y_canvasOffset = bounds.top
-
-                    // Get the mouse coordinates within the canvas
-                    var x_mouseWithinCanvas = event.clientX - x_canvasOffset 
-                    var y_mouseWithinCanvas = event.clientY - y_canvasOffset 
-                    mouseCoordsWithinCanvas = [x_mouseWithinCanvas,y_mouseWithinCanvas];
-
-                    // Get the offset between the relative and absolute mouse position within the page
-                    var x_scrollOffset = event.pageX-event.clientX
-                    var y_scrollOffset = event.pageY-event.clientY
-
-                    // Define a custom selection offset
-                    var x_customSelectionOffset = 29.5
-                    var y_customSelectionOffset = 47.5
-
-                    var i;
-                    var distances = new Array();
+                // Lock the selection if the user double clicked
+                if ((user_double_clicked === true) && (lock_selection == false)) {
+                    user_double_clicked = false
+                }
                     
-                    if (typeof points !== 'undefined') {
-
-                        for (i=0; i<points.length; i++) {
-
-                            var point = points[i]
-
-                            var distance = Math.sqrt( Math.pow(mouseCoordsWithinCanvas[0] - point.xCanvas, 2) + Math.pow(mouseCoordsWithinCanvas[1] - point.yCanvas, 2) );
-
-                            if (distance < 10 && point.active) {
-
-                                // Show the selection
-                                selection.style.visibility = "visible";
-                                selection.style.position = "absolute";                          
-                                // selection.style.left = (point.xCanvas) + x_canvasOffset + x_scrollOffset - x_customSelectionOffset + "px";
-                                // selection.style.top = (point.yCanvas) + y_canvasOffset + y_scrollOffset - y_customSelectionOffset  + "px";
-                                selection.style.left = (point.xCanvas) + x_customSelectionOffset + "px";
-                                selection.style.top = (point.yCanvas)  + y_customSelectionOffset + "px"
-
-                                // Check to see if a row element is selected. If so, de-select it.
-                                if ( (previousRowElement != null) && (!previousRowElement.is($(this))) ) {
-                                    previousRowElement.css({ "background-color": previousRowBackgroundColor });
-                                }
-
-                                // Extact information from a 3FGL point
-                                if (point.catalog.includes('FGL')) {
-
-                                    var Source_Name = point.Source_Name
-                                    var RAJ2000 = point.RAJ2000.toFixed(2).toString()
-                                    var DEJ2000 = point.DEJ2000.toFixed(2).toString()
-                                    var CLASS1 = point.CLASS1
-                                    var ASSOC1 = point.ASSOC1
-
-                                    var data_subdirectory = point.Source_Name.substring(6,8)
-                                    var catalog_source_name = point.Source_Name.replace('-','m').replace('.','d').replace(' ','_').replace('+','p')
-                                    var source_name_url = point.Source_Name.replace(' ','_')
-
-                                    var link_spectrum_4FGL = "./data/4FGL/4FGL-DR2_spec_v23/" + data_subdirectory + '/' + catalog_source_name + '_spec.pdf'
-                                    var link_lightcurve_4FGL = "./data/4FGL/4FGL-DR2_flux_v23/" + data_subdirectory + '/' + catalog_source_name + '_lc.pdf'
-                                    var link_lightcurves_LCR = "./source.php?source_name=" + source_name_url
-                                    var link_lightcurves_FAVA = "https://fermi.gsfc.nasa.gov/ssc/data/access/lat/FAVA/LightCurve.php?ra=" + RAJ2000 + '&dec=' + DEJ2000
-
-                                    var onclick_small_window = "onclick=\"window.open(this.href,'targetWindow','width=800px, height=650px'); return false;"
-                                    var onclick_full_window = "onclick=\"window.open(this.href,'targetWindow'); return false;"
-
-                                    var innerHTML =  point.Source_Name
-                                    innerHTML =  innerHTML + '<BR>RA: ' + point.RAJ2000.toFixed(2).toString()
-                                    innerHTML =  innerHTML + ', Dec: ' + point.DEJ2000.toFixed(2).toString()
-                                    innerHTML =  innerHTML + '<BR>Variability Index: ' + parseFloat(point.Variability_Index).toFixed(2).toString()
-                                    innerHTML =  innerHTML + '<BR>Classification: ' + point.CLASS1
-                                    innerHTML =  innerHTML + '<BR>Association: ' + point.ASSOC1
-                                    innerHTML =  innerHTML + '<BR><p></p><a href="' + link_lightcurve_4FGL + '"' + onclick_small_window + '">4FGL Light Curve</a>' 
-                                    innerHTML =  innerHTML + ' | <a href="' + link_spectrum_4FGL + '"' + onclick_small_window + '">4FGL Spectrum</a>'
-
-                                    // Add the LCR link
-                                    if (parseFloat(point.Variability_Index) > 18.48) {
-                                        innerHTML =  innerHTML +'<BR><a href="' + link_lightcurves_LCR + '">LCR Light Curves</a>'
-                                    } else {
-                                        innerHTML =  innerHTML +'<BR><font color="gray">LCR Light Curves</font>'
-                                    }
-
-                                    // Add the FAVA link
-                                    innerHTML =  innerHTML + ' | <a href="' + link_lightcurves_FAVA + '"' + onclick_full_window + '"">FAVA Light Curves</a>'
-
-
-                                    // Define a custom tooltip offset
-                                    var x_customTooltipOffset = 95
-                                    // var y_customTooltipOffset = 115
-                                    var y_customTooltipOffset = 125
-
-                                    // Show the tooltip
-                                    tooltip_map.style.visibility = "visible";
-                                    tooltip_map.innerHTML = innerHTML;
-                                    tooltip_map.style.left = (point.xCanvas) - x_customTooltipOffset + "px";
-                                    tooltip_map.style.top = (point.yCanvas) - y_customTooltipOffset + "px";
-
-
-                                // Extact information from a 3FGL point
-                                } else if (point.catalog.includes('IceCube')) {
-
-                                    var energy
-                                    if (point.ENERGY === null) {
-                                        energy = ""
-                                    } else {
-                                        energy = point.ENERGY + ' TeV'
-                                    }
-
-                                    var innerHTML =  point.NOTICE_TYPE
-                                    innerHTML =  innerHTML + '<BR>Date: ' + point.DISCOVERY_DATE + ' Time: ' + point.DISCOVERY_TIME
-                                    innerHTML =  innerHTML + '<BR>RA: ' + point.SRC_RA.toFixed(2).toString()
-                                    innerHTML =  innerHTML + ', Dec: ' + point.SRC_DEC.toFixed(2).toString()
-                                    innerHTML =  innerHTML + '<BR>Error: ' + (point.SRC_ERROR/60.).toFixed(2).toString() + ' deg'
-                                    innerHTML =  innerHTML + '<BR>Energy: ' + energy
-                                    innerHTML =  innerHTML + '<BR>Link: ' + '<a href="' + point.URL + '">' + point.URL.split('/')[4] + '</a>'
-
-                                    // Define a custom tooltip offset
-                                    var x_customTooltipOffset = 75
-                                    var y_customTooltipOffset = 105
-
-                                    // Show the tooltip
-                                    tooltip_map.style.visibility = "visible";
-                                    tooltip_map.innerHTML = innerHTML;
-                                    tooltip_map.style.left = (point.xCanvas) - x_customTooltipOffset + "px";
-                                    tooltip_map.style.top = (point.yCanvas) - y_customTooltipOffset + "px";
-
-                                } else if (point.catalog.includes('2FLGC')) {
-
-                                    var innerHTML =  'GRB ' + point.GCNNAME
-                                    innerHTML =  innerHTML + '<BR>Date: ' + point.GRBDATE.split(' ')[0] + ' Time: ' + point.GRBDATE.split(' ')[1]
-                                    innerHTML =  innerHTML + '<BR>RA: ' + point.RA.toFixed(2).toString()
-                                    innerHTML =  innerHTML + ', Dec: ' + point.DEC.toFixed(2).toString()
-                                    innerHTML =  innerHTML + '<BR>Error: ' + (point.ERR).toString() + ' deg'
-                                    // innerHTML =  innerHTML + '<BR>Event Number: ' + point.EVENT_NUM
-                                    innerHTML =  innerHTML + '<BR>TS: ' + parseFloat(point.LIKE_BEST_TS_GRB).toFixed(2).toString()
-                                    innerHTML =  innerHTML + '<BR>Link: ' + '<a href="' + '#' + '">' + 'GRB ' + point.GRBNAME + '</a>'
-
-                                    // Define a custom tooltip offset
-                                    var x_customTooltipOffset = 75
-                                    var y_customTooltipOffset = 105
-
-                                    // Show the tooltip
-                                    tooltip_map.style.visibility = "visible";
-                                    tooltip_map.innerHTML = innerHTML;
-                                    tooltip_map.style.left = (point.xCanvas) - x_customTooltipOffset + "px";
-                                    tooltip_map.style.top = (point.yCanvas) - y_customTooltipOffset + "px";
-
-                                } else if (point.catalog.includes('2FAV')) {
-
-                                    var week_number = point.flareID.split("_")[0]
-                                    var flare_number = point.flareID.split("_")[1]
-                                    var link = "https://fermi.gsfc.nasa.gov/ssc/data/access/lat/FAVA/SourceReport.php?week=" + week_number + "&flare=" + flare_number
-
-                                    var innerHTML =  'FAVA ' + week_number + '_' + flare_number
-                                    innerHTML =  innerHTML + '<BR>Date: ' + point.dateStart
-                                    innerHTML =  innerHTML + '<BR>RA: ' + parseFloat(point.best_ra).toFixed(2).toString()
-                                    innerHTML =  innerHTML + ', Dec: ' + parseFloat(point.best_dec).toFixed(2).toString()
-                                    innerHTML =  innerHTML + '<BR>Error: ' + parseFloat(point.best_r95).toString() + ' deg'
-                                    innerHTML =  innerHTML + '<BR>Link: <a href="' + link + '">FAVA Source Report</a>'
-
-                                    // Define a custom tooltip offset
-                                    var x_customTooltipOffset = 55
-                                    var y_customTooltipOffset = 95
-
-                                    // Show the tooltip
-                                    tooltip_map.style.visibility = "visible";
-                                    tooltip_map.innerHTML = innerHTML;
-                                    tooltip_map.style.left = (point.xCanvas) - x_customTooltipOffset + "px";
-                                    tooltip_map.style.top = (point.yCanvas) - y_customTooltipOffset + "px";
-
-                                }
-
-
-                            } 
-                        }  
-                    }
+                if (lock_selection === false) {
+                    findNearestSource(event)
                 }
+            }
 
-                // Get the canvas offset
-                var bounds = canvas.getBoundingClientRect()
-                var x_canvasOffset = bounds.left
-                var y_canvasOffset = bounds.top
-                
-                // Get the mouse coordinates within the canvas
-                var x_mouseWithinCanvas = event.clientX - x_canvasOffset
-                var y_mouseWithinCanvas = event.clientY - y_canvasOffset 
-
-                // Define a custom selection offset
-                var x_customSelectionOffset = 7.5
-                var y_customSelectionOffset = 7.5
-
-                // Get the coordinates associated with the current mouse position
-                coordinates_projection = Celestial.mapProjection.invert([x_mouseWithinCanvas, y_mouseWithinCanvas]);
-
-                var radec_coordinates;
-                if (typeof coordinates_projection !== 'undefined') {
-
-                    if (config.transform.includes('galactic')) {
-                        coordinates = astrojs.coords.galactic2equatorial(coordinates_projection[0],coordinates_projection[1]);
-                        radec_coordinates = [coordinates.ra, coordinates.dec]
-                    } else {
-                        radec_coordinates = coordinates_projection
-                    }
-
-                    $("#cursor_coordinates")[0].innerHTML = "RA: " + radec_coordinates[0].toFixed(2) + ", Dec: " + radec_coordinates[1].toFixed(2)
-                } else {
-
-                    $("#cursor_coordinates")[0].innerHTML = "RA: --, Dec: --"
-
-                    tooltip_map.style.visibility = "hidden";
-                    selection.style.visibility = "hidden";                    
-                }
-            };
+            // Display the tooltip for source under the mouse double click
+            canvas.ondblclick = function(event) {
+                user_double_clicked = true;
+                findNearestSource(event)
+            }
 
             // Hide the tooltip and reset the coordinate display when moving out of the canvas
             $("#map_panel").on('mouseleave', function() {
-                tooltip_map.style.visibility = "hidden";
-                selection.style.visibility = "hidden";    
-                $("#cursor_coordinates")[0].innerHTML = "RA: --, Dec: --"
+
+                if (lock_selection === false) {
+                    tooltip_map.style.visibility = "hidden";
+                    selection.style.visibility = "hidden";    
+                    $("#cursor_coordinates")[0].innerHTML = "RA: --, Dec: --"
+                }
+
             });
 
             $("#search_button").on('click', function() {
@@ -4682,10 +4767,21 @@
             })
 
             // Add an event lister for the 4FGL marker size checkbox
-            $(".map-overlap.markersize").change(function() {
+            $(".map-overlay.markersize").change(function() {
                 
                 // Prevent more than one checkbox to be selected at any given time
-                $(".map-overlap.markersize").prop('checked', false);
+                $(".map-overlay.markersize").prop('checked', false);
+                $(this).prop('checked', true);
+
+                // Redraw the map
+                Celestial.redraw()
+            });
+
+            // Add an event lister for the 4FGL marker size checkbox
+            $(".map-overlay.markerlabel").change(function() {
+                
+                // Prevent more than one checkbox to be selected at any given time
+                $(".map-overlay.markerlabel").prop('checked', false);
                 $(this).prop('checked', true);
 
                 // Redraw the map
@@ -5289,18 +5385,36 @@
                       </div>
                       <div class="row-small-gutter">
                         <div class="col-sm-6">
-                            <label class="checkbox-inline"><input class="map-overlap markersize" type="checkbox" id="marker_size_varindex" value="" checked>Variability Index</label>
+                            <label class="checkbox-inline"><input class="map-overlay markersize" type="checkbox" id="marker_size_varindex" value="" checked>Variability Index</label>
                         </div>
                         <div class="col-sm-5">
-                            <label class="checkbox-inline" id="lines-ecliptic-show"><input class="map-overlap markersize" type="checkbox" value="" id="marker_size_sig">Significance</label>
+                            <label class="checkbox-inline" id="lines-ecliptic-show"><input class="map-overlay markersize" type="checkbox" value="" id="marker_size_sig">Significance</label>
                         </div>
                       </div>
                       <div style="margin-top:30px">
-                        <label for="name">4FGL Source Options:</label>
+                        <label>4FGL Marker Label:</label>
+                      </div>
+                      <div class="row-small-gutter">
+                        <div class="col-sm-6">
+                            <label class="checkbox-inline"><input class="map-overlay markerlabel" type="checkbox" id="marker_label_name" checked value="">4FGL Name</label>
+                        </div>
+                        <div class="col-sm-5">
+                            <label class="checkbox-inline" id="lines-ecliptic-show"><input class="map-overlay markerlabel" type="checkbox" value="" id="marker_label_assoc">Association</label>
+                        </div>
+                        <BR>
+                        <div class="col-sm-6">
+                            <label class="checkbox-inline"><input class="map-overlay markerlabel" type="checkbox" id="marker_label_3FGL" value="">3FGL Assoc</label>
+                        </div>
+                        <div class="col-sm-5">
+                            <label class="checkbox-inline" id="lines-ecliptic-show"><input class="map-overlay markerlabel" type="checkbox" value="" id="marker_label_class" >Classification</label>
+                        </div>
+                      </div>                      
+                      <div style="margin-top:30px">
+                        <label for="name">4FGL Marker Color:</label>
                       </div>
                       <div class="row-small-gutter">
                         <div class="col-sm-12">
-                            <label class="checkbox-inline"><input class="map-overlap show_only_variable" type="checkbox" id="show_only_variable_sources" value="" checked>Hide Non-Variable Sources</label>
+                            <label class="checkbox-inline" title="Changes the color of non-variabile sources to gray"><input class="map-overlap show_only_variable" type="checkbox" id="show_only_variable_sources" value="" checked><span>Gray Non-Variable Sources</label>
                         </div>
                       </div>                  
 

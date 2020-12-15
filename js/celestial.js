@@ -88,7 +88,10 @@ Celestial.display = function(config) {
 
   if (cfg.interactive) {
     canvas.call(zoom);
-    d3.select(parentElement).on('dblclick', function () { zoomBy(1.5625); return false; });
+    // d3.select(parentElement).on('dblclick', function () { zoomBy(1.5625); return false; });
+    // d3.select(parentElement).on('dblclick', function () { zoomBy(1); return false; });
+    canvas.attr("style", "cursor: default!important");
+
   } else {
     canvas.attr("style", "cursor: default!important");
   }
