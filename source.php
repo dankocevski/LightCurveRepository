@@ -1991,7 +1991,7 @@
 				<!-- Download panel start here -->		
 				<div id="DownloadPanel" class="panel panel-default">
 					<div class="panel-heading">
-				        <h3 class="panel-title">Data Export</h3>
+				        <h3 class="panel-title">Data Download</h3>
 				     </div>
 				     <div class="panel-body" style="height:105px">
 
