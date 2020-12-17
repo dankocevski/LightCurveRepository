@@ -1404,9 +1404,9 @@
 
             var flux_header
 			if (flux_type.includes('energy')) {
-				flux_header = 'Energy Flux [1-100 GeV]<BR>(MeV cm<sup>-2</sup> s<sup>-1</sup>)'
+				flux_header = 'Energy Flux [0.1-100 GeV]<BR>(MeV cm<sup>-2</sup> s<sup>-1</sup>)'
             } else {
-				flux_header = 'Photon Flux [1-100 GeV]<BR>(photons cm<sup>-2</sup> s<sup>-1</sup>)'
+				flux_header = 'Photon Flux [0.1-100 GeV]<BR>(photons cm<sup>-2</sup> s<sup>-1</sup>)'
             }
 
             // Create the header string
@@ -2063,7 +2063,7 @@
 								    <ul class="dropdown-menu ancillary-data">
                                 		<li id="photon_index" class="active"><a href="#">Photon Index</a></li>
                                 		<li id="ts"><a href="">TS</a></li>
-                                		<li id="fit_convergance"><a href="">Fit Convergance</a></li>
+                                		<li id="fit_convergance"><a href="">Convergance</a></li>
                                 		<li id="fit_tolerance"><a href="">Fit Tolerance</a></li>
 									</ul>
 								</div>
