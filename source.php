@@ -148,6 +148,8 @@
 		var flux_type_label
 		var flux_type
 
+		var URL_light_curve_data;
+
 		// var xaxis_type_label;
 
 		// Extending the addClass jquery function to accept a callback function
@@ -895,9 +897,9 @@
 			});
 
             if (flux_type.includes('photon')) {
-            	chart1.yAxis[0].setTitle({ text: "Photon Flux ( ph cm<sup>-2</sup> s<sup>-1</sup> )" });
+                    chart1.yAxis[0].setTitle({ text: "Photon Flux ( 0.1-100 GeV ph cm<sup>-2</sup> s<sup>-1</sup> )" });
             } else {
-            	chart1.yAxis[0].setTitle({ text: "Energy Flux ( MeV cm<sup>-2</sup> s<sup>-1</sup> )" });
+            	chart1.yAxis[0].setTitle({ text: "Energy Flux ( 0.1-100 GeV MeV cm<sup>-2</sup> s<sup>-1</sup> )" });
             }
             
 			// Reshow the plot
@@ -1307,12 +1309,12 @@
 		    var source_name_urlEncoded = encodeURIComponent(source_name);
 		    var magic_word_urlEncoded = encodeURIComponent(magic_word_submitted);
 
-	        var URL = "queryDB.php?typeOfRequest=lightCurveData&source_name=" + source_name_urlEncoded + '&cadence=' + cadence + '&flux_type=' + flux_type  + "&magicWord=" + magic_word_urlEncoded;
+	        URL_light_curve_data = "queryDB.php?typeOfRequest=lightCurveData&source_name=" + source_name_urlEncoded + '&cadence=' + cadence + '&flux_type=' + flux_type  + "&magicWord=" + magic_word_urlEncoded;
 
-	        console.log(URL);
+	        console.log(URL_light_curve_data);
 
 	        // Get the data
-			$.ajax({url: URL, success: function(responseText){
+			$.ajax({url: URL_light_curve_data, success: function(responseText){
 
 				// Parse the resulting json file
                 // data = JSON.parse(responseText);
@@ -1822,6 +1824,37 @@
 		        download_table_as_csv('data_table')
 		    });
 
+          // Light curve data plot selector
+          $('.dropdown-menu.data-download').on('click', 'li', function() {
+
+				event.preventDefault();
+
+              // Get the id of the button that was clicked
+              id = $(this).attr("id");
+              
+              if (id.includes('csv')) {
+				download_table_as_csv('data_table')
+              } else if (id.includes('json')) {
+				window.open(URL_light_curve_data,'_newtab');
+              } else {
+
+              	var dummy = document.createElement("textarea");
+              	document.body.appendChild(dummy);
+              	dummy.value = URL_light_curve_data;
+              	dummy.select();
+
+              	document.execCommand("copy");
+    			document.body.removeChild(dummy);
+
+    			alert('API link copied to clipboard:\r\n\r\n' + 'https://fermi.gsfc.nasa.gov/ssc/data/access/lat/LightCurveRepository/' + URL_light_curve_data)
+    			
+              }
+
+                                            
+
+
+          });
+          
 			// getCatalogData();
 			// getLightCurveData();
 		    
@@ -1958,18 +1991,28 @@
 				<!-- Download panel start here -->		
 				<div id="DownloadPanel" class="panel panel-default">
 					<div class="panel-heading">
-				        <h3 class="panel-title">Download</h3>
+				        <h3 class="panel-title">Data Export</h3>
 				     </div>
-				     <div class="panel-body">
+				     <div class="panel-body" style="height:105px">
 
-				     <center>
-						<button id="Download" style="margin:5px 0px 0px 2px" id="Download" class="btn btn-default" title="Download data" rel="nofollow"> Download Data</button>
-	              	</center>
+                        <BR>
+                         <center>
+                            <!-- <button id="Download" style="margin:5px 0px 0px 2px" id="Download" class="btn btn-default" title="Download data" rel="nofollow"> Download Data</button> -->
+
+                            <div class="btn-group" role="group">
+                                <button style="min-width:125px" class="btn btn-default dropdown-toggle data-download" type="button" data-toggle="dropdown">Select Format <span class="caret"></span></button>
+                                <ul class="dropdown-menu data-download">
+                                    <li id="download_csv"><a href="#">Download CSV</a></li>
+                                    <li id="download_json"><a href="#">Download JSON</a></li>
+                                    <li id="copy_api"><a href="#">Copy API Link</a></li>
+                                </ul>
+                            </div>
+                        </center>
 
 			      	</div>
 			    </div>
 				<!-- Download panel ends here -->
-
+                                                                            
 	            <!-- Related resources start here -->      
 	            <div class="panel panel-default" style="height: 225px;">
 	                <div class="panel-heading">
