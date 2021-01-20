@@ -1463,7 +1463,7 @@
 
                 	var photon_index = data['photon_index'][j_detections][1]
                 	var photon_index_error = photon_index - data['photon_index_error'][j_detections][1]
-                	photon_index_string = photon_index + ' &#177; ' + photon_index_error.toPrecision(2)
+                	photon_index_string = -photon_index + ' &#177; ' + Math.abs(photon_index_error.toFixed(2))
 
                 	j_detections = j_detections + 1
 
