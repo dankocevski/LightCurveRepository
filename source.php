@@ -962,7 +962,6 @@
                         }
                     }
                 }
-
             });
 
             if (flux_type.includes('photon')) {
@@ -1349,18 +1348,21 @@
 
                 if (spectrumType.includes('PowerLaw')) {
 
-                    var PL_Index = String(parseFloat(data[0]['PL_Index']).toPrecision(2))
+                    var PL_Index = String(-1*parseFloat(data[0]['PL_Index']).toPrecision(2))
                     var Unc_PL_Index = String(parseFloat(data[0]['Unc_PL_Index']).toPrecision(2)) 
 
                     document.getElementById('SpectralIndex_label1').innerHTML = 'Photon Index &Gamma;:'
                     document.getElementById('SpectralIndex1').innerHTML = PL_Index + ' &plusmn; ' + Unc_PL_Index
 
+                    // Set the ancillary data table y-axis label
+                    ancillary_data_label = 'Photon Index &Gamma;'
+
                 } else if  (spectrumType.includes('LogParabola')) {
 
-                    LP_Index = String(parseFloat(data[0]['LP_Index']).toPrecision(3))
+                    LP_Index = String(-1*parseFloat(data[0]['LP_Index']).toPrecision(3))
                     Unc_LP_Index = String(parseFloat(data[0]['Unc_LP_Index']).toPrecision(2)) 
 
-                    LP_beta = String(parseFloat(data[0]['LP_beta']).toPrecision(2))
+                    LP_beta = String(-1*parseFloat(data[0]['LP_beta']).toPrecision(2))
                     Unc_LP_beta = String(parseFloat(data[0]['Unc_LP_beta']).toPrecision(2)) 
 
                     document.getElementById('SpectralIndex_label1').innerHTML = 'Photon Index &alpha;:'
@@ -1369,13 +1371,21 @@
                     document.getElementById('SpectralIndex2').innerHTML = LP_beta + ' &plusmn; ' + Unc_LP_beta
                     $('#SpectralIndex_row2').show()
 
+                    // Set the ancillary data table y-axis label
+                    ancillary_data_label = 'Photon Index &alpha;'
+
+
                 } else if  (spectrumType.includes('PLSuperExpCutoff')) {
 
-                    PLEC_Index = String(parseFloat(data[0]['PLEC_Index']).toPrecision(2))
+                    PLEC_Index = String(-1*parseFloat(data[0]['PLEC_Index']).toPrecision(2))
                     Unc_PLEC_Index = String(parseFloat(data[0]['Unc_PLEC_Index']).toPrecision(2)) 
 
                     document.getElementById('SpectralIndex_label1').innerHTML = 'Photon Index &Gamma;:'
                     document.getElementById('SpectralIndex1').innerHTML = PLEC_Index + ' &plusmn; ' + Unc_PLEC_Index
+
+                    // Set the ancillary data table y-axis label
+                    ancillary_data_label = 'Photon Index 1;'
+
                 }
 
             }});
@@ -1719,9 +1729,10 @@
                     // var flux_error_string = flux_error.toExponential(2)
                     flux_string = flux + ' &#177; ' + flux_error.toExponential(2)
 
-                    var photon_index = data['photon_index'][j_detections][1]
-                    var photon_index_error = photon_index - data['photon_index_error'][j_detections][1]
-                    photon_index_string = photon_index + ' &#177; ' + photon_index_error.toPrecision(2)
+
+                	var photon_index = data['photon_index'][j_detections][1]
+                	var photon_index_error = photon_index - data['photon_index_error'][j_detections][1]
+                	photon_index_string = -photon_index + ' &#177; ' + Math.abs(photon_index_error.toFixed(2))
 
                     j_detections = j_detections + 1
 
