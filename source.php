@@ -1015,11 +1015,10 @@
 
             }
 
-
             fit_tolerance_keys = [1e-8, 1e-4, 1]
             fit_tolerance_distribution = [0,0,0,0]
 
-            fit_convergance_keys = [0, 1, 2, 102]
+            fit_convergance_keys = [0, 1, 2, 101]
             fit_convergance_distribution = [0,0,0,0]
 
             ts_keys = ['Detections', 'Upper Limits']
@@ -1046,6 +1045,7 @@
                 for (var j = 0; j < fit_convergance_keys.length; j++) {
 
                     key = fit_convergance_keys[j]
+
                     if (value === key) {
                         fit_convergance_distribution[j] = fit_convergance_distribution[j] + 1
                     }
@@ -1053,25 +1053,9 @@
 
             }
 
-            // console.log(fit_tolerance_values)
+            // Fix the convergance keys to reflect 102 rather than 101
+            fit_convergance_keys = [0, 1, 2, 102]
 
-
-            // counts1 = {};
-            // counts2 = {};
-
-            // for (var i = 0; i < fit_tolerance.length; i++) {
-            //  var value1 = fit_tolerance[i];
-            //  var value2 = fit_convergance[i];
-            //  counts1[value1] = counts1[value1] ? counts1[value1] + 1 : 1;
-            //  counts2[value2] = counts2[value2] ? counts2[value2] + 1 : 1;
-            // }            
-
-            // var fit_tolerance_keys = Object.keys(counts1)
-            // var fit_convergance_keys = Object.keys(counts2)
-
-            // for (var i = 0; i < fit_tolerance_keys.length; i++) {
-            // var fit_tolerance_values = Object.values(counts1)
-            // var fit_convergance_values = Object.values(counts2)
 
 
             // var palette = ['#142850', '#27496d', '#0c7b93', '#00a8cc', '#26689d']
