@@ -31,11 +31,9 @@
         echo '<BR><B>Usage Examples:</B><BR>';
         echo 'queryDB.php?typeOfRequest=MapData&ra=0&dec=0&radius=12<BR>';
         return;
-
     } else if ((isset($_GET['typeOfRequest']) == true) and (isset($_GET['magicWord']) == false)) {
         echo "You didn't say the magic word"; 
         return;
-
     } else {
 
         // Determine the type of data requested
@@ -642,28 +640,46 @@
     // Return light curve data for one source
     if ($typeOfRequest === 'lightCurveData') { 
 
-            // Extract the url parameters
-            if (isset($_GET['source_name']) && (isset($_GET['cadence'])) && (isset($_GET['flux_type']))) { 
-                $source_name = $_GET['source_name']; 
-                $cadence = $_GET['cadence']; 
-                $flux_type = $_GET['flux_type']; 
+        // Extract the url parameters
+        if (isset($_GET['source_name']) && (isset($_GET['cadence'])) && (isset($_GET['flux_type']))) { 
+            $source_name = $_GET['source_name']; 
+            $cadence = $_GET['cadence']; 
+            $flux_type = $_GET['flux_type']; 
+            $index_type = $_GET['index_type']; 
+            $ts_min = floatval($_GET['ts_min']);
 
-                // $source_name = "'4FGL J0237.8+2848'";
-
-            } else {
-
-                echo '<BR><B>Usage Examples:</B><BR>';
-                echo 'queryDB.php?typeOfRequest=LightCurveData&source=&cadence=daily&cadence=photon';
-
-                return;
-            }
+            // if ($ts_min === 'ts4') {
+            //     $ts_min = 4
+            // } else if ($ts_min === 'ts3') {
+            //     $ts_min = 3
+            // } else if ($ts_min === 'ts2') {
+            //     $ts_min = 2
+            // } else if ($ts_min === 'ts1') {
+            //     $ts_min = 1
+            // }
 
             // $source_name = "'4FGL J0237.8+2848'";
-            // $cadence = "'daily'";
-            // $flux_type = "energy";
+            // $index_type = 'free';
 
-            // Construct the query statement
-            $queryStatement = 'SELECT tmin, tmax, ts, ' . $flux_type . '_flux, ' . $flux_type . '_flux_error, ' . $flux_type . '_flux_upper_limit, photon_index, photon_index_error, photon_index_alpha, photon_index_alpha_error, fit_tolerance, return_code, bin_id FROM lightcurve_data WHERE source_name == \'' . $source_name . '\' AND cadence == \'' . $cadence . '\' ORDER BY tmin ASC';
+        } else {
+
+            echo '<BR><B>Usage Examples:</B><BR>';
+            echo 'queryDB.php?typeOfRequest=LightCurveData&source=&cadence=daily&cadence=photon';
+
+            return;
+        }
+
+        // $source_name = "'4FGL J0237.8+2848'";
+        // $cadence = "'daily'";
+        // $flux_type = "energy";
+
+        // Construct the query statement
+        // $queryStatement = 'SELECT tmin, tmax, ts, ' . $flux_type . '_flux, ' . $flux_type . '_flux_error, ' . $flux_type . '_flux_upper_limit, photon_index, photon_index_error, photon_index_alpha, photon_index_alpha_error, fit_tolerance, return_code, bin_id FROM lightcurve_data WHERE source_name == \'' . $source_name . '\' AND cadence == \'' . $cadence . '\' ORDER BY tmin ASC';
+
+        if ($index_type === 'fixed') {
+
+            $queryStatement = 'SELECT tmin, tmax, ts, ' . $flux_type . '_flux, ' . $flux_type . '_flux_error, ' . $flux_type . '_flux_upper_limit, photon_index, photon_index_error, fit_tolerance, return_code, dlogl, EG, GAL, bin_id FROM lightcurve_data_v2 WHERE source_name == \'' . $source_name . '\' AND cadence == \'' . $cadence . '\' ORDER BY tmin ASC';
+
 
             if (isset($_GET['verbose'])) {
                 echo  $queryStatement;
@@ -671,7 +687,8 @@
             }
 
             // Establish the database connection
-            $db = new SQLite3('./db/lc_repository.db');
+            // $db = new SQLite3('./db/lc_repository.db');
+            $db = new SQLite3('./db/lc_repository_v2.db');
             $results = $db->query($queryStatement);
 
             // Create the data array to store the values
@@ -681,9 +698,12 @@
             $data['flux_upper_limits'] = array();
             $data['flux_error'] = array();
             $data['photon_index'] = array();
-            $data['photon_index_error'] = array();
+            $data['photon_index_error'] = array();           
             $data['fit_tolerance'] = array();
             $data['fit_convergance'] = array();
+            $data['dlogl'] = array();
+            $data['EG'] = array();
+            $data['GAL'] = array();
             $data['bin_id'] = array();
 
             // // Construct the flux keyword
@@ -704,13 +724,14 @@
                 }
 
                 // Photon flux
-                if ((empty($row['ts']) == FALSE) && (empty($row[$flux_key]) == FALSE)) {
+                if ((empty($row['ts']) == FALSE) && (empty($row[$flux_key]) == FALSE) && (floatval($row['ts']) >= $ts_min)) {
 
                     array_push($data['flux'], array($met, $row[$flux_key]));
+
                 }
 
                 // Photon flux error
-                if ((empty($row['ts']) == FALSE) && (empty($row[$flux_error_key]) == FALSE)) {
+                if ((empty($row['ts']) == FALSE) && (empty($row[$flux_error_key]) == FALSE) && (floatval($row['ts']) >= $ts_min)) {
 
                     $flux_error_max = floatval($row[$flux_key]) + floatval($row[$flux_error_key]);
                     $flux_error_min = floatval($row[$flux_key]) - floatval($row[$flux_error_key]);
@@ -719,17 +740,19 @@
                     $flux_error_min = sprintf("%0.2e", $flux_error_min);
 
                     array_push($data['flux_error'], array($met, $flux_error_min, $flux_error_max));
-                }                
+
+                }        
 
                 // Photon flux upper limit
-                else if ((empty($row['ts']) == FALSE) && (empty($row[$flux_upper_limit_key]) == FALSE)) {
+                if ((empty($row['ts']) == FALSE) && (empty($row[$flux_upper_limit_key]) == FALSE) && (floatval($row['ts']) < $ts_min)) {
 
                     $flux_upper_limit = sprintf("%0.2e", $row[$flux_upper_limit_key]);
                     array_push($data['flux_upper_limits'], array($met, $flux_upper_limit));
+
                 }
 
                 // Photon index and photon index error
-                if ((empty($row['ts']) == FALSE) && (empty($row['photon_index']) == FALSE)) {
+                if ((empty($row['ts']) == FALSE) && (empty($row['photon_index']) == FALSE) && (floatval($row['ts']) >= $ts_min)) {
 
                     // Photon index
                     $photon_index = sprintf("%0.2f", $row['photon_index']);
@@ -745,42 +768,34 @@
                     array_push($data['photon_index_error'], array($met, $index_error_max, $index_error_min));
                 }
 
-                // Photon index alpha and photon index alpha error
-                if ((empty($row['ts']) == FALSE) && (empty($row['photon_index_alpha']) == FALSE)) {
-
-                    // Photon index alpha
-                    $photon_index = sprintf("%0.2f", $row['photon_index_alpha']);
-                    array_push($data['photon_index'], array($met, $photon_index));
-
-                    // Photon index alpha error
-                    $index_error_max = floatval($row['photon_index_alpha']) + floatval($row['photon_index_alpha_error']);
-                    $index_error_min = floatval($row['photon_index_alpha']) - floatval($row['photon_index_alpha_error']);
-
-                    $index_error_max = sprintf("%0.2f", $index_error_max);
-                    $index_error_min = sprintf("%0.2f", $index_error_min);
-
-                    array_push($data['photon_index_error'], array($met, $index_error_max, $index_error_min));
-                }
-
                 // Fit Tolerance
                 if ((empty($row['ts']) == FALSE)) {
-
                     array_push($data['fit_tolerance'], array($met, $row['fit_tolerance']));
-
                 }
 
                 // Fit Convergance
                 if ((empty($row['ts']) == FALSE)) {
-
                     array_push($data['fit_convergance'], array($met, $row['return_code']));
-
                 }
-
 
                 // bin id
                 if (empty($row['ts']) == FALSE) {
-
                     array_push($data['bin_id'], $row['bin_id']);
+                }
+
+                // dlogl
+                if (empty($row['ts']) == FALSE) {
+                    array_push($data['dlogl'], $row['dlogl']);
+                }
+
+                // EG
+                if (empty($row['ts']) == FALSE) {
+                    array_push($data['EG'], $row['EG']);
+                }
+
+                // GAL
+                if (empty($row['ts']) == FALSE) {
+                    array_push($data['GAL'], $row['GAL']);
                 }
 
             }
@@ -797,13 +812,165 @@
             $data = str_replace('flux_upper_limits:', '"flux_upper_limits":', $data);
             $data = str_replace('flux_error:', '"flux_error":', $data);
             $data = str_replace('photon_index:', '"photon_index":', $data);
-            $data = str_replace('photon_index:', '"photon_index":', $data);
-            $data = str_replace('photon_index_error:', '"photon_index_error":', $data);
+            $data = str_replace('photon_index_error:', '"photon_index_error":', $data);          
             $data = str_replace('fit_tolerance:', '"fit_tolerance":', $data);
             $data = str_replace('fit_convergance:', '"fit_convergance":', $data);
             $data = str_replace('bin_id:', '"bin_id":', $data);
+            $data = str_replace('dlogl:', '"dlogl":', $data);
+            $data = str_replace('EG:', '"EG":', $data);
+            $data = str_replace('GAL:', '"GAL":', $data);
 
             echo $data;
+
+        }
+
+        if ($index_type === 'free') {
+
+            $queryStatement = 'SELECT tmin, tmax, ts2, ' . $flux_type . '_flux2, ' . $flux_type . '_flux_error2, ' . $flux_type . '_flux_upper_limit, photon_index2, photon_index_error2, fit_tolerance, return_code2,  dlogl, EG2, GAL2, bin_id FROM lightcurve_data_v2 WHERE source_name == \'' . $source_name . '\' AND cadence == \'' . $cadence . '\' ORDER BY tmin ASC';
+
+
+            if (isset($_GET['verbose'])) {
+                echo  $queryStatement;
+                echo "<BR><BR>";
+            }
+
+            // Establish the database connection
+            // $db = new SQLite3('./db/lc_repository.db');
+            $db = new SQLite3('./db/lc_repository_v2.db');
+            $results = $db->query($queryStatement);
+
+            // Create the data array to store the values
+            $data = array();
+            $data['ts'] = array();
+            $data['flux'] = array();
+            $data['flux_upper_limits'] = array();
+            $data['flux_error'] = array();
+            $data['photon_index'] = array();
+            $data['photon_index_error'] = array();           
+            $data['fit_tolerance'] = array();
+            $data['fit_convergance'] = array();
+            $data['dlogl'] = array();
+            $data['EG'] = array();
+            $data['GAL'] = array();            
+            $data['bin_id'] = array();
+
+            // // Construct the flux keyword
+            $flux_key = $flux_type . '_flux2';
+            $flux_error_key = $flux_type . '_flux_error2';
+            $flux_upper_limit_key = $flux_type . '_flux_upper_limit';
+
+            // Retrieve the data 
+            while ($row = $results->fetchArray(SQLITE3_ASSOC)) {
+
+                $met = (intval($row['tmin']) + intval($row['tmax']))/2.0;
+
+                // TS
+                if (empty($row['ts2']) == FALSE) {
+                    $ts = sprintf("%0.2f", $row['ts2']);
+
+                    array_push($data['ts'], array($met, $ts));
+                }
+
+                // Photon flux
+                if ((empty($row['ts2']) == FALSE) && (empty($row[$flux_key]) == FALSE) && (floatval($row['ts2']) >= $ts_min)) {
+
+                    array_push($data['flux'], array($met, $row[$flux_key]));
+                }
+
+                // Photon flux error
+                if ((empty($row['ts2']) == FALSE) && (empty($row[$flux_error_key]) == FALSE) && (floatval($row['ts2']) >= $ts_min)) {
+
+                    $flux_error_max = floatval($row[$flux_key]) + floatval($row[$flux_error_key]);
+                    $flux_error_min = floatval($row[$flux_key]) - floatval($row[$flux_error_key]);
+
+                    $flux_error_max = sprintf("%0.2e", $flux_error_max);
+                    $flux_error_min = sprintf("%0.2e", $flux_error_min);
+
+                    array_push($data['flux_error'], array($met, $flux_error_min, $flux_error_max));
+                }        
+
+                // Photon flux upper limit
+                if ((empty($row['ts2']) == FALSE) && (empty($row[$flux_upper_limit_key]) == FALSE) && (floatval($row['ts2']) < $ts_min)) {
+
+                    $flux_upper_limit = sprintf("%0.2e", $row[$flux_upper_limit_key]);
+                    array_push($data['flux_upper_limits'], array($met, $flux_upper_limit));
+                }
+
+                // Photon index and photon index error
+                if ((empty($row['ts2']) == FALSE) && (empty($row['photon_index2']) == FALSE) && (floatval($row['ts2']) >= $ts_min)) {
+
+                    // Photon index
+                    $photon_index = sprintf("%0.2f", $row['photon_index2']);
+                    array_push($data['photon_index'], array($met, $photon_index));
+
+                    // Photon index error
+                    $index_error_max = floatval($row['photon_index2']) + floatval($row['photon_index_error2']);
+                    $index_error_min = floatval($row['photon_index2']) - floatval($row['photon_index_error2']);
+
+                    $index_error_max = sprintf("%0.2f", $index_error_max);
+                    $index_error_min = sprintf("%0.2f", $index_error_min);
+
+                    array_push($data['photon_index_error'], array($met, $index_error_max, $index_error_min));
+                }
+
+                // Fit Tolerance
+                if (empty($row['ts2']) == FALSE) {
+                    array_push($data['fit_tolerance'], array($met, $row['fit_tolerance']));
+                }
+
+                // Fit Convergance
+                if ((empty($row['ts2']) == FALSE)) {
+                    array_push($data['fit_convergance'], array($met, $row['return_code2']));
+                }
+
+                // bin id
+                if (empty($row['ts2']) == FALSE) {
+                    array_push($data['bin_id'], $row['bin_id']);
+                }
+
+                // dlogl
+                if (empty($row['ts2']) == FALSE) {
+                    array_push($data['dlogl'], $row['dlogl']);
+                }
+
+                // EG
+                if (empty($row['ts2']) == FALSE) {
+                    array_push($data['EG'], $row['EG2']);
+                }
+
+                // GAL
+                if (empty($row['ts2']) == FALSE) {
+                    array_push($data['GAL'], $row['GAL2']);
+                }
+
+
+            }
+
+            // Encode the data into a json file
+            // echo json_encode($data);
+
+            // $data = json_encode($data);
+            // echo trim($data, '"'); 
+
+            $data = str_replace('"', '', json_encode($data));
+            $data = str_replace('{ts:', '{"ts":', $data);
+            $data = str_replace('flux:', '"flux":', $data);
+            $data = str_replace('flux_upper_limits:', '"flux_upper_limits":', $data);
+            $data = str_replace('flux_error:', '"flux_error":', $data);
+            $data = str_replace('photon_index:', '"photon_index":', $data);
+            $data = str_replace('photon_index_error:', '"photon_index_error":', $data);          
+            $data = str_replace('fit_tolerance:', '"fit_tolerance":', $data);
+            $data = str_replace('fit_convergance:', '"fit_convergance":', $data);
+            $data = str_replace('bin_id:', '"bin_id":', $data);
+            $data = str_replace('dlogl:', '"dlogl":', $data);
+            $data = str_replace('EG:', '"EG":', $data);
+            $data = str_replace('GAL:', '"GAL":', $data);
+
+            echo $data;
+
+        }
+
+
     }
 
     if ($typeOfRequest === 'sourceData') { 
