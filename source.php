@@ -106,29 +106,27 @@
        left: -9999em;
     }
 
-.tooltip{
-    opacity: 1;
+    .tooltip{
+        opacity: 1;
 
-}
+    }
 
-.tooltip-inner {
-    color: white;
-    background: #00468b;
-    opacity: 1;
+    .tooltip-inner {
+        color: white;
+        background: #00468b;
+        opacity: 1;
 
-}
+    }
 
-.tooltip.top .tooltip-arrow{
-    bottom:0;
-    left:50%;
-    margin-left:-5px;
-    border-left:5px solid transparent;
-    border-right:5px solid transparent;
-    border-top:5px solid #00468b
-}
+    .tooltip.top .tooltip-arrow{
+        bottom:0;
+        left:50%;
+        margin-left:-5px;
+        border-left:5px solid transparent;
+        border-right:5px solid transparent;
+        border-top:5px solid #00468b
+    }
 
-
-}
 
 </style>
 
@@ -146,6 +144,7 @@
         var colors;
         var catalog;
         var magic_word_submitted;
+        var passphrase;
         
         var chart1;
         var chart2;
@@ -1764,11 +1763,11 @@
         function checkCookie() {
             
             // Check if the cookie contains the passphrase data
-            passphrase = getCookieData("passphrase");
+            // passphrase = getCookieData("passphrase");
 
             console.log("Cookie stored passphrase = " + passphrase)
 
-            passphrase = '130427A'
+            // passphrase = '130427A'
             console.log(passphrase)
 
             if (passphrase == null) {
@@ -1796,22 +1795,19 @@
                 
 
             $("#submitForm").on('click', function() {
-
                 $("#magic_word_form").submit();
-
             });
 
             $("#dismissForm").on('click', function() {
-
                 $('#main').hide()
-                
             });
 
             $("#magic_word_form").on("submit", function(e) {
 
                 // Get the form data
-                magic_word_submitted =document.forms["magic_word_form"]["magic_word"].value;
-
+                // magic_word_submitted = document.forms["magic_word_form"]["magic_word"].value;
+                magic_word_submitted = '130427A'
+                
                 e.preventDefault();
 
                 $('#magic_word_dialog').modal('hide');
@@ -1843,7 +1839,6 @@
             });
 
             $('#cadence_selector1 button').click(function() {
-                console.log($(this))
                 $(this).removeClass('btn-default')
                 $(this).addClass('btn-primary')
                 $(this).addClass('active')
@@ -2430,11 +2425,6 @@
                                 <div class="dropdown">
                                     <button style="width:110px" id="ts_min_button" class="btn btn-default dropdown-toggle ts_min" type="button" data-toggle="dropdown">TS = 4 (2&sigma;)  <span class="caret"></span></button>
                                     <ul class="dropdown-menu ts_min" style="min-width:115px">
-<!--                                         <li id="ts9" class="active"><a href="#">TS = 9 (3&sigma;)</a></li>
-                                        <li id="ts8"><a href="#">TS = 8 </a></li>
-                                        <li id="ts7"><a href="#">TS = 7 </a></li>
-                                        <li id="ts6"><a href="#">TS = 6 </a></li>
-                                        <li id="ts5"><a href="#">TS = 5 </a></li> -->
                                         <li id="ts4" class="active"><a href="#">TS = 4 (2&sigma;)</a></li>
                                         <li id="ts3"><a href="#">TS = 3 </a></li>
                                         <li id="ts2"><a href="#">TS = 2 </a></li>
@@ -2495,10 +2485,7 @@
                             <div class="col-sm-12">
                                 <label class="checkbox-inline" style="margin-right:5px"><input type="checkbox" value="" id="show_unconstrained_fits">Show Unconstrained Fits</label>
 
-<!-- 								<a href="javascript:void(0)"><svg xmlns="http://www.w3.org/2000/svg" type="button" data-toggle="modal" data-target="#exampleModalCenter" width="16" height="16" style="float:right; margin-left:110px; margin-top:12px; position: absolute;" fill="currentColor" class="bi bi-question-circle" viewBox="0 0 16 16">
-								  <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
-								  <path d="M5.255 5.786a.237.237 0 0 0 .241.247h.825c.138 0 .248-.113.266-.25.09-.656.54-1.134 1.342-1.134.686 0 1.314.343 1.314 1.168 0 .635-.374.927-.965 1.371-.673.489-1.206 1.06-1.168 1.987l.003.217a.25.25 0 0 0 .25.246h.811a.25.25 0 0 0 .25-.25v-.105c0-.718.273-.927 1.01-1.486.609-.463 1.244-.977 1.244-2.056 0-1.511-1.276-2.241-2.673-2.241-1.267 0-2.655.59-2.75 2.286zm1.557 5.763c0 .533.425.927 1.01.927.609 0 1.028-.394 1.028-.927 0-.552-.42-.94-1.029-.94-.584 0-1.009.388-1.009.94z"/>
-								</svg></a> -->
+
 
                             </div>
 
@@ -2510,7 +2497,7 @@
                 <!-- Light curve options panel ends here -->  
 
 
-                <!-- Position information start here -->        
+                <!-- Catalog information start here -->        
                 <div class="panel panel-default">
                     <div class="panel-heading">
                         <h3 class="panel-title">4FGL Catalog Data</h3>
@@ -2580,7 +2567,7 @@
                         </div>
                     </div>
                 </div>
-                <!-- Position information ends here -->     
+                <!-- Catalog information ends here -->     
 
     
                 <!-- Download panel start here -->      
@@ -2649,41 +2636,16 @@
                         <div class="panel-heading"><h3 class="panel-title">Light Curve Data</h3></div>
                         <div class="panel-body">
 
-<!--                            <div style="float:left; margin: 10px 20px 10px 100px">
-                            <div id="cadence_selector1" class="btn-group">
-                                <button id="daily" type="button" class="btn btn-default ">3 day</button>
-                                <button id="weekly" type="button" class="btn btn-primary active">1 week</button>
-                                <button id="monthly" type="button" class="btn btn-default">1 month</button>
-                            </div>
-                            </div> -->
-
                             <div style="float:right; margin: 10px 20px 10px 0">
-
-<!--                                <div id="cadence_selector1" class="btn-group">
-                                    <button id="daily" type="button" class="btn btn-default ">3 day</button>
-                                    <button id="weekly" type="button" class="btn btn-primary active">1 week</button>
-                                    <button id="monthly" type="button" class="btn btn-default">1 month</button>
-                                </div> -->
-
                                 <div class="btn-group" role="group">
                                     <button class="btn btn-default dropdown-toggle flux-type" type="button" data-toggle="dropdown">Photon Flux <span class="caret"></span></button>
                                     <ul class="dropdown-menu flux-type">
                                         <li id="y-axis" class="disabled"><a href="#">Y-Axis:</a></li>
                                         <li id="photon" class="active"><a href="javascript:void(0)">Photon Flux </a></li>
                                         <li id="energy"><a href="javascript:void(0)">Energy Flux </a></li>
-<!--                                        <li id="photon2"><a href="javascript:void(0)">Photon Flux (Free Index)</a></li>
-                                        <li id="energy2"><a href="javascript:void(0)">Energy Flux (Free Index)</a></li>  -->                                    
                                     </ul>
                                 </div>
 
-<!--                                <div class="btn-group" role="group">
-                                    <button class="btn btn-default dropdown-toggle flux-type" type="button" data-toggle="dropdown">Fixed Index <span class="caret"></span></button>
-                                    <ul class="dropdown-menu flux-type">
-                                        <li id="met" class="disabled"><a href="javascript:void(0)">Spectral Fit Type:</a></li>
-                                        <li id="photon" class="active"><a href="javascript:void(0)">Fixed Index </a></li>
-                                        <li id="energy"><a href="javascript:void(0)">Free Index </a></li>                               
-                                    </ul>
-                                </div> -->
 
                                 <div class="btn-group" role="group">
                                     <button class="btn btn-default dropdown-toggle xaxis-type" type="button" data-toggle="dropdown">Date <span class="caret"></span></button>
@@ -2703,18 +2665,6 @@
                                 <div id="chart1" style="width:100%; height:400px; padding-right:10px;position:relative"></div>
                             </div>
                             </center>
-
-<!--                            <div style="float:right; margin: -20px 20px 10px 0">
-                                <div class="btn-group" role="group">
-                                    <button class="btn btn-default dropdown-toggle xaxis-type" type="button" data-toggle="dropdown">Date <span class="caret"></span></button>
-                                    <ul class="dropdown-menu xaxis-type">
-                                        <li id="date" class="active"><a href="javascript:void(0)">Date</a></li>
-                                        <li id="met"><a href="javascript:void(0)">MET</a></li>
-                                        <li id="jd"><a href="javascript:void(0)">JD</a></li>
-                                        <li id="mjd"><a href="javascript:void(0)">MJD</a></li>
-                                    </ul>
-                                </div>
-                            </div> -->
 
 
                         </div>  
@@ -2769,8 +2719,6 @@
                 <!-- Doughnut plots panels start here -->   
                 <div class="container" style="width:100%; height: 425px; max-width:100%; margin-left: 390px; padding-right:10px">
                     <div class="row" style="margin-left:-30px; height: 425px;">
-<!--                        <div class="col-md-12">
-                            <div class="row"> -->
 
                                 <div class="col-md-4">  
                                     <!-- Fit convergance panels start here -->  
@@ -2822,9 +2770,7 @@
                                     </div>
                                     <!-- Detection distribution panels ends here -->    
                                 </div>
-<!-- 
-                            </div>
-                        </div> -->
+
                     </div>
                 </div>
 
@@ -2878,15 +2824,20 @@
                     <h4 class="modal-title" style="text-align: center;">Welcome to the Fermi LAT Light Curve Repository</h4>
                 </div>
 
-                <div class="modal-body center-block" style="text-align: center; height:200px; margin-top:10%">
-
+                <div class="modal-body center-block" style="text-align: center; height:200px; margin-top:5%; margin-bottom:5%">
+                    <center>
+                        <!-- <span style="font-size: 50px;" class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span> -->
+                        <img width="75px" src="./img/spaceship.png">
+                    </center>
                     
-                    This page is currently under developement.<BR>Please enter the passphrase to view the draft page:
+                    <BR>
+
+                    This page is currently under developement.<BR>A public announcement will be made when the light curve data is available.<BR>Feedback on the light curve repository data portal is certainly welcomed!
                     
                     <BR>
                     <BR>
                 
-                    <form id="magic_word_form" name='MagicWordForm'>
+                    <form id="magic_word_form" name='MagicWordForm' style="display:none">
                         <input id="magic_word" type="text" class="input-small" placeholder="">
                         </form>
 
@@ -2894,11 +2845,11 @@
 
                 <div class="modal-footer">             
                     <div id="SaveButtonDiv" style="float: right;">
-                        <button type="button" id="submitForm" class="btn btn-primary" style="color:white;font-size: 12px;margin:10px">Submit</button>
+                        <button type="button" id="submitForm" class="btn btn-primary" style="width:60px; color:white;font-size: 12px;margin:10px">Ok</button>
                     </div>  
-                    <div style="float: right;"> 
+<!--                     <div style="float: right;"> 
                         <button type="button" id="dismissForm" class="btn btn-default" data-dismiss="modal" style="font-size: 12px;margin-top:10px">Close</button>
-                    </div> 
+                    </div>  -->
                 </div> <!-- /.modal-footer -->
 
             </div> <!-- /.modal-content -->

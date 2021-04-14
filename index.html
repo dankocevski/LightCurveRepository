@@ -57,6 +57,7 @@
   
     <!-- Moment.js -->
     <script charset="UTF-8" src="./js/moment.js"></script>
+<!--  -->
 
 </head>
 
@@ -920,7 +921,7 @@
                             }
 
                             if ((show_only_variable_4FGL_sources === true) && (perform_search == false)) {
-                                if (parseFloat(source.Variability_Index) < 18) {
+                                if (parseFloat(source.Variability_Index) < 21.67) {
                                     pointStyle = {stroke: "rgba(128, 128, 128, .25)", fill: "rgba(128, 128, 128, .25)" };
                                 } else {
                                     pointStyle = pointStyle_active
@@ -3474,7 +3475,8 @@
         function checkCookie() {
             
             // Check if the cookie contains the passphrase data
-            passphrase = getCookieData("passphrase");
+            // passphrase = getCookieData("passphrase");
+            // passphrase = '130427A'
 
             console.log("Cookie stored passphrase = " + passphrase)
 
@@ -5173,7 +5175,8 @@
             $("#magic_word_form").on("submit", function(e) {
 
                 // Get the form data
-                magicWord = document.forms["magic_word_form"]["magic_word"].value;
+                // magicWord = document.forms["magic_word_form"]["magic_word"].value;
+                magicWord = '130427A'
 
                 e.preventDefault();
 
@@ -5707,15 +5710,20 @@
                     <h4 class="modal-title" style="text-align: center;">Welcome to the Fermi LAT Light Curve Repository</h4>
                 </div>
 
-                <div class="modal-body center-block" style="text-align: center; height:200px; margin-top:10%">
-
+                <div class="modal-body center-block" style="text-align: center; height:200px; margin-top:5%; margin-bottom:5%">
+                    <center>
+                        <!-- <span style="font-size: 50px;" class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span> -->
+                        <img width="75px" src="./img/spaceship.png">
+                    </center>
                     
-                    This page is currently under developement.<BR>Please enter the passphrase to view the draft page:
+                    <BR>
+
+                    This page is currently under developement.<BR>A public announcement will be made when the light curve data is available.<BR>Feedback on the light curve repository data portal is certainly welcomed!
                     
                     <BR>
                     <BR>
                 
-                    <form id="magic_word_form" name='MagicWordForm'>
+                    <form id="magic_word_form" name='MagicWordForm' style="display:none">
                         <input id="magic_word" type="text" class="input-small" placeholder="">
                         </form>
 
@@ -5723,11 +5731,11 @@
 
                 <div class="modal-footer">             
                     <div id="SaveButtonDiv" style="float: right;">
-                        <button type="button" id="submitForm" class="btn btn-primary" style="color:white;font-size: 12px;margin:10px">Submit</button>
+                        <button type="button" id="submitForm" class="btn btn-primary" style="width:60px; color:white;font-size: 12px;margin:10px">Ok</button>
                     </div>  
-                    <div style="float: right;"> 
+<!--                     <div style="float: right;"> 
                         <button type="button" id="dismissForm" class="btn btn-default" data-dismiss="modal" style="font-size: 12px;margin-top:10px">Close</button>
-                    </div> 
+                    </div>  -->
                 </div> <!-- /.modal-footer -->
 
             </div> <!-- /.modal-content -->
