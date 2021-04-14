@@ -1406,14 +1406,34 @@
                     return
                 }
 
+	            // Make an array of the METs
+	            mets = []
+	            for (var i in data['ts']) {
+	                mets.push(data['ts'][i][0])
+	            }
+
+	            // Loop through and add MET information to the arrays that encompass the entire data range
+	            $.each( data, function( key, value ) {
+	                for (i = 0; i < data[key].length; i++) { 
+	                    if ((data[key][i].length != 2) && (data[key][i].length != 3) && (key != 'bin_id')) {
+	                        var item = new Array;
+	                        item.push(mets[i])
+	                        item.push(data[key][i])
+	                        data[key][i] = item
+	                    }
+	                }
+	            });
+
                 // Make a deep copy of the original data array
-                // data_original = [...data]
                 data_original = JSON.parse(JSON.stringify(data))
 
+                // Fill the html table
                 fillTable()
 
+                // Create the doughnut plots
                 fillDoughnutPlots()
 
+                // Prepare the light curve data for display in the scatter plots
                 prepareLightCurveData() 
 
             }});
@@ -1430,31 +1450,12 @@
             fit_convergance = data['fit_convergance']        
             photon_index = data['photon_index']     
 
-            // Make an array of the METs
-            mets = []
-            for (var i in data['ts']) {
-                mets.push(data['ts'][i][0])
-            }
-
-            // Loop through and add MET information to the arrays that encompass the entire data range
-            $.each( data, function( key, value ) {
-                for (i = 0; i < data[key].length; i++) { 
-                    if ((data[key][i].length != 2) && (data[key][i].length != 3) && (key != 'bin_id')) {
-                        var item = new Array;
-                        item.push(mets[i])
-                        item.push(data[key][i])
-                        data[key][i] = item
-
-                    }
-                }
-            });
 
             // Correct the flux error precision
             for (i = 0; i < flux_error.length; i++) { 
                 flux_error[i][1] = parseFloat(flux_error[i][1].toPrecision(3))
                 flux_error[i][2] = parseFloat(flux_error[i][2].toPrecision(3))
             }
-
 
 
             // Find all of the nonconvergant fits
@@ -1531,6 +1532,7 @@
             }    
 
 
+
             // Update the side table with the results
             // if (xtitle.includes('Mission Elapsed Time (seconds)') === false) {
                 $.each( data, function( key, value ) {
@@ -1572,6 +1574,8 @@
                         }
 
                     }
+
+
                 })                 
             // }                     
 
@@ -1768,7 +1772,7 @@
             console.log("Cookie stored passphrase = " + passphrase)
 
             // passphrase = '130427A'
-            console.log(passphrase)
+            // console.log(passphrase)
 
             if (passphrase == null) {
 
@@ -1807,7 +1811,7 @@
                 // Get the form data
                 // magic_word_submitted = document.forms["magic_word_form"]["magic_word"].value;
                 magic_word_submitted = '130427A'
-                
+
                 e.preventDefault();
 
                 $('#magic_word_dialog').modal('hide');
