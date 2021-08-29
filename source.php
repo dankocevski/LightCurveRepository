@@ -1767,12 +1767,11 @@
         function checkCookie() {
             
             // Check if the cookie contains the passphrase data
-            // passphrase = getCookieData("passphrase");
+            passphrase = getCookieData("passphrase");
 
             console.log("Cookie stored passphrase = " + passphrase)
 
-            // passphrase = '130427A'
-            // console.log(passphrase)
+            console.log(passphrase)
 
             if (passphrase == null) {
 
@@ -2841,7 +2840,7 @@
                     <BR>
                     <BR>
                 
-                    <form id="magic_word_form" name='MagicWordForm' style="display:none">
+                    <form id="magic_word_form" name='MagicWordForm' style="display:visible">
                         <input id="magic_word" type="text" class="input-small" placeholder="">
                         </form>
 
