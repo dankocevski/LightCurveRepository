@@ -477,7 +477,8 @@
             $queryStatement = $queryStatement . ' order by RAJ2000;';
 
             // Open the database
-            $db = new SQLite3('./db/gll_psc_v21.db');
+            // $db = new SQLite3('./db/gll_psc_v21.db');
+            $db = new SQLite3('./db/gll_psc_v27.db');
 
             // Query the database
             $results = $db->query($queryStatement);
@@ -969,8 +970,6 @@
             echo $data;
 
         }
-
-
     }
 
     if ($typeOfRequest === 'sourceData') { 
