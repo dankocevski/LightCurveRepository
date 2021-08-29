@@ -2367,7 +2367,7 @@
 
                         row[++j] ='<td class="' + key + '" style="text-align: center;">';
                         var source_name = source[key].replace(' ','_')
-                        if (parseFloat(source['Variability_Index']) >= 18) {
+                        if (parseFloat(source['Variability_Index']) >= 21.67) {
                             row[++j] = '<a href="./source.php?source_name=' + source_name + '">' + source[key] + '</a>';
                         } else {
                             row[++j] = source[key];
@@ -3600,7 +3600,7 @@
                                 innerHTML =  innerHTML + ' | <a href="' + link_spectrum_4FGL + '"' + onclick_small_window + '">4FGL Spectrum</a>'
 
                                 // Add the LCR link
-                                // if (parseFloat(point.Variability_Index) > 18.48) { <-- DR1 variability index threshold
+                                // if (parseFloat(point.Variability_Index) > 18.48) {  <-- DR1 variability index threshold
                                 if (parseFloat(point.Variability_Index) > 21.67) { 
                                     innerHTML =  innerHTML +'<BR><a href="' + link_lightcurves_LCR + '">LCR Light Curves</a>'
                                 } else {
@@ -4660,7 +4660,8 @@
                                         innerHTML =  innerHTML + ' | <a href="' + link_spectrum_4FGL + '"' + onclick_small_window + '">4FGL Spectrum</a>'
 
                                         // Add the LCR link
-                                        if (parseFloat(point.Variability_Index) > 18.48) {
+                                        // if (parseFloat(point.Variability_Index) > 18.48) {  <-- DR1 variability index threshold
+                                        if (parseFloat(point.Variability_Index) > 21.67) { 
                                             innerHTML =  innerHTML +'<BR><a href="' + link_lightcurves_LCR + '">LCR Light Curves</a>'
                                         } else {
                                             innerHTML =  innerHTML +'<BR><font color="gray">LCR Light Curves</font>'
