@@ -2210,13 +2210,13 @@
 
                 var dummy = document.createElement("textarea");
                 document.body.appendChild(dummy);
-                dummy.value = URL_light_curve_data;
+                dummy.value = 'https://fermi.gsfc.nasa.gov/ssc/data/access/lat/LightCurveRepository/' + URL_light_curve_data;
                 dummy.select();
 
                 document.execCommand("copy");
                 document.body.removeChild(dummy);
 
-                alert('API link copied to clipboard:\r\n\r\n' + 'https://fermi.gsfc.nasa.gov/ssc/data/access/lat/LightCurveRepository/' + URL_light_curve_data)
+                alert('API link copied to clipboard:\r\n\r\n' + URL_light_curve_data)
                 
               }                            
             });
