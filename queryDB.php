@@ -699,7 +699,7 @@
             $data['flux_upper_limits'] = array();
             $data['flux_error'] = array();
             $data['photon_index'] = array();
-            $data['photon_index_error'] = array();           
+            $data['photon_index_interval'] = array();           
             $data['fit_tolerance'] = array();
             $data['fit_convergance'] = array();
             $data['dlogl'] = array();
@@ -766,7 +766,7 @@
                     $index_error_max = sprintf("%0.2f", $index_error_max);
                     $index_error_min = sprintf("%0.2f", $index_error_min);
 
-                    array_push($data['photon_index_error'], array($met, $index_error_max, $index_error_min));
+                    array_push($data['photon_index_interval'], array($met, $index_error_max, $index_error_min));
                 }
 
                 // Fit Tolerance
@@ -813,7 +813,7 @@
             $data = str_replace('flux_upper_limits:', '"flux_upper_limits":', $data);
             $data = str_replace('flux_error:', '"flux_error":', $data);
             $data = str_replace('photon_index:', '"photon_index":', $data);
-            $data = str_replace('photon_index_error:', '"photon_index_error":', $data);          
+            $data = str_replace('photon_index_interval:', '"photon_index_interval":', $data);          
             $data = str_replace('fit_tolerance:', '"fit_tolerance":', $data);
             $data = str_replace('fit_convergance:', '"fit_convergance":', $data);
             $data = str_replace('bin_id:', '"bin_id":', $data);
@@ -847,7 +847,7 @@
             $data['flux_upper_limits'] = array();
             $data['flux_error'] = array();
             $data['photon_index'] = array();
-            $data['photon_index_error'] = array();           
+            $data['photon_index_interval'] = array();           
             $data['fit_tolerance'] = array();
             $data['fit_convergance'] = array();
             $data['dlogl'] = array();
@@ -911,7 +911,7 @@
                     $index_error_max = sprintf("%0.2f", $index_error_max);
                     $index_error_min = sprintf("%0.2f", $index_error_min);
 
-                    array_push($data['photon_index_error'], array($met, $index_error_max, $index_error_min));
+                    array_push($data['photon_index_interval'], array($met, $index_error_max, $index_error_min));
                 }
 
                 // Fit Tolerance
@@ -959,7 +959,7 @@
             $data = str_replace('flux_upper_limits:', '"flux_upper_limits":', $data);
             $data = str_replace('flux_error:', '"flux_error":', $data);
             $data = str_replace('photon_index:', '"photon_index":', $data);
-            $data = str_replace('photon_index_error:', '"photon_index_error":', $data);          
+            $data = str_replace('photon_index_interval:', '"photon_index_interval":', $data);          
             $data = str_replace('fit_tolerance:', '"fit_tolerance":', $data);
             $data = str_replace('fit_convergance:', '"fit_convergance":', $data);
             $data = str_replace('bin_id:', '"bin_id":', $data);
