@@ -2483,7 +2483,7 @@
 
                         <div class="row-small-gutter" style="margin-top:30px">
                             <div class="col-sm-12">
-                                <label class="checkbox-inline" style="margin-right:5px"><input type="checkbox" value="" id="show_nonconvergant_fits">Show Non-Convergant Fits</label>
+                                <label class="checkbox-inline" style="margin-right:5px"><input type="checkbox" value="" id="show_nonconvergant_fits">Show Non-Convergent Fits</label>
                             </div>
                             <div class="col-sm-12">
                                 <label class="checkbox-inline" style="margin-right:5px"><input type="checkbox" value="" id="show_unconstrained_fits">Show Unconstrained Fits</label>
