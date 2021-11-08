@@ -376,12 +376,12 @@
 
                         <B>Motivation:</B><BR>
 
-                        The Fermi Large Area Telescope (LAT) Light Curve Repository (LCR) is a database of multi-cadence flux calibrated light curves for over 1300 sources deemed variable in the 10 year Fermi LAT point source (4FGL) catalog <a href="https://ui.adsabs.harvard.edu/abs/2020ApJS..247...33A/abstract">(Abdollahi et al. 2020)</a>.  The light curves hosted by the LCR cover the entire ongoing Fermi mission duration and include data binned at 3 day, 1 week, and 1 month intervals and are continually updated as new data becomes available. The high duty cycle and long-term monitoring of the gamma-ray sky has made the LAT an important tool in the study of time-domain astronomy, provided the identification and regular monitoring of thousands of transient and variable sources. The LCR is intended to serve as a resource to the time-domain and multi-messenger communities by allowing users to quickly search the LAT data to identify correlated variability and flaring emission episodes from gamma-ray sources. 
+                        The Fermi Large Area Telescope (LAT) Light Curve Repository (LCR) is a database of multi-cadence flux calibrated light curves for over 1500 sources deemed variable in the 10 year Fermi LAT point source (4FGL-DR2) catalog <a href="https://ui.adsabs.harvard.edu/abs/2020arXiv200511208B/abstract">(Ballet et al. 2020)</a>.  The light curves hosted by the LCR cover the entire ongoing Fermi mission duration and include data binned at 3 day, 1 week, and 1 month intervals and are continually updated as new data become available. The high duty cycle and long-term monitoring of the gamma-ray sky has made the LAT an important tool in the study of time-domain astronomy, provided the identification and regular monitoring of thousands of transient and variable sources. The LCR is intended to serve as a resource to the time-domain and multi-messenger communities by allowing users to quickly search the LAT data to identify correlated variability and flaring emission episodes from gamma-ray sources. 
 
                         <BR><BR>
                         <B>Sample Selection:</B><BR>
 
-                        The LCR provides light curves for all sources in the 4FGL catalog that exhibit a variability index greater than 18.49, where the variability index can be thought of as a proxy to the average fractional variability with dF/F measured on timescales of 1 year. As defined in the 4FGL catalog, sources with a variability index greater than 18.48 over 12 intervals are estimated to have a < 1% chance of being a steady source. The resulting sample consists of 1327 sources, or roughly 26% of the 4FGL catalog. A vast majority of these sources are blazars, with flat spectrum radio quasars, BL Lacs, and blazars candidates of unknown type making up roughly 40%, 30%, and 24% of the repository sample respectively. Generating 3 day, 1 week, and 1 month light curves for each of these sources for over 11 years of data requires the analysis of over 2.7 million individual time bins.
+                        The LCR provides light curves for all sources in the 4FGL-DR2 catalog that exhibit a variability index greater than 21.67, where the variability index can be thought of as a proxy to the average fractional variability with dF/F measured on timescales of 1 year. As defined in the 4FGL-DR2 catalog, sources with a variability index greater than 21.67 over 12 intervals are estimated to have a < 1% chance of being a steady source. The resulting sample consists of 1525 sources, or roughly 26% of the 4FGL-DR2 catalog. A vast majority of these sources are blazars, with flat spectrum radio quasars, BL Lacs, and blazar candidates of unknown type making up roughly 38%, 31%, and 24% of the repository sample respectively. Generating 3 day, 1 week, and 1 month light curves for each of these sources for over 13 years of data requires the analysis of over 3.7 million individual time bins.
 
 
                         <BR><BR>
@@ -389,9 +389,9 @@
 
                         The characterization of LAT sources is typically performed using a maximum likelihood analysis (<a href="http://arxiv.org/abs/0902.1340">Abdo et al. 2009, ApJS, 183, 46</a>), in which a model describing the point sources and diffuse and isotropic gamma-ray emission in a given region of the sky are jointly optimized to best describe the observed count distribution.  The flux determinations in the light curves provided by the LCR are obtained by performing an <a href="https://fermi.gsfc.nasa.gov/ssc/data/analysis/scitools/likelihood_tutorial.html">unbinned likelihood</a> analysis, in which the full spatial and spectral information of each count is used in the maximum likelihood optimization.  The analysis is performed using the P8_SOURCE event selection over an energy range covering 100 MeV - 100 GeV.
                         <BR>
-                        &nbsp&nbsp&nbsp&nbsp&nbsp Figure 1 shows a model map for a single time bin of the region surrounding 4FGL J0237.8+2848, which contains 15 other variable sources within a 12 deg radius (roughly corresponding to the <a href="https://www.slac.stanford.edu/exp/glast/groups/canda/lat_Performance.htm">95% LAT PSF</a> at 100 MeV). The source flux for each time bin is fit while simultaneously accounting for the flux variations from all of the other variable sources within the region of interest, which are left free to vary in the model of the region. An iterative fitting strategy, which varies the required fit tolerance, is also employed to minimize the number of bins in which the likelihood fit does not successfully convergence.  The resulting best fit flux determination (or upper limit) and spectral shape are reported by the LCR. 
+                        &nbsp&nbsp&nbsp&nbsp&nbsp Figure 1 shows a model map for a single time bin of the region surrounding 4FGL J0237.8+2848, which contains 15 other variable sources within a 12 deg radius (roughly corresponding to the <a href="https://www.slac.stanford.edu/exp/glast/groups/canda/lat_Performance.htm">95% LAT PSF</a> at 100 MeV). The source flux for each time bin is fit while simultaneously accounting for the flux variations from all of the other variable sources within the region of interest, which are left free to vary in the model of the region. An iterative fitting strategy, which varies the required fit tolerance, is also employed to minimize the number of bins in which the likelihood fit does not converge successfully.  The resulting best fit flux determination (or upper limit) and spectral shape are reported by the LCR. 
                         <BR>
-                        &nbsp&nbsp&nbsp&nbsp&nbsp For a relatively small number of counts, an <a href="https://fermi.gsfc.nasa.gov/ssc/data/analysis/scitools/likelihood_tutorial.html">unbinned likelihood</a> analysis can be performed rapidly, but as the number of counts increases, the time to perform the analysis can become prohibitive. This limitation becomes increasingly burdensome when the need arises to perform source characterization over a large number of time bins. <a href="https://fermi.gsfc.nasa.gov/ssc/data/analysis/scitools/binned_likelihood_tutorial.html">Binned likelihood</a> analysis can help alleviate some of these issues, but since information is lost when binning data, there exists a trade off between the number of bins to use (e.g. computing time) and the accuracy of the final results. The LCR tackles the computational overhead by parallelizing the process of performing a full unbinned likelihood analysis. In order to produce a high cadence light curve over the entire lifetime of the mission in a reasonable amount of time, the LCR distributes the analysis of each light curve bin to a separate node in a computer cluster hosted at the SLAC National Accelerator Center. The parallelization allows for thousands of time bins to be analyzed simultaneously, with the net effect of drastically reducing the time it takes to generate mission duration light curves. Figure 2 shows the resulting 3-day light curve covering over 11 years of LAT data for the source 4FGL J0237.8+2848.
+                        &nbsp&nbsp&nbsp&nbsp&nbsp For a relatively small number of counts, an <a href="https://fermi.gsfc.nasa.gov/ssc/data/analysis/scitools/likelihood_tutorial.html">unbinned likelihood</a> analysis can be performed rapidly, but as the number of counts increases, the time to perform the analysis can become prohibitive. This limitation becomes increasingly burdensome when the need arises to perform source characterization over a large number of time bins. <a href="https://fermi.gsfc.nasa.gov/ssc/data/analysis/scitools/binned_likelihood_tutorial.html">Binned likelihood</a> analysis can help alleviate some of these issues, but since information is lost when binning data, there is a trade off between the number of bins to use (e.g. computing time) and the accuracy of the final results. The LCR tackles the computational overhead by parallelizing the process of performing a full unbinned likelihood analysis. In order to produce a high cadence light curve over the entire lifetime of the mission in a reasonable amount of time, the LCR distributes the analysis of each light curve bin to a separate node in a computer cluster hosted at the SLAC National Accelerator Center. The parallelization allows for thousands of time bins to be analyzed simultaneously, with the net effect of drastically reducing the time it takes to generate mission duration light curves. Figure 2 shows the resulting 3-day light curve covering over 11 years of LAT data for the source 4FGL J0237.8+2848.
 
                         <BR><BR>
 
@@ -433,7 +433,7 @@
                                 </tr>
                                 <tr>
                                     <td>Instrument response function</td>
-                                    <td>P8R3_SOURCE_V2</td> 
+                                    <td>P8R3_SOURCE_V3</td> 
                                 </tr>
                                 <tr>
                                     <td>Acceptance cone (ROI)</td>
@@ -441,7 +441,7 @@
                                 </tr>
                                 <tr>
                                     <td>Zenith angle cut (zmax)</td>
-                                    <td>100 deg</td>
+                                    <td>90 deg</td>
                                 </tr>
                                 <tr>
                                     <td>Fit optimizer</td>
@@ -449,15 +449,15 @@
                                 </tr>
                                 <tr>
                                     <td><a href="https://fermi.gsfc.nasa.gov/ssc/data/access/lat/BackgroundModels.html">Galactic interstellar emission model<a></td>
-                                    <td><a href="https://fermi.gsfc.nasa.gov/ssc/data/analysis/software/aux/4fgl/gll_iem_v06.fits">gll_iem_v06.fits</a></td> 
+                                    <td><a href="https://fermi.gsfc.nasa.gov/ssc/data/analysis/software/aux/4fgl/gll_iem_v07.fits">gll_iem_v07.fits</a></td> 
                                 </tr>
                                 <tr>
                                     <td><a href="https://fermi.gsfc.nasa.gov/ssc/data/access/lat/BackgroundModels.html">Isotropic spectral template</a></td>
-                                    <td><a href="https://fermi.gsfc.nasa.gov/ssc/data/analysis/software/aux/iso_P8R3_SOURCE_V2.txt">iso_P8R3_SOURCE_V2</a></td> 
+                                    <td><a href="https://fermi.gsfc.nasa.gov/ssc/data/analysis/software/aux/iso_P8R3_SOURCE_V3_v1.txt">iso_P8R3_SOURCE_V3_v1</a></td> 
                                 </tr>
                                 <tr>
-                                    <td><a href="https://fermi.gsfc.nasa.gov/ssc/data/access/lat/8yr_catalog/">4FGL catalog</a></td>
-                                    <td><a href="https://fermi.gsfc.nasa.gov/ssc/data/access/lat/8yr_catalog/gll_psc_v20.fit">gll_psc_v20.fit</a></td> 
+                                    <td><a href="https://fermi.gsfc.nasa.gov/ssc/data/access/lat/10yr_catalog/">4FGL-DR2 catalog</a></td>
+                                    <td><a href="https://fermi.gsfc.nasa.gov/ssc/data/access/lat/10yr_catalog/gll_psc_v27.fit">gll_psc_v27.fit</a></td> 
                                 </tr>
                                 <tr>
                                     <td>Upper limits confidence level</td>
@@ -465,7 +465,7 @@
                                 </tr>
                                 <tr>
                                     <td>Minimum detection threshold</td>
-                                    <td>TS = 9 (~3&sigma;)</td>
+                                    <td>TS = 1-4 (~1-2&sigma;)</td>
                                 </tr>
                             </table>
                         </div>
