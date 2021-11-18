@@ -2783,7 +2783,7 @@
                     <div class="panel panel-default">
                         <div class="panel-heading"><h3 class="panel-title">Likelihood Fit Data Table</h3></div>
                         <div class="panel-body">
-                            
+                            <a href="https://fermi.gsfc.nasa.gov/ssc/data/access/lat/LightCurveRepository/table_description.html">Table and JSON File Description</a>
                             <center>
                                 <table class="table table-striped table-condensed table-bordered data-table" id="data_table" style="width:1000px;"></table>  
                             </center>
