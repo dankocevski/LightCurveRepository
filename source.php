@@ -164,7 +164,7 @@
         var index_type = 'fixed'
         var ts_min = '4'
         var ancillary_type = 'photon_index'
-        // var ancillary_type = 'fit_convergance'
+        // var ancillary_type = 'fit_convergence'
         var ancillary_data_label = 'Photon Index'
 
         // var chartType = 'linear';
@@ -1004,21 +1004,21 @@
 
             var ts = []
             fit_tolerance = []
-            fit_convergance = []
+            fit_convergence = []
 
             for (i = 0; i < data['ts'].length; i++) { 
 
                 ts.push(data['ts'][i][1])
                 fit_tolerance.push(data['fit_tolerance'][i][1])
-                fit_convergance.push(data['fit_convergance'][i][1])
+                fit_convergence.push(data['fit_convergence'][i][1])
 
             }
 
             fit_tolerance_keys = [1e-8, 1e-4, 1]
             fit_tolerance_distribution = [0,0,0,0]
 
-            fit_convergance_keys = [0, 1, 2, 101]
-            fit_convergance_distribution = [0,0,0,0]
+            fit_convergence_keys = [0, 1, 2, 101]
+            fit_convergence_distribution = [0,0,0,0]
 
             ts_keys = ['Detections', 'Upper Limits']
             ts_distribution = [0,0]
@@ -1040,20 +1040,20 @@
                     }
                 }
 
-                var value = fit_convergance[i]
-                for (var j = 0; j < fit_convergance_keys.length; j++) {
+                var value = fit_convergence[i]
+                for (var j = 0; j < fit_convergence_keys.length; j++) {
 
-                    key = fit_convergance_keys[j]
+                    key = fit_convergence_keys[j]
 
                     if (value === key) {
-                        fit_convergance_distribution[j] = fit_convergance_distribution[j] + 1
+                        fit_convergence_distribution[j] = fit_convergence_distribution[j] + 1
                     }
                 }
 
             }
 
-            // Fix the convergance keys to reflect 102 rather than 101
-            fit_convergance_keys = [0, 1, 2, 102]
+            // Fix the convergence keys to reflect 102 rather than 101
+            fit_convergence_keys = [0, 1, 2, 102]
 
 
 
@@ -1081,12 +1081,12 @@
                 type: 'doughnut',
                 data: {
                     datasets: [{
-                        data: fit_convergance_distribution,
+                        data: fit_convergence_distribution,
                         backgroundColor: colors,
                         label: 'Dataset 1'
                     }],
 
-                    labels: fit_convergance_keys
+                    labels: fit_convergence_keys
                     // labels: classificationsUnique
                 },
                 options: {
@@ -1447,7 +1447,7 @@
             flux = data['flux']
             flux_error = data['flux_error']
             flux_upper_limits = data['flux_upper_limits']
-            fit_convergance = data['fit_convergance']        
+            fit_convergence = data['fit_convergence']        
             photon_index = data['photon_index']     
 
 
@@ -1462,7 +1462,7 @@
             nonconvergant_fits = []
             if (show_nonconvergant_fits == false) {
                 for (i = 0; i < ts.length; i++) { 
-                    if (fit_convergance[i][1] > 0) {
+                    if (fit_convergence[i][1] > 0) {
                         nonconvergant_fits.push(mets[i])
                     }
                 }
@@ -1693,7 +1693,7 @@
 
                 var ts = data['ts'][i][1]
 
-                var fit_convergance = data['fit_convergance'][i][1]
+                var fit_convergence = data['fit_convergence'][i][1]
                 var fit_tolerance = data['fit_tolerance'][i][1]
 
                 // Get the source name and decode it (but leave the underscore in place)
@@ -1742,7 +1742,7 @@
                 row[++j] ='<td id="flux" style="text-align: center;">' + flux_string + '</td>';
                 row[++j] ='<td id="photon_index" style="text-align: center;">' + photon_index_string + '</td>';
                 row[++j] ='<td id="fit_tolerance" style="text-align: center;">' + fit_tolerance + '</td>';
-                row[++j] ='<td id="fit_convergance" style="text-align: center;">' + fit_convergance + '</td>';
+                row[++j] ='<td id="fit_convergence" style="text-align: center;">' + fit_convergence + '</td>';
                 row[++j] ='<td id="log" style="text-align: center;"><a href="' + log_link + '" onclick="window.open(this.href,\'targetWindow\'); return false;">' + log_filename + '</a></td>';
 
             }
@@ -2483,7 +2483,7 @@
 
                         <div class="row-small-gutter" style="margin-top:30px">
                             <div class="col-sm-12">
-                                <label class="checkbox-inline" style="margin-right:5px"><input type="checkbox" value="" id="show_nonconvergant_fits">Show Non-Convergant Fits</label>
+                                <label class="checkbox-inline" style="margin-right:5px"><input type="checkbox" value="" id="show_nonconvergant_fits">Show Non-Convergent Fits</label>
                             </div>
                             <div class="col-sm-12">
                                 <label class="checkbox-inline" style="margin-right:5px"><input type="checkbox" value="" id="show_unconstrained_fits">Show Unconstrained Fits</label>
@@ -2689,7 +2689,7 @@
                                         <li id="y-axis" class="disabled"><a href="#">Y-Axis:</a></li>
                                         <li id="photon_index" class="active"><a href="#">Photon Index</a></li>
                                         <li id="ts"><a href="">TS</a></li>
-                                        <li id="fit_convergance"><a href="">Fit Convergance</a></li>
+                                        <li id="fit_convergence"><a href="">Fit Convergence</a></li>
                                         <li id="fit_tolerance"><a href="">Fit Tolerance</a></li>
                                         <li id="GAL"><a href="">GAL</a></li>
                                         <li id="EG"><a href="">EG</a></li>
@@ -2724,9 +2724,9 @@
                     <div class="row" style="margin-left:-30px; height: 425px;">
 
                                 <div class="col-md-4">  
-                                    <!-- Fit convergance panels start here -->  
+                                    <!-- Fit convergence panels start here -->  
                                     <div class="panel panel-default" style="width:408px; height:425px;">
-                                        <div class="panel-heading"><h3 class="panel-title">Fit Convergance</h3></div>
+                                        <div class="panel-heading"><h3 class="panel-title">Fit Convergence</h3></div>
                                         <div class="panel-body">
                                             <center>
                                                 <!-- Detector distribution plot beings here -->
@@ -2737,7 +2737,7 @@
                                             </center>
                                         </div>  
                                     </div>
-                                    <!-- Fit convergance panels ends here -->   
+                                    <!-- Fit convergence panels ends here -->   
                                 </div>
 
                                 <div class="col-md-4">
