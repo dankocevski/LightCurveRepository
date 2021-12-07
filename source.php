@@ -154,7 +154,7 @@
         var flux_error;
         var flux_upper_limits;
         var photon_index;
-        var photon_index_error;
+        var photon_index_interval;
         var ancillary_data;
         var responseText;
 
@@ -196,7 +196,7 @@
 		var flux_error_forPlotting
 		var flux_upper_limits_forPlotting
 		var photon_index_forPlotting
-		var photon_index_error_forPlotting
+		var photon_index_interval_forPlotting
 
         // Extending the addClass jquery function to accept a callback function
         ;(function ($) {
@@ -1583,7 +1583,7 @@
             // Extract the ancillary data
             if (ancillary_type.includes('photon_index')) {
                 ancillary_data = data['photon_index']  
-                ancillary_data_error = data['photon_index_error'] 
+                ancillary_data_error = data['photon_index_interval'] 
 
             } else {
                 ancillary_data = data[ancillary_type]
@@ -1718,8 +1718,12 @@
 
 
                 	var photon_index = data['photon_index'][j_detections][1]
-                	var photon_index_error = photon_index - data['photon_index_error'][j_detections][1]
-                	photon_index_string = -photon_index + ' &#177; ' + Math.abs(photon_index_error.toFixed(2))
+                	var photon_index_interval = photon_index - data['photon_index_interval'][j_detections][1]
+                	if (index_type == 'free') {
+                            photon_index_string = -photon_index + ' &#177; ' + Math.abs(photon_index_interval.toFixed(2))
+                        } else {
+                            photon_index_string = '-' + photon_index
+                        }
 
                     j_detections = j_detections + 1
 
@@ -2006,7 +2010,7 @@
                 ancillary_data = data[ancillary_type]
 
                 if (ancillary_type.includes('photon_index')) {
-                    ancillary_data_error = data['photon_index_error']
+                    ancillary_data_error = data['photon_index_interval']
                 } else {
                 	ancillary_data_error = null;
                 }
@@ -2148,7 +2152,7 @@
                             name: 'Error',
                             type: 'errorbar',
                             color: 'rgba(57, 66, 100, .40)',
-                            // data: data['photon_index_error'],
+                            // data: data['photon_index_interval'],
                             data: ancillary_data_error_forPlotting,
                             zIndex: 0,
                             marker: {
