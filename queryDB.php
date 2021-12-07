@@ -995,7 +995,8 @@
         }
 
         // Establish the database connection
-        $db = new SQLite3('./db/gll_psc_v21.db');
+        // $db = new SQLite3('./db/gll_psc_v21.db');
+        $db = new SQLite3('./db/gll_psc_v27.db');
         $results = $db->query($queryStatement);
 
         // Create an array to store the results
