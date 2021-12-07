@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <title>Fermi LAT Light Curve Repository</title>
+</head>
+
+<body>
+    <div style="margin-bottom: 40px;">
+        <h4>Table Description</h4>
+
+        <table style="width:800px; border-collapse: separate; border-spacing: 10px;">
+            <colgroup>
+                <col span="1" style="width: 25%;">
+                <col span="1" style="width: 75%;">
+            </colgroup>
+            <tr>
+                <td>Date:</td>
+                <td>Mid point of time bin in UTC.</td>
+            </tr>
+            <tr>
+                <td>Julian date:</td>
+                <td>Mid point of time bin in JD.</td>
+            </tr>
+            <tr>
+                <td>MET:</td>
+                <td>Mid point of time bin in Mission Elapsed Time (MET).</td>
+            </tr>
+            <tr>
+                <td>TS:</td>
+                <td><a href="https://ui.adsabs.harvard.edu/abs/1996ApJ...461..396M/abstract">Test Statistic.</a></td>
+            </tr>
+            <tr>
+                <td>Photon Flux:</td>
+                <td>Average integrated flux of photons with energies from 0.1 to 100 MeV. Units in photons/cm^2/s.</td>
+            </tr>
+            <tr>
+                <td>Photon Index:</td>
+                <td>Average photon index, if the spectral model for the source in the FGL catalog used by the LCR is a
+                    power-law. Average alpha, if the spectral model for the source in the FGL catalog used by the LCR is
+                    a logparabola.</td>
+            </tr>
+            <tr>
+                <td>Fit Tolerance:</td>
+                <td>Relative fit tolerance.</td>
+            </tr>
+            <tr>
+                <td>MINUIT Return Code:</td>
+                <td>Anything other than '0' means that the analysis did not converge. Please read the <a href="https://fermi.gsfc.nasa.gov/ssc/data/access/lat/LightCurveRepository/about.html">caveats</a> about non-convergent analyses.</td>
+            </tr>
+            <tr>
+                <td>Analysis Log:</td>
+                <td>Complete LAT analysis runtime output of data within the time invertal of the bin.</td>
+            </tr>
+        </table>
+    </div>
+
+
+    <div>
+        <h4>JSON File Description</h4>
+        Some of the objects below are provided as arrays of 2-tuples where the first element is the center of the bin time interval (in MET).
+
+        <table style="width:800px; border-collapse: separate; border-spacing: 10px;">
+            <colgroup>
+                <col span="1" style="width: 25%;">
+                <col span="1" style="width: 75%;">
+            </colgroup>
+            <tr>
+                <td>ts:</td>
+                <td><a href="https://ui.adsabs.harvard.edu/abs/1996ApJ...461..396M/abstract">Test Statistic.</a></td>
+            </tr>
+            <tr>
+                <td>flux:</td>
+                <td>Average integrated flux of photons with energies from 0.1 to 100 MeV. Units in photons/cm^2/s.</td>
+            </tr>
+            <tr>
+                <td>flux_upper_limits:</td>
+                <td>95% Flux upper limits in photons/cm^2/s.</td>
+            </tr>
+            <tr>
+                <td>flux_error:</td>
+                <td>Photon flux uncertainty in photons/cm^2/s.</td>
+            </tr>
+            <tr>
+                <td>photon_index:</td>
+                <td>Photon index if source spectral shape is power-law, alpha if it is logparabola.</td>
+            </tr>
+            <tr>
+                <td>photon_index_error:</td>
+                <td>Photon index/alpha statistical uncertainty.</td>
+            </tr>
+            <tr>
+                <td>fit_tolerance:</td>
+                <td>Relative fit tolerance.</td>
+            </tr>
+            <tr>
+                <td>fit_convergence:</td>
+                <td>MINUIT return code. Anything other than '0' means that the analysis did not converge. Please read the <a href="https://fermi.gsfc.nasa.gov/ssc/data/access/lat/LightCurveRepository/about.html">caveats</a> about non-convergent analyses.</td>
+            </tr>
+            <tr>
+                <td>dlogl:</td>
+                <td>Delta log-likelihood between a fixed index and free index fit.</td>
+            </tr>
+            <tr>
+                <td>EG:</td>
+                <td>Isotropic diffuse background Normalization.</td>
+            </tr>
+            <tr>
+                <td>GAL:</td>
+                <td>Galactic diffuse background Prefactor.</td>
+            </tr>
+            <tr>
+                <td>bin_id:</td>
+                <td>Time bin number.</td>
+            </tr>
+        </table>
+    </div>
+</body>
+
+</html>
