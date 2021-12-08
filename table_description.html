@@ -8,10 +8,10 @@
 </head>
 
 <body>
-    <div style="margin-bottom: 40px;">
+    <div style="width:800px; margin-bottom: 40px;">
         <h4>Table Description</h4>
 
-        <table style="width:800px; border-collapse: separate; border-spacing: 10px;">
+        <table style="border-collapse: separate; border-spacing: 10px;">
             <colgroup>
                 <col span="1" style="width: 25%;">
                 <col span="1" style="width: 75%;">
@@ -38,9 +38,7 @@
             </tr>
             <tr>
                 <td>Photon Index:</td>
-                <td>Average photon index, if the spectral model for the source in the FGL catalog used by the LCR is a
-                    power-law. Average alpha, if the spectral model for the source in the FGL catalog used by the LCR is
-                    a logparabola.</td>
+                <td>Average photon index, if the spectral model for the source in the FGL catalog used by the LCR is a power-law. Average alpha, if the spectral model for the source in the FGL catalog used by the LCR is a logparabola (beta is fixed to the catalog value).</td>
             </tr>
             <tr>
                 <td>Fit Tolerance:</td>
@@ -58,11 +56,11 @@
     </div>
 
 
-    <div>
+    <div style="width:800px;">
         <h4>JSON File Description</h4>
         Some of the objects below are provided as arrays of 2-tuples where the first element is the center of the bin time interval (in MET).
 
-        <table style="width:800px; border-collapse: separate; border-spacing: 10px;">
+        <table style="border-collapse: separate; border-spacing: 10px;">
             <colgroup>
                 <col span="1" style="width: 25%;">
                 <col span="1" style="width: 75%;">
@@ -101,7 +99,7 @@
             </tr>
             <tr>
                 <td>dlogl:</td>
-                <td>Delta log-likelihood between a fixed index and free index fit.</td>
+                <td>Delta log-likelihood between a fixed index and free index fit. The difference in degrees of freedom between these two hypothesis is of 1 for both power-law and logparabola spectral models (beta is fixed to the catalog value).</td>
             </tr>
             <tr>
                 <td>EG:</td>
