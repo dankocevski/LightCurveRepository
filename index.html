@@ -390,6 +390,7 @@
         var showMoon = false
         var user_double_clicked = false
         var lock_selection = false
+        var variability_index_cut = 21.67;
 
         var months = {'1':'Jan', '2':'Feb', '3':'Mar', '4':'Apr', '5':'May', '6':'Jun', '7':'Jul', '8':'Aug', '9':'Sep', '10':'Oct', '11':'Nov', '12':'Dec'}
         // var months = {'1':'January', '2':'Feburary', '3':'March', '4':'April', '5':'May', '6':'June', '7':'July', '8':'August', '9':'September', '10':'October', '11':'November', '12':'December'}
@@ -921,7 +922,7 @@
                             }
 
                             if ((show_only_variable_4FGL_sources === true) && (perform_search == false)) {
-                                if (parseFloat(source.Variability_Index) < 21.67) {
+                                if (parseFloat(source.Variability_Index) < variability_index_cut) {
                                     pointStyle = {stroke: "rgba(128, 128, 128, .25)", fill: "rgba(128, 128, 128, .25)" };
                                 } else {
                                     pointStyle = pointStyle_active
@@ -2367,7 +2368,7 @@
 
                         row[++j] ='<td class="' + key + '" style="text-align: center;">';
                         var source_name = source[key].replace(' ','_')
-                        if (parseFloat(source['Variability_Index']) >= 21.67) {
+                        if (parseFloat(source['Variability_Index']) >= variability_index_cut) {
                             row[++j] = '<a href="./source.php?source_name=' + source_name + '">' + source[key] + '</a>';
                         } else {
                             row[++j] = source[key];
@@ -3601,7 +3602,7 @@
 
                                 // Add the LCR link
                                 // if (parseFloat(point.Variability_Index) > 18.48) {  <-- DR1 variability index threshold
-                                if (parseFloat(point.Variability_Index) > 21.67) { 
+                                if (parseFloat(point.Variability_Index) > variability_index_cut) { 
                                     innerHTML =  innerHTML +'<BR><a href="' + link_lightcurves_LCR + '">LCR Light Curves</a>'
                                 } else {
                                     innerHTML =  innerHTML +'<BR><font color="gray">LCR Light Curves</font>'
@@ -3795,6 +3796,11 @@
                 }
             };           
 
+            canvas.onmouseover = function(event) {
+                // $('#usagetip').text("Double click a source to lock selection");
+                $('#usagetip').show()
+            };
+
             canvas.addEventListener('wheel',function(event){
                 // event.preventDefault();
                 selection.style.visibility = "hidden";
@@ -3827,6 +3833,8 @@
                     tooltip_map.style.visibility = "hidden";
                     selection.style.visibility = "hidden";    
                     $("#cursor_coordinates")[0].innerHTML = "RA: --, Dec: --"
+                    $('#usagetip').hide();
+
                 }
 
             });
@@ -4661,7 +4669,7 @@
 
                                         // Add the LCR link
                                         // if (parseFloat(point.Variability_Index) > 18.48) {  <-- DR1 variability index threshold
-                                        if (parseFloat(point.Variability_Index) > 21.67) { 
+                                        if (parseFloat(point.Variability_Index) > variability_index_cut) { 
                                             innerHTML =  innerHTML +'<BR><a href="' + link_lightcurves_LCR + '">LCR Light Curves</a>'
                                         } else {
                                             innerHTML =  innerHTML +'<BR><font color="gray">LCR Light Curves</font>'
@@ -5444,7 +5452,7 @@
                             <label class="switch" style="float:right; margin-top:-12px"><input id="2FAV_switch" type="checkbox"><span class="slider round red"></span></label>
                     </li>
                     <li class="list-group-item">
-                            2nd LAT GRB Catalog (2FLGC)<BR><small><a href="https://iopscience.iop.org/article/10.3847/1538-4357/ab1d4e/pdf">Ajello 2019</a>/<a href="https://gcn.gsfc.nasa.gov/fermi_grbs.html">GCN</a><span id=number_of_LAT_detections></span></small>
+                            2nd LAT GRB Catalog (2FLGC)<BR><small><a href="https://iopscience.iop.org/article/10.3847/1538-4357/ab1d4e/pdf">Ajello et al. 2019</a>/<a href="https://gcn.gsfc.nasa.gov/fermi_grbs.html">GCN</a><span id=number_of_LAT_detections></span></small>
                             <!-- <BR><small><a href="https://gcn.gsfc.nasa.gov/admin/fermi_lat_offline_announce.txt">GCN Notices</a><span id=number_of_offline_notices> - 0 Detections<span></small> -->
                             <label class="switch" style="float:right; margin-top:-12px"><input id='2FLGC_switch' type="checkbox"><span class="slider round green"></span></label>
                     </li>                                 
@@ -5461,17 +5469,17 @@
             <!-- Related resources start here -->      
             <div class="panel panel-default" style="height: 225px;">
                 <div class="panel-heading">
-                    <h3 class="panel-title">Related Resources</h3>
+                    <h3 class="panel-title">Additional Information</h3>
                  </div>
                     <center>
                         <table class="table table-striped">
                         <!-- <table class="table"> -->
                           <tbody>           
+                                <tr><td><a href="about.html">About the Light Curve Repository</a></td></tr>      
                                 <tr><td><a href="https://fermi.gsfc.nasa.gov/ssc/">The Fermi Science Support Center</a></td></tr>
                                 <tr><td><a href="https://fermi.gsfc.nasa.gov/ssc/data/access/lat/FAVA/">Fermi All-Sky Variability Analysis (FAVA)</a></td></tr>           
                                 <tr><td><a href="https://fermi.gsfc.nasa.gov/ssc/data/analysis/scitools/">Fermi LAT & GBM Analysis Tutorials</a></td></tr>
                                 <tr><td><a href="https://fermi.gsfc.nasa.gov/ssc/data/access/">Fermi LAT & GBM Data Access</a></td></tr>
-                                <tr><td><a href="about.html">About the Light Curve Repository</a></td></tr>      
                           </tbody>
                         </table>  
                     </center>
@@ -5487,7 +5495,7 @@
             <!--  Citation request ends here -->    
 
             <!-- Citation request start here -->    
-<!--             <div class="panel panel-default" style="height:132px">   
+            <!--  <div class="panel panel-default" style="height:132px">   
                 <div class="panel-heading">
                     <h3 class="panel-title">Citation Request</h3>
                 </div>
@@ -5496,9 +5504,6 @@
                 </center>
             </div> -->
             <!--  Citation request ends here -->  
-
-
-
         </div>
         <!-- sidebar ends here -->
 
@@ -5508,12 +5513,14 @@
         <!-- Catalog Map panel starts here-->  
             <div class="panel panel-default">
                 <div class="panel-heading"><h3 class="panel-title">Catalog Map</h3></div>
-                <div id="map_panel" class="panel-body" style="margin-top:0px; margin-bottom:0px">
+                <div id="map_panel" class="panel-body" style="margin-top:0px; margin-bottom:0px;">
                     <div id="map_container" style="overflow:hidden; border:1px">
                         <div id="celestial-map" style="width:100%; border:1px solid lightgray;padding-left:5px"></div>
                     </div>
                     <div id="celestial-form"></div>
-                    <div id="cursor_coordinates" style="margin-top:-25px; margin-left:10px">RA: --, Dec: --</div> 
+                    <div id="cursor_coordinates" style="margin-top:-25px; margin-left:10px">RA: --, Dec: --</div>
+                    <!-- <div id="usagetip" style="margin-top:-25px; margin-right:10px; text-align:right; color: #808080;">Double click a source to lock selection</div> -->
+                    <div id="usagetip" style="float:right;margin-top:-25px; margin-right:10px; text-align:right; color: #808080;display:none">Double click a source to lock selection</div>
                     <div id="selection" width=10 height=10></div>
                     <div id="tooltip_map"></div>  
                     <!-- <img id="map_loading" src="./img/loading_apple.gif" width="30px" style="margin-top:-327px; margin-left:617px; position: absolute; float:left;"> -->
