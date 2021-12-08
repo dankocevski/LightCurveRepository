@@ -699,9 +699,9 @@
             $data['flux_upper_limits'] = array();
             $data['flux_error'] = array();
             $data['photon_index'] = array();
-            $data['photon_index_error'] = array();           
+            $data['photon_index_interval'] = array();           
             $data['fit_tolerance'] = array();
-            $data['fit_convergance'] = array();
+            $data['fit_convergence'] = array();
             $data['dlogl'] = array();
             $data['EG'] = array();
             $data['GAL'] = array();
@@ -766,7 +766,7 @@
                     $index_error_max = sprintf("%0.2f", $index_error_max);
                     $index_error_min = sprintf("%0.2f", $index_error_min);
 
-                    array_push($data['photon_index_error'], array($met, $index_error_max, $index_error_min));
+                    array_push($data['photon_index_interval'], array($met, $index_error_max, $index_error_min));
                 }
 
                 // Fit Tolerance
@@ -774,9 +774,9 @@
                     array_push($data['fit_tolerance'], array($met, $row['fit_tolerance']));
                 }
 
-                // Fit Convergance
+                // Fit Convergence
                 if ((empty($row['ts']) == FALSE)) {
-                    array_push($data['fit_convergance'], array($met, $row['return_code']));
+                    array_push($data['fit_convergence'], array($met, $row['return_code']));
                 }
 
                 // bin id
@@ -813,9 +813,9 @@
             $data = str_replace('flux_upper_limits:', '"flux_upper_limits":', $data);
             $data = str_replace('flux_error:', '"flux_error":', $data);
             $data = str_replace('photon_index:', '"photon_index":', $data);
-            $data = str_replace('photon_index_error:', '"photon_index_error":', $data);          
+            $data = str_replace('photon_index_interval:', '"photon_index_interval":', $data);          
             $data = str_replace('fit_tolerance:', '"fit_tolerance":', $data);
-            $data = str_replace('fit_convergance:', '"fit_convergance":', $data);
+            $data = str_replace('fit_convergence:', '"fit_convergence":', $data);
             $data = str_replace('bin_id:', '"bin_id":', $data);
             $data = str_replace('dlogl:', '"dlogl":', $data);
             $data = str_replace('EG:', '"EG":', $data);
@@ -847,9 +847,9 @@
             $data['flux_upper_limits'] = array();
             $data['flux_error'] = array();
             $data['photon_index'] = array();
-            $data['photon_index_error'] = array();           
+            $data['photon_index_interval'] = array();           
             $data['fit_tolerance'] = array();
-            $data['fit_convergance'] = array();
+            $data['fit_convergence'] = array();
             $data['dlogl'] = array();
             $data['EG'] = array();
             $data['GAL'] = array();            
@@ -911,7 +911,7 @@
                     $index_error_max = sprintf("%0.2f", $index_error_max);
                     $index_error_min = sprintf("%0.2f", $index_error_min);
 
-                    array_push($data['photon_index_error'], array($met, $index_error_max, $index_error_min));
+                    array_push($data['photon_index_interval'], array($met, $index_error_max, $index_error_min));
                 }
 
                 // Fit Tolerance
@@ -919,9 +919,9 @@
                     array_push($data['fit_tolerance'], array($met, $row['fit_tolerance']));
                 }
 
-                // Fit Convergance
+                // Fit Convergence
                 if ((empty($row['ts2']) == FALSE)) {
-                    array_push($data['fit_convergance'], array($met, $row['return_code2']));
+                    array_push($data['fit_convergence'], array($met, $row['return_code2']));
                 }
 
                 // bin id
@@ -959,9 +959,9 @@
             $data = str_replace('flux_upper_limits:', '"flux_upper_limits":', $data);
             $data = str_replace('flux_error:', '"flux_error":', $data);
             $data = str_replace('photon_index:', '"photon_index":', $data);
-            $data = str_replace('photon_index_error:', '"photon_index_error":', $data);          
+            $data = str_replace('photon_index_interval:', '"photon_index_interval":', $data);          
             $data = str_replace('fit_tolerance:', '"fit_tolerance":', $data);
-            $data = str_replace('fit_convergance:', '"fit_convergance":', $data);
+            $data = str_replace('fit_convergence:', '"fit_convergence":', $data);
             $data = str_replace('bin_id:', '"bin_id":', $data);
             $data = str_replace('dlogl:', '"dlogl":', $data);
             $data = str_replace('EG:', '"EG":', $data);
@@ -995,7 +995,8 @@
         }
 
         // Establish the database connection
-        $db = new SQLite3('./db/gll_psc_v21.db');
+        // $db = new SQLite3('./db/gll_psc_v21.db');
+        $db = new SQLite3('./db/gll_psc_v27.db');
         $results = $db->query($queryStatement);
 
         // Create an array to store the results
