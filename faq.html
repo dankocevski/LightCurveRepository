@@ -3,23 +3,37 @@
 
 <head>
 
+    <!-- Bootstrap compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+        integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
     <meta charset="utf-8">
     <title>Fermi LAT Light Curve Repository</title>
 </head>
 
 <body>
-    <h2>Frequently Asked Questions</h2>
-    <div style="width:800px; border-collapse: separate;">
-        <B>Why is there no light curve data for some of the sources listed in the main page table? </B><BR>
-        The light curve repository (LCR) provides flux estimates at three different cadences for >1500 sources that are deemed variable in the 10-year Fermi-LAT point source catalog data release 2 (4FGL-DR2), that is, with a variability index above 21.67. While the table in the  <a href="https://fermi.gsfc.nasa.gov/ssc/data/access/lat/LightCurveRepository/">main page</a> lists all 4FGL-DR2 sources, only the ones with variability index above 21.67 show embedded hyperlinks to the data products of the source.
-        
-        <BR><BR>         
-        <B>Can I download the light curves of more than one source at the time?</B><BR>
-        You could use scripts like <a href="download.py">this one</a> to that end.
-        
-        <BR><BR>
-        <B>Is it possible to fix the pop out charts that appear when I hover over a source in the map? They disappear before I can click on the links within them.</B><BR>
-        Double clicking on the desired source in the map will fix the chart.
+    <div class="panel panel-default" style="width:800px; border-collapse: separate; margin: 20px;">
+        <div class="panel-heading">
+            <h3 class="panel-title">Having technical difficulties?</h3>
+        </div>
+        <div class="panel-body">
+            <B>Why is there no light curve data for some of the sources listed in the main page table? </B><BR>
+            The light curve repository (LCR) provides flux estimates at three different cadences for >1500 sources that are deemed variable in the 10-year Fermi-LAT point source catalog data release 2 (4FGL-DR2), that is, with a variability index above 21.67. While the table in the <a href="https://fermi.gsfc.nasa.gov/ssc/data/access/lat/LightCurveRepository/">main page</a> lists all 4FGL-DR2 sources, only the ones with variability index above 21.67 show embedded hyperlinks to the data products of the source.
+
+            <BR><BR>
+            <B>Can I download the light curves of more than one source at the time?</B><BR>
+            You could use scripts like <a href="download.py">this one</a> to that end.
+
+            <BR><BR>
+            <B>Is it possible to fix the pop out charts that appear when I hover over a source in the map? They disappear before I can click on the links within them.</B><BR>
+            Double clicking on the desired source in the map will fix the chart.
+        </div>
+    </div>
+
+    <div class="panel panel-default" style="width:800px; border-collapse: separate; margin: 20px;">
+        <div class="panel-body">
+            <i>If your issue is not described in the list above, you can contact us through <u>fermilcr@athena.gsfc.nasa.gov</u>, with a description of your issue.</i>
+        </div>
     </div>
 </body>
 
