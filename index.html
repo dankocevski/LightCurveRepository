@@ -1679,7 +1679,8 @@
             console.log('Querying the 4FGL database...')
 
             // Setup the URL
-            URL = "queryDB.php?typeOfRequest=SourceList&catalog=4FGL&magicWord=" + magicWord; 
+            // URL = "queryDB.php?typeOfRequest=SourceList&catalog=4FGL&magicWord=" + magicWord; 
+            URL = "queryDB.php?typeOfRequest=SourceList&catalog=4FGL"; 
 
             if (isNaN(query_ra) !== true && isNaN(query_dec) !== true) {
 
@@ -2361,6 +2362,11 @@
                 // Loop through each of the keys in the current record
                 for (var index in table_columns) {
 
+                    // Code to hide non-variable sources
+                    // if (parseFloat(source['Variability_Index']) < variability_index_cut) {
+                    //     continue
+                    // }
+
                     var key = table_columns[index]
 
                     // Check to see if the current key is in the list of columns that we want to show
@@ -2369,7 +2375,7 @@
                         row[++j] ='<td class="' + key + '" style="text-align: center;">';
                         var source_name = source[key].replace(' ','_')
                         if (parseFloat(source['Variability_Index']) >= variability_index_cut) {
-                            row[++j] = '<a href="./source.php?source_name=' + source_name + '">' + source[key] + '</a>';
+                            row[++j] = '<a href="./source.php?source_name=' + source_name + '" target="_blank">' + source[key] + '</a>';
                         } else {
                             row[++j] = source[key];
                         }
@@ -5205,8 +5211,8 @@
 
 
             // Check to see if the passphrase data is stored in a cookie
-            checkCookie();
-
+            // checkCookie();
+            get4FGLData();
 
         });
 
@@ -5429,7 +5435,14 @@
                             <label class="checkbox-inline" title="Changes the color of non-variabile sources to gray"><input class="map-overlap show_only_variable" type="checkbox" id="show_only_variable_sources" value="" checked><span>Gray Non-Variable Sources</label>
                         </div>
                       </div>                  
-
+<!--                       <div style="margin-top:30px">
+                        <label for="name">4FGL Table:</label>
+                      </div>
+                      <div class="row-small-gutter">
+                        <div class="col-sm-12">
+                            <label class="checkbox-inline" title="Changes the color of non-variabile sources to gray"><input class="map-overlap show_only_variable" type="checkbox" id="show_only_variable_sources" value=""><span>List Only Variable Sources</label>
+                        </div>
+                      </div>   -->
                 </div>
             </div>
             <!-- Map options panel ends here -->       
@@ -5467,6 +5480,23 @@
             </div>
 
             <!-- Related resources start here -->      
+            <div class="panel panel-default" style="height: 150px;">
+                <div class="panel-heading">
+                    <h3 class="panel-title">LCR Resources Information</h3>
+                 </div>
+                    <center>
+                        <table class="table table-striped">
+                        <!-- <table class="table"> -->
+                          <tbody>           
+                                <tr><td><a href="about.html">The Light Curve Repository Usage Guide</a></td></tr>      
+                                <tr><td><a href="https://fermi.gsfc.nasa.gov/ssc/">LCR Data Description</a></td></tr>
+                          </tbody>
+                        </table>  
+                    </center>
+            </div>
+            <!-- Related resources ends here -->   
+
+            <!-- Related resources start here -->      
             <div class="panel panel-default" style="height: 225px;">
                 <div class="panel-heading">
                     <h3 class="panel-title">Additional Information</h3>
@@ -5475,7 +5505,7 @@
                         <table class="table table-striped">
                         <!-- <table class="table"> -->
                           <tbody>           
-                                <tr><td><a href="about.html">About the Light Curve Repository</a></td></tr>      
+                                <tr><td><a href="about.html">The Light Curve Repository Usage Guide</a></td></tr>      
                                 <tr><td><a href="https://fermi.gsfc.nasa.gov/ssc/">The Fermi Science Support Center</a></td></tr>
                                 <tr><td><a href="https://fermi.gsfc.nasa.gov/ssc/data/access/lat/FAVA/">Fermi All-Sky Variability Analysis (FAVA)</a></td></tr>           
                                 <tr><td><a href="https://fermi.gsfc.nasa.gov/ssc/data/analysis/scitools/">Fermi LAT & GBM Analysis Tutorials</a></td></tr>
@@ -5489,7 +5519,7 @@
             <!-- Citation request start here -->    
             <div class="panel panel-default">   
                 <div class="panel-heading">
-                    Please reference <a href="">Kocevski et al. 2020</a> for use of any results presented in the Fermi LAT Light Curve Repository.
+                    Please reference <a href="">Kocevski et al. 2020</a> for use of any results presented in the Fermi LAT Light Curve Repository. Also be sure to consult the <a href="about.html">LCR Usage Guide</a> for important details and caveats about the LCR analysis.
                 </div>
             </div>
             <!--  Citation request ends here -->    
@@ -5518,7 +5548,7 @@
                         <div id="celestial-map" style="width:100%; border:1px solid lightgray;padding-left:5px"></div>
                     </div>
                     <div id="celestial-form"></div>
-                    <div id="cursor_coordinates" style="margin-top:-25px; margin-left:10px">RA: --, Dec: --</div>
+                    <div id="cursor_coordinates" style="margin-top:-30px; margin-left:10px">RA: --, Dec: --</div>
                     <!-- <div id="usagetip" style="margin-top:-25px; margin-right:10px; text-align:right; color: #808080;">Double click a source to lock selection</div> -->
                     <div id="usagetip" style="float:right;margin-top:-25px; margin-right:10px; text-align:right; color: #808080;display:none">Double click a source to lock selection</div>
                     <div id="selection" width=10 height=10></div>
@@ -5699,7 +5729,7 @@
             <div id="footer-content">
                 <p>
                     <hr>
-                    Fermi LAT Light Curve Repository - Support Contact:<a href="mailto:daniel.kocevski@nasa.gov"> Daniel Kocevski</a>
+                    Fermi LAT Light Curve Repository - Support Contact:<a href="mailto:fermilcr@athena.gsfc.nasa.gov"> fermilcr@athena.gsfc.nasa.gov</a>
                     <BR>
                     <BR>
                 </p>

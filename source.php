@@ -47,8 +47,6 @@
     <!-- Load test data -->
     <!-- <script type="text/javascript" src="./data/photon_flux_error.json"></script> -->
 
-
-
 </head>
 
 <!-- custom css -->
@@ -126,6 +124,50 @@
         border-right:5px solid transparent;
         border-top:5px solid #00468b
     }
+
+
+.tooltip2 {
+  position: relative;
+  display: inline-block;
+  /*border-bottom: 1px dotted black;*/
+
+}
+
+.tooltip2 .tooltiptext {
+  visibility: hidden;
+  width: 120px;
+  /*background-color: black;*/
+  /*color: #fff;*/
+  background-color: WhiteSmoke;
+  color: #333;
+  text-align: center;
+  border-radius: 6px;
+  padding: 5px 5px 5px 5px;
+  border: 1px;
+  border-style: solid;
+  border-color: gray;
+
+/*   font-size: 1em !important;
+   color: #333 !important;
+   font-family: Arial !important;*/
+   font-weight: 500;
+
+  /* Position the tooltip */
+  position: absolute;
+  z-index: 1;
+}
+
+.tooltip2 .tooltiptext {
+  width: 200px;
+  bottom: 120%;
+  left: 50%; 
+  margin-left: -100px; /* Use half of the width (120/2 = 60), to center the tooltip */
+}
+
+.tooltip2:hover .tooltiptext {
+  visibility: visible;
+}
+
 
 
 </style>
@@ -521,6 +563,7 @@
                     gridLineWidth: 0,
                     min: 0,
                     max: median_from_matrix(flux)*10,
+                    // softMax: median_from_matrix(flux)*10,
                     labels: {
                         formatter: function() {
 
@@ -1279,15 +1322,12 @@
             var source_name_urlEncoded = encodeURIComponent(source_name);
             var magic_word_urlEncoded = encodeURIComponent(magic_word_submitted);
 
-            var URL = "queryDB.php?typeOfRequest=sourceData&source_name=" + source_name_urlEncoded + "&magicWord=" + magic_word_urlEncoded;
+            var URL = "queryDB.php?typeOfRequest=sourceData&source_name=" + source_name_urlEncoded
 
             console.log(URL);
 
             // Get the data
             $.ajax({url: URL, success: function(responseText){
-
-                // Parse the resulting json file
-                // var data = JSON.parse(responseText);
 
                 // Get the data
                 var data;
@@ -1295,7 +1335,7 @@
                     data = JSON.parse(responseText);
                 } catch (error) {
                     console.log('Error parsing query response.')
-                    $('#main').hide()
+                    // $('#main').hide()
                     return
                 }
 
@@ -1386,7 +1426,7 @@
             var source_name_urlEncoded = encodeURIComponent(source_name);
             var magic_word_urlEncoded = encodeURIComponent(magic_word_submitted);
 
-            URL_light_curve_data = "queryDB.php?typeOfRequest=lightCurveData&source_name=" + source_name_urlEncoded + '&cadence=' + cadence + '&flux_type=' + flux_type + '&index_type=' + index_type + '&ts_min=' + ts_min + "&magicWord=" + magic_word_urlEncoded;
+            URL_light_curve_data = "queryDB.php?typeOfRequest=lightCurveData&source_name=" + source_name_urlEncoded + '&cadence=' + cadence + '&flux_type=' + flux_type + '&index_type=' + index_type + '&ts_min=' + ts_min;
 
             console.log(URL_light_curve_data);
 
@@ -1661,21 +1701,21 @@
 
             var flux_header
             if (flux_type.includes('energy')) {
-                flux_header = 'Energy Flux [0.1-100 GeV]<BR>(MeV cm<sup>-2</sup> s<sup>-1</sup>)'
+                flux_header = '<div class="tooltip2">Energy Flux [0.1-100 GeV]<BR>(MeV cm<sup>-2</sup> s<sup>-1</sup>)<span class="tooltiptext">Average integrated photon flux from 0.1 to 100 MeV in units of photons/cm^2/s</span></div>'
             } else {
-                flux_header = 'Photon Flux [0.1-100 GeV]<BR>(photons cm<sup>-2</sup> s<sup>-1</sup>)'
+                flux_header = '<div class="tooltip2">Photon Flux [0.1-100 GeV]<BR>(photons cm<sup>-2</sup> s<sup>-1</sup>)<span class="tooltiptext">Average integrated energy flux from 0.1 to 100 MeV in units of MeV/cm^2/s</span></div>'
             }
 
             // Create the header string
             var header = '<tr> \
-            <th style="text-align: center; min-width:150px">Date<BR>(UTC)</th> \
-            <th style="text-align: center;">Julian Date<BR></th> \
-            <th style="text-align: center;">MET</th> \
-            <th style="text-align: center;">TS</th> \
+            <th style="text-align: center; min-width:150px"><div class="tooltip2">Date<BR>(UTC)<span class="tooltiptext">Mid point of time bin in UTC</span></div></th> \
+            <th style="text-align: center;"><div class="tooltip2">Julian Date<BR><span class="tooltiptext">Mid point of time bin in Julian Date (JD)</span></div></th> \
+            <th style="text-align: center;"><div class="tooltip2">MET<span class="tooltiptext">Mid point of time bin in Mission Elapsed Time (MET)</span></div></th> \
+            <th style="text-align: center;"><div class="tooltip2">TS<span class="tooltiptext">The likelihood Test Statistic (TS)</span></div></th> \
             <th id="flux_header" style="text-align: center;">' + flux_header + '</th> \
-            <th style="text-align: center;">Photon Index</th> \
-            <th style="text-align: center;">Fit Tolerance</th> \
-            <th style="text-align: center;">MINUIT Return Code</th> \
+            <th style="text-align: center;"><div class="tooltip2">Photon Index<span class="tooltiptext">Spectral photon index</span></div></th> \
+            <th style="text-align: center;"><div class="tooltip2">Fit Tolerance<span class="tooltiptext">Relative fit tolerance</span></div></th> \
+            <th style="text-align: center;"><div class="tooltip2">MINUIT Return Code<span class="tooltiptext">MINUIT fit convergance</span></div></th> \
             <th style="text-align: center;">Analysis Log</th> \
             '
 
@@ -2220,8 +2260,11 @@
                 document.execCommand("copy");
                 document.body.removeChild(dummy);
 
-                alert('API link copied to clipboard:\r\n\r\n' + URL_light_curve_data)
-                
+                // alert('API link copied to clipboard:\r\n\r\n' + 'https://fermi.gsfc.nasa.gov/ssc/data/access/lat/LightCurveRepository/' + URL_light_curve_data)
+
+                $('#api_link_text').text('https://fermi.gsfc.nasa.gov/ssc/data/access/lat/LightCurveRepository/' + URL_light_curve_data)
+                $('#api_link_dialog').modal('show');
+
               }                            
             });
 
@@ -2330,12 +2373,12 @@
             }); 
 
             
-
-            // getCatalogData();
-            // getLightCurveData();
-            
             // Check if a passphrase cookie exists and get the data if it does, or luanch the magic word model if it doesn't
-            checkCookie()
+            // checkCookie()
+
+            getCatalogData();
+            getLightCurveData();
+            
 
         });
 
@@ -2582,7 +2625,8 @@
                     <div class="panel-heading">
                         <h3 class="panel-title">Data Download</h3>
                      </div>
-                     <div class="panel-body" style="height:105px">
+<!--                      <div class="panel-body" style="height:105px">
+ -->                     <div class="panel-body">
 
                         <BR>
                          <center>
@@ -2596,6 +2640,12 @@
                                     <li id="copy_api"><a href="#">Copy API Link</a></li>
                                 </ul>
                             </div>
+
+                        <BR>
+                        <BR>
+                        <a href="table_description.html" target="_blank" onclick="window.open(this.href,'targetWindow','width=800px, height=1175px'); return false;">JSON File Description</a>
+                        <p>
+
                         </center>
 
                     </div>
@@ -2605,17 +2655,17 @@
                 <!-- Related resources start here -->      
                 <div class="panel panel-default" style="height: 225px;">
                     <div class="panel-heading">
-                        <h3 class="panel-title">Related Resources</h3>
+                        <h3 class="panel-title">Additional Information</h3>
                      </div>
                         <center>
                             <table class="table table-striped">
                             <!-- <table class="table"> -->
                               <tbody>           
+                                    <tr><td><a href="about.html">The Light Curve Repository Usage Guide</a></td></tr>      
                                     <tr><td><a href="https://fermi.gsfc.nasa.gov/ssc/">The Fermi Science Support Center</a></td></tr>
                                     <tr><td><a href="https://fermi.gsfc.nasa.gov/ssc/data/access/lat/FAVA/">Fermi All-Sky Variability Analysis (FAVA)</a></td></tr>           
                                     <tr><td><a href="https://fermi.gsfc.nasa.gov/ssc/data/analysis/scitools/">Fermi LAT & GBM Analysis Tutorials</a></td></tr>
                                     <tr><td><a href="https://fermi.gsfc.nasa.gov/ssc/data/access/">Fermi LAT & GBM Data Access</a></td></tr>
-                                    <tr><td><a href="about.html">About the Light Curve Repository</a></td></tr>      
                               </tbody>
                             </table>  
                         </center>
@@ -2625,7 +2675,7 @@
                 <!-- Citation request start here -->    
                 <div class="panel panel-default">   
                     <div class="panel-heading">
-                        Please reference <a href="">Kocevski et al. 2021</a> for use of any results presented in the Fermi LAT Light Curve Repository.
+                      Please reference <a href="">Kocevski et al. 2020</a> for use of any results presented in the Fermi LAT Light Curve Repository. Also be sure to consult the <a href="about.html">LCR Usage Guide</a> for important details and caveats about the LCR analysis.
                     </div>
                 </div>
                 <!--  Citation request ends here -->   
@@ -2787,11 +2837,13 @@
                     <div class="panel panel-default">
                         <div class="panel-heading"><h3 class="panel-title">Likelihood Fit Data Table</h3></div>
                         <div class="panel-body">
-                            <a href="https://fermi.gsfc.nasa.gov/ssc/data/access/lat/LightCurveRepository/table_description.html">Table and JSON File Description</a>
+                            <!-- <a href="https://fermi.gsfc.nasa.gov/ssc/data/access/lat/LightCurveRepository/table_description.html">Table and JSON File Description</a> -->
                             <center>
+                                <a href="table_description.html" target="_blank" onclick="window.open(this.href,'targetWindow','width=800px, height=1175px'); return false;">Table Data Description</a>
+                                <p>
                                 <table class="table table-striped table-condensed table-bordered data-table" id="data_table" style="width:1000px;"></table>  
-                            </center>
 
+                            </center>
                         </div>  
                     </div>
                 </div>
@@ -2811,7 +2863,7 @@
             
                 <p>
                     <hr>
-                    Fermi LAT Light Curve Repository - Support Contact:<a href="mailto:daniel.kocevski@nasa.gov"> Daniel Kocevski</a>
+                    Fermi LAT Light Curve Repository - Support Contact:<a href="mailto:fermilcr@athena.gsfc.nasa.gov"> fermilcr@athena.gsfc.nasa.gov</a>
                 </p>
 
             </div>
@@ -2822,103 +2874,38 @@
     <!-- Main ends here -->
     </div>
 
+
     <!-- Magic word dialog modal view starts here -->
-    <div id="magic_word_dialog" class="modal fade">
-        <div class="modal-dialog" style="width:800px; margin: auto; margin-top:10%">
+    <div id="api_link_dialog" class="modal fade">
+        <div class="modal-dialog" style="width:500px; margin: auto; margin-top:10%">
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                    <h4 class="modal-title" style="text-align: center;">Welcome to the Fermi LAT Light Curve Repository</h4>
+                    <h4 class="modal-title" style="text-align: center;">API Data Link</h4>
                 </div>
 
-                <div class="modal-body center-block" style="text-align: center; height:200px; margin-top:5%; margin-bottom:5%">
+
+                <div class="modal-body center-block" style="text-align: center; height:250px; margin-top:5%; margin-bottom:5%">
                     <center>
-                        <!-- <span style="font-size: 50px;" class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span> -->
+                        <!-- <span style="font-size: 50px;" class="glyphicon glyphicon-copy" aria-hidden="true"></span> -->
                         <img width="75px" src="./img/spaceship.png">
                     </center>
-                    
-                    <BR>
-
-                    This page is currently under developement.<BR>A public announcement will be made when the light curve data is available.<BR>Feedback on the light curve repository data portal is certainly welcomed!
-                    
-                    <BR>
-                    <BR>
                 
-                    <form id="magic_word_form" name='MagicWordForm' style="display:visible">
-                        <input id="magic_word" type="text" class="input-small" placeholder="">
-                        </form>
+                    <BR>
 
+                    The JSON data URL has been copied to the clipboard:
+                    <BR>
+                    <BR>
+
+                    <div id="api_link_text" style="word-break: break-all; word-wrap: break-word;font-family:'Courier New';font-weight:500;">
+                    </div>
+                    
                 </div> <!-- /.modal-body -->
 
-                <div class="modal-footer">             
-                    <div id="SaveButtonDiv" style="float: right;">
-                        <button type="button" id="submitForm" class="btn btn-primary" style="width:60px; color:white;font-size: 12px;margin:10px">Ok</button>
-                    </div>  
-<!--                     <div style="float: right;"> 
-                        <button type="button" id="dismissForm" class="btn btn-default" data-dismiss="modal" style="font-size: 12px;margin-top:10px">Close</button>
-                    </div>  -->
-                </div> <!-- /.modal-footer -->
 
             </div> <!-- /.modal-content -->
         </div> <!-- /.modal-dialog -->
     </div> <!-- /.modal -->  
-
-
-
-    <!-- Magic word dialog modal view starts here -->
-    <div id="exampleModalCenter" class="modal fade">
-        <div class="modal-dialog" style="width:800px; margin: auto; margin-top:10%">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                    <h4 class="modal-title" style="text-align: center;">Welcome to the Fermi LAT Light Curve Repository</h4>
-                </div>
-
-                <div class="modal-body center-block" style="text-align: center; height:200px; margin-top:10%">
-
-                    
-                    This page is currently under developement.<BR>Please enter the passphrase to view the draft page:
-                    
-                    <BR>
-                    <BR>
-               
-
-                </div> <!-- /.modal-body -->
-
-                <div class="modal-footer">             
-                    <div style="float: right;"> 
-                        <button type="button" id="dismissForm" class="btn btn-default" data-dismiss="modal" style="font-size: 12px;margin-top:10px">Close</button>
-                    </div> 
-                </div> <!-- /.modal-footer -->
-
-            </div> <!-- /.modal-content -->
-        </div> <!-- /.modal-dialog -->
-    </div> <!-- /.modal -->  
-
-
-
-	<!-- Info modal -->
-<!-- 	<div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
-	  <div class="modal-dialog modal-dialog-centered" role="document">
-	    <div class="modal-content">
-	      <div class="modal-header">
-	        <h5 class="modal-title" id="exampleModalLongTitle">Modal title</h5>
-	        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-	          <span aria-hidden="true">&times;</span>
-	        </button>
-	      </div>
-	      <div class="modal-body">
-	        ...
-	      </div>
-	      <div class="modal-footer">
-	        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-	        <button type="button" class="btn btn-primary">Save changes</button>
-	      </div>
-	    </div>
-	  </div>
-	</div> -->
-
-
 
 
     <!-- tippy -->
