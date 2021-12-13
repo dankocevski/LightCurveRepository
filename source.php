@@ -2925,17 +2925,6 @@
     </div> <!-- /.modal -->  
 
 
-    <!-- tippy -->
-<!--     <script src="https://unpkg.com/@popperjs/core@2"></script>
-    <script src="https://unpkg.com/tippy.js@6"></script>
-
-    <script>
-	    tippy('#ts_min_button', {
-			theme: 'light',
-        	content: 'Set the minimum detction significance. Time intervals with a detection signifiance below this level will result in the reporting of an upper limit'
-    	});
-	</script> -->
-
 </body>
 
 
