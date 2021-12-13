@@ -2653,7 +2653,25 @@
                 <!-- Download panel ends here -->
                                                                             
                 <!-- Related resources start here -->      
-                <div class="panel panel-default" style="height: 225px;">
+                <div class="panel panel-default" style="height: 151px;">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">Light Curve Repository Resources</h3>
+                     </div>
+                        <center>
+                            <table class="table table-striped">
+                            <!-- <table class="table"> -->
+                              <tbody>           
+                                    <tr><td><a href="about.html" target="_blank">About the Light Curve Repository</a></td></tr>      
+                                    <tr><td><a href="table_description.html" target="_blank" onclick="window.open(this.href,'targetWindow','width=800px, height=1175px'); return false;"> The Light Curve Repository Data Description</a></td></tr>
+                                    <tr><td><a href="FAQ.html" target="_blank">The Light Curve Repository FAQ</a></td></tr>
+                              </tbody>
+                            </table>  
+                        </center>
+                </div>
+                <!-- Related resources ends here -->   
+
+                <!-- Related resources start here -->      
+                <div class="panel panel-default" style="height: 188px;">
                     <div class="panel-heading">
                         <h3 class="panel-title">Additional Information</h3>
                      </div>
@@ -2661,11 +2679,10 @@
                             <table class="table table-striped">
                             <!-- <table class="table"> -->
                               <tbody>           
-                                    <tr><td><a href="about.html">The Light Curve Repository Usage Guide</a></td></tr>      
                                     <tr><td><a href="https://fermi.gsfc.nasa.gov/ssc/">The Fermi Science Support Center</a></td></tr>
-                                    <tr><td><a href="https://fermi.gsfc.nasa.gov/ssc/data/access/lat/FAVA/">Fermi All-Sky Variability Analysis (FAVA)</a></td></tr>           
-                                    <tr><td><a href="https://fermi.gsfc.nasa.gov/ssc/data/analysis/scitools/">Fermi LAT & GBM Analysis Tutorials</a></td></tr>
+                                    <tr><td><a href="https://fermi.gsfc.nasa.gov/ssc/data/analysis/documentation/Cicerone/">Fermi LAT & GBM Analysis Guide</a></td></tr>
                                     <tr><td><a href="https://fermi.gsfc.nasa.gov/ssc/data/access/">Fermi LAT & GBM Data Access</a></td></tr>
+                                    <tr><td><a href="https://fermi.gsfc.nasa.gov/ssc/data/access/lat/FAVA/">Fermi All-Sky Variability Analysis (FAVA)</a></td></tr>           
                               </tbody>
                             </table>  
                         </center>
@@ -2675,7 +2692,7 @@
                 <!-- Citation request start here -->    
                 <div class="panel panel-default">   
                     <div class="panel-heading">
-                      Please reference <a href="">Kocevski et al. 2020</a> for use of any results presented in the Fermi LAT Light Curve Repository. Also be sure to consult the <a href="about.html">LCR Usage Guide</a> for important details and caveats about the LCR analysis.
+                      Please reference <a href="">Kocevski et al. 2020</a> for use of any results presented in the Fermi LAT Light Curve Repository. Also be sure to consult the <a href="about.html">LCR Usage Notes</a> for important details and caveats about the LCR analysis.
                     </div>
                 </div>
                 <!--  Citation request ends here -->   
