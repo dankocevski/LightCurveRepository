@@ -1861,7 +1861,6 @@
 
                 getCatalogData();
                 getLightCurveData();
-
             });
 
 
@@ -1907,6 +1906,10 @@
             // Light curve data plot selector
             $('.dropdown-menu.flux-type').on('click', 'li', function() {
 
+                if ($(this).attr('id').includes('axis')) {
+                    return
+                }
+
                 $('.dropdown-menu.flux-type li.active').removeClass('active');
                 $(this).addClass('active');
 
@@ -1925,6 +1928,10 @@
 
             // Spectral fitting type selector
             $('.dropdown-menu.index_type').on('click', 'li', function() {
+
+                if ($(this).attr('id').includes('axis')) {
+                    return
+                }
 
                 $('.dropdown-menu.index_type li.active').removeClass('active');
                 $(this).addClass('active');
@@ -1964,6 +1971,10 @@
             // Light curve data plot selector
             $('.dropdown-menu.xaxis-type').on('click', 'li', function() {
 
+                if ($(this).attr('id').includes('axis')) {
+                    return
+                }
+                
                 $('.dropdown-menu.xaxis-type li.active').removeClass('active');
                 $(this).addClass('active');
 
@@ -2022,11 +2033,14 @@
                 // Reload the data and update the plots
                 getLightCurveData();
                 // prepareLightCurveData();
-
             });
 
             // Ancillary data plot selector
             $('.dropdown-menu.ancillary-data').on('click', 'li', function() {
+
+                if ($(this).attr('id').includes('axis')) {
+                    return
+                }
 
                 $('.dropdown-menu.ancillary-data li.active').removeClass('active');
                 $(this).addClass('active');
@@ -2223,7 +2237,6 @@
                 // });
             });
 
-
             $('.dropdown-menu.ancillary-data li a').click(function(event) {
 
                 event.preventDefault();
@@ -2287,7 +2300,6 @@
                     chart1.tooltip.defaultFormatter = defaultFormatter1;
                     chart2.tooltip.defaultFormatter = defaultFormatter2;
                 }
-
             });
      
             $('#show_upper_limits').click( function(){
@@ -2316,7 +2328,6 @@
                     }
 
                 }
-
             });
 
             $('#show_error_bars').click( function(){
@@ -2329,7 +2340,6 @@
                 } else {
                     chart1.series[2].hide()
                 }
-
             });
 
             $('#show_data_line').click( function(){
@@ -2343,7 +2353,6 @@
 
                 chart1.series[0].userOptions.lineWidth = data_line_width
                 chart1.series[0].update()
-
             });
 
             $('#show_nonconvergant_fits').click( function(){
@@ -2353,9 +2362,7 @@
             	// Reload the light curve data
             	// getLightCurveData()
                 prepareLightCurveData()
-
             });
-
 
             $('#show_unconstrained_fits').click( function(){
 
@@ -2364,9 +2371,7 @@
             	// Reload the light curve data
             	// getLightCurveData()
                 prepareLightCurveData()
-
             });
-
 
             $('[data-toggle="tooltip"]').tooltip({
                 delay: {"show": 300, "hide": 100}
@@ -2715,7 +2720,7 @@
                                 <div class="btn-group" role="group">
                                     <button class="btn btn-default dropdown-toggle flux-type" type="button" data-toggle="dropdown">Photon Flux <span class="caret"></span></button>
                                     <ul class="dropdown-menu flux-type">
-                                        <li id="y-axis" class="disabled"><a href="#">Y-Axis:</a></li>
+                                        <li id="y-axis" class="disabled"><a href="javascript:void(0)">Y-Axis:</a></li>
                                         <li id="photon" class="active"><a href="javascript:void(0)">Photon Flux </a></li>
                                         <li id="energy"><a href="javascript:void(0)">Energy Flux </a></li>
                                     </ul>
@@ -2758,7 +2763,7 @@
                                 <div class="btn-group" role="group">
                                     <button style="min-width:125px" class="btn btn-default dropdown-toggle ancillary-data" type="button" data-toggle="dropdown">Photon Index <span class="caret"></span></button>
                                     <ul class="dropdown-menu ancillary-data">
-                                        <li id="y-axis" class="disabled"><a href="#">Y-Axis:</a></li>
+                                        <li id="y-axis" class="disabled"><a href="javascript:void(0)">Y-Axis:</a></li>
                                         <li id="photon_index" class="active"><a href="#">Photon Index</a></li>
                                         <li id="ts"><a href="">TS</a></li>
                                         <li id="fit_convergence"><a href="">Fit Convergence</a></li>
