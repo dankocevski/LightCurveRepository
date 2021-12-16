@@ -857,8 +857,8 @@
 
                 for (i=0; i<data_FGL.length; i++) {
 
-                    var coordinates
-                    var source = data_FGL[i]
+                    var coordinates;
+                    var source = data_FGL[i];
 
                     if (config.transform.includes('equatorial')) {
                         coordinates = [source.RAJ2000, source.DEJ2000]
@@ -949,7 +949,7 @@
                             // draw on canvas
                             Celestial.setStyle(pointStyle);
                             Celestial.context.beginPath();
-                            Celestial.context.arc(point[0], point[1], r, 0, 2 * Math.PI);
+                            Celestial.context.arc(point[0],  point[1], r, 0, 2 * Math.PI);
                             Celestial.context.closePath();
                             Celestial.context.stroke();
                             Celestial.context.fill();

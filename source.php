@@ -1529,7 +1529,7 @@
 
                     var met = nonconvergant_fits[i]
                     for (var j = 0; j < flux_forPlotting.length; j++) {
-                        if (flux_forPlotting[j][0] === met) {
+                        if ((flux_forPlotting[j] != undefined) && (flux_forPlotting[j][0] === met)) {
                             flux_forPlotting.splice(j,1)
                             flux_error_forPlotting.splice(j,1)
                             break
@@ -1537,7 +1537,7 @@
                     }
 
                     for (var j = 0; j < flux_upper_limits_forPlotting.length; j++) {
-                        if (flux_upper_limits_forPlotting[i][0] === met) {
+                        if ((flux_upper_limits_forPlotting[j] != undefined) && (flux_upper_limits_forPlotting[i][0] === met)) {
                             flux_upper_limits_forPlotting.splice(j,1)
                             flux_upper_limits_forPlotting.splice(j,1)
                             break
@@ -1553,7 +1553,7 @@
 
                     var met = unconstrained_fits[i]
                     for (var j = 0; j < flux_forPlotting.length; j++) {
-                        if (flux_forPlotting[j][0] === met) {
+                        if ((flux_forPlotting[j] != undefined) && (flux_forPlotting[j][0] === met)) {
                             flux_forPlotting.splice(j,1)
                             flux_error_forPlotting.splice(j,1)
                             break
@@ -1561,16 +1561,19 @@
                     }
 
                     for (var j = 0; j < flux_upper_limits.length; j++) {
-                        if (flux_upper_limits_forPlotting[j][0] === met) {
-                            flux_upper_limits_forPlotting.splice(j,1)
-                            flux_upper_limits_forPlotting.splice(j,1)
-                            break
+                        if ((flux_upper_limits_forPlotting[j] != undefined) && (flux_upper_limits_forPlotting[j][0] === met)) {
+                                flux_upper_limits_forPlotting.splice(j,1)
+                                flux_upper_limits_forPlotting.splice(j,1)
+                                break
                         }
                     }
 
                 }
             }    
 
+            console.log(ts.length)
+            console.log(flux_forPlotting.length)
+            console.log(flux_upper_limits_forPlotting.length)
 
 
             // Update the side table with the results
