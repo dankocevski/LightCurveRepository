@@ -877,20 +877,26 @@
                             if (perform_search === true) {
 
                                 // Position search only
-                                if (search_keyword.length === 0) {
-                                    if (source.distance <= search_radius) {
+                                if (search_keyword.length == 0) {
+                                    if (search_radius > 0) {
+                                        if (source.distance <= search_radius) {
+                                            pointStyle = pointStyle_active
+                                            labelStyle = labelStyle_active
+                                            source['active'] = true
+                                        } else {
+                                            pointStyle = pointStyle_gray
+                                            labelStyle = labelStyle_gray
+                                            source['active'] = true
+                                        }        
+                                    } else {
                                         pointStyle = pointStyle_active
                                         labelStyle = labelStyle_active
-                                        source['active'] = true
-                                    } else {
-                                        pointStyle = pointStyle_gray
-                                        labelStyle = labelStyle_gray
                                         source['active'] = true
                                     }
                                 }
 
                                 // Keyword search only
-                                if (search_radius === 0) {
+                                if (search_keyword.length > 0 && search_radius == 0) {
                                     if (sourceIncludesKeyword(source, search_keyword) === true) {
                                         pointStyle = pointStyle_active
                                         labelStyle = labelStyle_active
@@ -921,7 +927,7 @@
                                 source['active'] = true
                             }
 
-                            if ((show_only_variable_4FGL_sources === true) && (perform_search == false)) {
+                            if ((show_only_variable_4FGL_sources === true) && (perform_search == false || (search_radius == 0 && search_keyword.length == 0))) {
                                 if (parseFloat(source.Variability_Index) < variability_index_cut) {
                                     pointStyle = {stroke: "rgba(128, 128, 128, .25)", fill: "rgba(128, 128, 128, .25)" };
                                 } else {
@@ -2010,7 +2016,6 @@
 
             // Show the spinner while the data is being loaded
             $('#timeline_spinner').hide()
-
         }
 
         function addFakeDataPoint(ra, dec) {
@@ -2454,6 +2459,32 @@
 
             }
 
+            // Get the an object containing the url parameters
+            urlParameters = new URLSearchParams(window.location.search);
+
+            // // Check if the user has passed any coordinate parameters
+            if (urlParameters.has('ra') && urlParameters.has('dec')) {
+
+                // Extract the url parameters
+                ra = urlParameters.get('ra')
+                dec = urlParameters.get('dec')
+                error = urlParameters.get('error')
+
+                // Add them to the input form
+                $("#ra_input").val(ra);
+                $("#dec_input").val(dec);
+                $("#radius_input").val(error);
+
+                // Setup the search and clear buttons
+                $('#clear_button').removeAttr("disabled");
+                $("#clear_button").removeClass("btn-default").addClass("btn-danger");
+
+                // Programmatically click the search button
+                $("#search_button")[0].click();
+
+            }
+
+            
         }
 
         // Fill the 2FAV table
@@ -2572,7 +2603,6 @@
 
             // // Update the pagination count
             // $('#pagination_end a')[0].innerText = String(parseInt(data.length/maxNumberOfTableRows))
-
         }
 
        // Fill the 2FAV table
@@ -2688,7 +2718,6 @@
 
             // // Update the number of detections
             // $('#number_of_LAT_detections')[0].innerHTML = " - " + data.length + " Detections"
-
         }
 
        // Fill the 2FAV table
@@ -2798,7 +2827,6 @@
 
             // Update the number of detections
             $('#number_of_icecube_detections')[0].innerHTML = " - " + data.length + " Events"
-
         }
 
         function fillDoughnutPlots(data) {
@@ -4367,8 +4395,8 @@
 
                         var dt = data.to-data.from
 
-                        if (dt < 350) {
-                            combined_string = date_to + " - " + date_from
+                        if (dt < 400) {
+                            combined_string = date_from + " - " + date_to
                             $('.irs-single').width(175)
                             $('.irs-single')[0].innerHTML = combined_string
                         }
@@ -5201,7 +5229,6 @@
 
                 // Add the 4FGL data
                 get4FGLData()
-
             });
 
             // Hide the page if the person clicks the close button
@@ -5209,10 +5236,12 @@
                 $('#main').hide()
             });
 
-
             // Check to see if the passphrase data is stored in a cookie
             // checkCookie();
             get4FGLData();
+
+             
+ 
 
         });
 
