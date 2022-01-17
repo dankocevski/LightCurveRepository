@@ -3900,13 +3900,16 @@
                 $('radius_input').attr('placeholder', '');
                 $('keyword_input').attr('placeholder', '');
 
-
-
                 $('#clear_button').attr("disabled", true);
                 $("#clear_button").removeClass("btn-danger").addClass("btn-default");
 
                 showReticale = false;
                 clearMapSearch()
+
+                // Remove any search paramerers from the url
+                window.history.replaceState(null, null, window.location.pathname);
+
+
             });
 
             $('.dropdown-menu.transform').on('click', 'li', function() {
