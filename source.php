@@ -1750,6 +1750,7 @@
                 var log_link = 'https://www.slac.stanford.edu/~kocevski/LCR/logs/' + source_name + '/' + cadence + '/' + log_filename
 
                 var flux_string;
+                var flux_error_string;
                 var photon_index_string;
 
                 if (ts >= parseFloat(ts_min)) {
@@ -1757,6 +1758,8 @@
                     var flux = data['flux'][j_detections][1].toExponential(2)
                     var flux_error = flux - data['flux_error'][j_detections][1]
                     // var flux_error_string = flux_error.toExponential(2)
+
+                    flux_error_string = flux_error.toExponential(2)
                     flux_string = flux + ' &#177; ' + flux_error.toExponential(2)
 
 
@@ -1774,6 +1777,7 @@
                 } else {
 
                     var flux_upper_limit = data['flux_upper_limits'][k_nondetections][1]
+                    flux_error_string = '-'
                     flux_string = '< ' + flux_upper_limit.toExponential(2)
                     photon_index_string = '-'
 
@@ -2701,7 +2705,7 @@
                 <!-- Citation request start here -->    
                 <div class="panel panel-default">   
                     <div class="panel-heading">
-                      Please reference <a href="">Kocevski et al. 2020</a> for use of any results presented in the Fermi LAT Light Curve Repository. Also be sure to consult the <a href="about.html">LCR Usage Notes</a> for important details and caveats about the LCR analysis.
+                      Please reference <a href="https://www.astronomerstelegram.org/?read=15110">Kocevski et al. 2021</a> for use of any results presented in the Fermi LAT Light Curve Repository. Also be sure to consult the <a href="about.html">LCR Usage Notes</a> for important details and caveats about the LCR analysis.
                     </div>
                 </div>
                 <!--  Citation request ends here -->   

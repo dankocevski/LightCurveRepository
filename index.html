@@ -1722,7 +1722,7 @@
                     console.log("4FGL data length = " + data_FGL.length)
                 } catch (error) {
                     console.log('Error parsing query response.')
-                    $('#main').hide()
+                    // $('#main').hide()
                     return;
                 }
 
@@ -1749,12 +1749,12 @@
 
                 }
 
-                // Check if data was successfully retrieved. If the passphrase wasn't set before, set it to the supplied magic_word
-                if (data_FGL.length != 0) {
-                    if (passphrase == null) {
-                        setCookieData('passphrase', magicWord, 1)  // Cookie expires in 1 day
-                    }
-                }
+                // // Check if data was successfully retrieved. If the passphrase wasn't set before, set it to the supplied magic_word
+                // if (data_FGL.length != 0) {
+                //     if (passphrase == null) {
+                //         setCookieData('passphrase', magicWord, 1)  // Cookie expires in 1 day
+                //     }
+                // }
 
                 return 
 
@@ -5551,7 +5551,7 @@
             <!-- Citation request start here -->    
             <div class="panel panel-default">   
                 <div class="panel-heading">
-                    Please reference <a href="">Kocevski et al. 2020</a> for use of any results presented in the Fermi LAT Light Curve Repository. Also be sure to consult the <a href="about.html">LCR Usage Notes</a> for important details and caveats about the LCR analysis.
+                    Please reference <a href="https://www.astronomerstelegram.org/?read=15110">Kocevski et al. 2021</a> for use of any results presented in the Fermi LAT Light Curve Repository. Also be sure to consult the <a href="about.html">LCR Usage Notes</a> for important details and caveats about the LCR analysis.
                 </div>
             </div>
             <!--  Citation request ends here -->    
