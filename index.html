@@ -2380,7 +2380,7 @@
                         row[++j] ='<td class="' + key + '" style="text-align: center;">';
                         var source_name = source[key].replace(' ','_')
                         if (parseFloat(source['Variability_Index']) >= variability_index_cut) {
-                            row[++j] = '<a href="./source.php?source_name=' + source_name + '" target="_blank">' + source[key] + '</a>';
+                            row[++j] = '<a href="./source.html?source_name=' + source_name + '" target="_blank">' + source[key] + '</a>';
                         } else {
                             row[++j] = source[key];
                         }
@@ -3619,7 +3619,7 @@
 
                                 var link_spectrum_4FGL = "./data/4FGL/4FGL-DR2_spec_v23/" + data_subdirectory + '/' + catalog_source_name + '_spec.pdf'
                                 var link_lightcurve_4FGL = "./data/4FGL/4FGL-DR2_flux_v23/" + data_subdirectory + '/' + catalog_source_name + '_lc.pdf'
-                                var link_lightcurves_LCR = "./source.php?source_name=" + source_name_url
+                                var link_lightcurves_LCR = "./source.html?source_name=" + source_name_url
                                 var link_lightcurves_FAVA = "https://fermi.gsfc.nasa.gov/ssc/data/access/lat/FAVA/LightCurve.php?ra=" + RAJ2000 + '&dec=' + DEJ2000
 
                                 var onclick_small_window = "onclick=\"window.open(this.href,'targetWindow','width=800px, height=650px'); return false;"
@@ -4689,7 +4689,7 @@
 
                                         var link_spectrum_4FGL = "./data/4FGL/4FGL-DR2_spec_v23/" + data_subdirectory + '/' + catalog_source_name + '_spec.pdf'
                                         var link_lightcurve_4FGL = "./data/4FGL/4FGL-DR2_flux_v23/" + data_subdirectory + '/' + catalog_source_name + '_lc.pdf'
-                                        var link_lightcurves_LCR = "./source.php"
+                                        var link_lightcurves_LCR = "./source.html"
                                         var link_lightcurves_FAVA = "https://fermi.gsfc.nasa.gov/ssc/data/access/lat/FAVA/LightCurve.php?ra=" + RAJ2000 + '&dec=' + DEJ2000
 
                                         var onclick_small_window = "onclick=\"window.open(this.href,'targetWindow','width=800px, height=650px'); return false;"
