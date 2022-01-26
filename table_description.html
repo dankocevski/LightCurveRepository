@@ -106,15 +106,27 @@
                         <td>Average integrated photon flux with energies from 0.1 to 100 GeV. Units in photons/cm^2/s.</td>
                     </tr>
                     <tr>
+                        <td>Photon Flux Error:</td>
+                        <td>1-sigma symmetric gaussian equivalent statistical uncertainty based on the inverse-Hessian at the optimum of the log-likelihood surface. Units in photons/cm^2/s.</td>
+                    </tr>
+                    <tr>
                         <td>Energy Flux:</td>
                         <td>Average integrated energy flux with energies from 0.1 to 100 GeV. Units in MeV/cm^2/s.</td>
-                    </tr>                    
+                    </tr>   
+                    <tr>
+                        <td>Energy Flux Error:</td>
+                        <td>1-sigma symmetric gaussian equivalent statistical uncertainty based on the inverse-Hessian at the optimum of the log-likelihood surface. Units in MeV/cm^2/s.</td>
+                    </tr>   
                     <tr>
                         <td>Photon Index:</td>
                         <td>Average photon index, if the spectral model for the source in the FGL catalog used by the LCR is a
                             power-law. Average alpha, if the spectral model for the source in the FGL catalog used by the LCR is
                             a logparabola.</td>
                     </tr>
+                    <tr>
+                        <td>Photon Index Error:</td>
+                        <td>1-sigma symmetric gaussian equivalent photon index error </td>
+                    </tr>                    
                     <tr>
                         <td>Fit Tolerance:</td>
                         <td>Relative fit tolerance.</td>
@@ -151,7 +163,7 @@
                 </tr>
                 <tr>
                     <td>flux:</td>
-                    <td>Average integrated flux of photons with energies from 0.1 to 100 MeV. Units in photons/cm^2/s.</td>
+                    <td>Average integrated flux of photons with energies from 0.1 to 100 MeV. Units in photons/cm^2/s if photon flux is selected, MeV/cm^2/s if energy flux is selected.</td>
                 </tr>
                 <tr>
                     <td>flux_upper_limits:</td>
@@ -159,7 +171,7 @@
                 </tr>
                 <tr>
                     <td>flux_error:</td>
-                    <td>Photon flux uncertainty in photons/cm^2/s.</td>
+                    <td>1-sigma symmetric gaussian equivalent statistical uncertainty in photons/cm^2/s if photon flux is selected, MeV/cm^2/s if energy flux is selected.</td>
                 </tr>
                 <tr>
                     <td>photon_index:</td>
@@ -167,7 +179,7 @@
                 </tr>
                 <tr>
                     <td>photon_index_error:</td>
-                    <td>Photon index/alpha statistical uncertainty.</td>
+                    <td>1-sigma symmetric gaussian equivalent photon index/alpha statistical uncertainty.</td>
                 </tr>
                 <tr>
                     <td>fit_tolerance:</td>
