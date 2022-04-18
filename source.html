@@ -47,8 +47,6 @@
     <!-- Load test data -->
     <!-- <script type="text/javascript" src="./data/photon_flux_error.json"></script> -->
 
-
-
 </head>
 
 <!-- custom css -->
@@ -126,6 +124,50 @@
         border-right:5px solid transparent;
         border-top:5px solid #00468b
     }
+
+
+.tooltip2 {
+  position: relative;
+  display: inline-block;
+  /*border-bottom: 1px dotted black;*/
+
+}
+
+.tooltip2 .tooltiptext {
+  visibility: hidden;
+  width: 120px;
+  /*background-color: black;*/
+  /*color: #fff;*/
+  background-color: WhiteSmoke;
+  color: #333;
+  text-align: center;
+  border-radius: 6px;
+  padding: 5px 5px 5px 5px;
+  border: 1px;
+  border-style: solid;
+  border-color: gray;
+
+/*   font-size: 1em !important;
+   color: #333 !important;
+   font-family: Arial !important;*/
+   font-weight: 500;
+
+  /* Position the tooltip */
+  position: absolute;
+  z-index: 1;
+}
+
+.tooltip2 .tooltiptext {
+  width: 200px;
+  bottom: 120%;
+  left: 50%; 
+  margin-left: -100px; /* Use half of the width (120/2 = 60), to center the tooltip */
+}
+
+.tooltip2:hover .tooltiptext {
+  visibility: visible;
+}
+
 
 
 </style>
@@ -521,6 +563,7 @@
                     gridLineWidth: 0,
                     min: 0,
                     max: median_from_matrix(flux)*10,
+                    // softMax: median_from_matrix(flux)*10,
                     labels: {
                         formatter: function() {
 
@@ -1279,15 +1322,12 @@
             var source_name_urlEncoded = encodeURIComponent(source_name);
             var magic_word_urlEncoded = encodeURIComponent(magic_word_submitted);
 
-            var URL = "queryDB.php?typeOfRequest=sourceData&source_name=" + source_name_urlEncoded + "&magicWord=" + magic_word_urlEncoded;
+            var URL = "queryDB.php?typeOfRequest=sourceData&source_name=" + source_name_urlEncoded
 
             console.log(URL);
 
             // Get the data
             $.ajax({url: URL, success: function(responseText){
-
-                // Parse the resulting json file
-                // var data = JSON.parse(responseText);
 
                 // Get the data
                 var data;
@@ -1295,7 +1335,7 @@
                     data = JSON.parse(responseText);
                 } catch (error) {
                     console.log('Error parsing query response.')
-                    $('#main').hide()
+                    // $('#main').hide()
                     return
                 }
 
@@ -1386,7 +1426,7 @@
             var source_name_urlEncoded = encodeURIComponent(source_name);
             var magic_word_urlEncoded = encodeURIComponent(magic_word_submitted);
 
-            URL_light_curve_data = "queryDB.php?typeOfRequest=lightCurveData&source_name=" + source_name_urlEncoded + '&cadence=' + cadence + '&flux_type=' + flux_type + '&index_type=' + index_type + '&ts_min=' + ts_min + "&magicWord=" + magic_word_urlEncoded;
+            URL_light_curve_data = "queryDB.php?typeOfRequest=lightCurveData&source_name=" + source_name_urlEncoded + '&cadence=' + cadence + '&flux_type=' + flux_type + '&index_type=' + index_type + '&ts_min=' + ts_min;
 
             console.log(URL_light_curve_data);
 
@@ -1489,7 +1529,7 @@
 
                     var met = nonconvergant_fits[i]
                     for (var j = 0; j < flux_forPlotting.length; j++) {
-                        if (flux_forPlotting[j][0] === met) {
+                        if ((flux_forPlotting[j] != undefined) && (flux_forPlotting[j][0] === met)) {
                             flux_forPlotting.splice(j,1)
                             flux_error_forPlotting.splice(j,1)
                             break
@@ -1497,7 +1537,7 @@
                     }
 
                     for (var j = 0; j < flux_upper_limits_forPlotting.length; j++) {
-                        if (flux_upper_limits_forPlotting[i][0] === met) {
+                        if ((flux_upper_limits_forPlotting[j] != undefined) && (flux_upper_limits_forPlotting[j][0] === met)) {
                             flux_upper_limits_forPlotting.splice(j,1)
                             flux_upper_limits_forPlotting.splice(j,1)
                             break
@@ -1513,7 +1553,7 @@
 
                     var met = unconstrained_fits[i]
                     for (var j = 0; j < flux_forPlotting.length; j++) {
-                        if (flux_forPlotting[j][0] === met) {
+                        if ((flux_forPlotting[j] != undefined) && (flux_forPlotting[j][0] === met)) {
                             flux_forPlotting.splice(j,1)
                             flux_error_forPlotting.splice(j,1)
                             break
@@ -1521,17 +1561,15 @@
                     }
 
                     for (var j = 0; j < flux_upper_limits.length; j++) {
-                        if (flux_upper_limits_forPlotting[j][0] === met) {
-                            flux_upper_limits_forPlotting.splice(j,1)
-                            flux_upper_limits_forPlotting.splice(j,1)
-                            break
+                        if ((flux_upper_limits_forPlotting[j] != undefined) && (flux_upper_limits_forPlotting[j][0] === met)) {
+                                flux_upper_limits_forPlotting.splice(j,1)
+                                flux_upper_limits_forPlotting.splice(j,1)
+                                break
                         }
                     }
 
                 }
             }    
-
-
 
             // Update the side table with the results
             // if (xtitle.includes('Mission Elapsed Time (seconds)') === false) {
@@ -1661,21 +1699,25 @@
 
             var flux_header
             if (flux_type.includes('energy')) {
-                flux_header = 'Energy Flux [0.1-100 GeV]<BR>(MeV cm<sup>-2</sup> s<sup>-1</sup>)'
+                flux_header = '<div class="tooltip2">Energy Flux [0.1-100 GeV]<BR>(MeV cm<sup>-2</sup> s<sup>-1</sup>)<span class="tooltiptext">Average integrated energy flux from 0.1 to 100 MeV in units of MeV cm<sup>-2</sup> s<sup>-1</sup></span></div>'
+                flux_error_header = '<div class="tooltip2">Energy Flux Error<span class="tooltiptext">1-sigma symmetric gaussian equivalent flux uncertainty from 0.1 to 100 MeV in units of MeV cm<sup>-2</sup> s<sup>-1</sup></span></div>'
             } else {
-                flux_header = 'Photon Flux [0.1-100 GeV]<BR>(photons cm<sup>-2</sup> s<sup>-1</sup>)'
+                flux_header = '<div class="tooltip2">Photon Flux [0.1-100 GeV]<BR>(photons cm<sup>-2</sup> s<sup>-1</sup>)<span class="tooltiptext">Average integrated photon flux from 0.1 to 100 MeV in units of photons cm<sup>-2</sup> s<sup>-1</sup></span></div>'
+                flux_error_header = '<div class="tooltip2">Photon Flux Error<BR>(photons cm<sup>-2</sup> s<sup>-1</sup>)<span class="tooltiptext">1-sigma symmetric gaussian equivalent flux uncertainty from 0.1 to 100 MeV in units of photons cm<sup>-2</sup> s<sup>-1</sup></span></div>'
             }
 
             // Create the header string
             var header = '<tr> \
-            <th style="text-align: center; min-width:150px">Date<BR>(UTC)</th> \
-            <th style="text-align: center;">Julian Date<BR></th> \
-            <th style="text-align: center;">MET</th> \
-            <th style="text-align: center;">TS</th> \
-            <th id="flux_header" style="text-align: center;">' + flux_header + '</th> \
-            <th style="text-align: center;">Photon Index</th> \
-            <th style="text-align: center;">Fit Tolerance</th> \
-            <th style="text-align: center;">MINUIT Return Code</th> \
+            <th style="text-align: center; min-width:150px"><div class="tooltip2">Date<BR>(UTC)<span class="tooltiptext">Mid point of time bin in UTC</span></div></th> \
+            <th style="text-align: center;"><div class="tooltip2">Julian Date<BR><span class="tooltiptext">Mid point of time bin in Julian Date (JD)</span></div></th> \
+            <th style="text-align: center;"><div class="tooltip2">MET<span class="tooltiptext">Mid point of time bin in Mission Elapsed Time (MET)</span></div></th> \
+            <th style="text-align: center;"><div class="tooltip2">TS<span class="tooltiptext">The likelihood Test Statistic (TS)</span></div></th> \
+            <th id="flux_header" style="text-align: center; min-width:200px">' + flux_header + '</th> \
+            <th id="flux_error_header" style="text-align: center; min-width:150px">' + flux_error_header + '</th> \
+            <th style="text-align: center;"><div class="tooltip2">Photon Index<span class="tooltiptext">Spectral photon index</span></div></th> \
+            <th style="text-align: center; min-width:100px"><div class="tooltip2">Photon Index Error<span class="tooltiptext">1-sigma symmetric gaussian equivalent photon index error</span></div></th> \
+            <th style="text-align: center;"><div class="tooltip2">Fit Tolerance<span class="tooltiptext">Relative fit tolerance</span></div></th> \
+            <th style="text-align: center; min-width:100px"><div class="tooltip2">MINUIT Return Code<span class="tooltiptext">MINUIT fit convergance</span></div></th> \
             <th style="text-align: center;">Analysis Log</th> \
             '
 
@@ -1707,22 +1749,31 @@
                 var log_link = 'https://www.slac.stanford.edu/~kocevski/LCR/logs/' + source_name + '/' + cadence + '/' + log_filename
 
                 var flux_string;
+                var flux_error_string;
                 var photon_index_string;
+                var photon_index_error_string;
 
                 if (ts >= parseFloat(ts_min)) {
 
                     var flux = data['flux'][j_detections][1].toExponential(2)
                     var flux_error = flux - data['flux_error'][j_detections][1]
                     // var flux_error_string = flux_error.toExponential(2)
-                    flux_string = flux + ' &#177; ' + flux_error.toExponential(2)
+
+                    flux_error_string = flux_error.toExponential(2)
+                    // flux_string = flux + ' &#177; ' + flux_error.toExponential(2)
+                    flux_string = flux
 
 
                 	var photon_index = data['photon_index'][j_detections][1]
                 	var photon_index_interval = photon_index - data['photon_index_interval'][j_detections][1]
                 	if (index_type == 'free') {
-                            photon_index_string = -photon_index + ' &#177; ' + Math.abs(photon_index_interval.toFixed(2))
+                            // photon_index_string = -photon_index + ' &#177; ' + Math.abs(photon_index_interval.toFixed(2))
+                            photon_index_string = -photon_index
+                            photon_index_error_string = Math.abs(photon_index_interval.toFixed(2))
+
                         } else {
                             photon_index_string = '-' + photon_index
+                            photon_index_error_string =  '-'
                         }
 
                     j_detections = j_detections + 1
@@ -1731,8 +1782,10 @@
                 } else {
 
                     var flux_upper_limit = data['flux_upper_limits'][k_nondetections][1]
+                    flux_error_string = '-'
                     flux_string = '< ' + flux_upper_limit.toExponential(2)
                     photon_index_string = '-'
+                    photon_index_error_string = '-'
 
                     k_nondetections = k_nondetections + 1
                 }
@@ -1744,7 +1797,9 @@
                 row[++j] ='<td id="met" style="text-align: center;">' + met + '</td>';
                 row[++j] ='<td id="ts" style="text-align: center;">' + ts + '</td>';
                 row[++j] ='<td id="flux" style="text-align: center;">' + flux_string + '</td>';
+                row[++j] ='<td id="flux_error" style="text-align: center;">' + flux_error_string + '</td>';
                 row[++j] ='<td id="photon_index" style="text-align: center;">' + photon_index_string + '</td>';
+                row[++j] ='<td id="photon_index_error" style="text-align: center;">' + photon_index_error_string + '</td>';
                 row[++j] ='<td id="fit_tolerance" style="text-align: center;">' + fit_tolerance + '</td>';
                 row[++j] ='<td id="fit_convergence" style="text-align: center;">' + fit_convergence + '</td>';
                 row[++j] ='<td id="log" style="text-align: center;"><a href="' + log_link + '" onclick="window.open(this.href,\'targetWindow\'); return false;">' + log_filename + '</a></td>';
@@ -1821,7 +1876,6 @@
 
                 getCatalogData();
                 getLightCurveData();
-
             });
 
 
@@ -1867,6 +1921,10 @@
             // Light curve data plot selector
             $('.dropdown-menu.flux-type').on('click', 'li', function() {
 
+                if ($(this).attr('id').includes('axis')) {
+                    return
+                }
+
                 $('.dropdown-menu.flux-type li.active').removeClass('active');
                 $(this).addClass('active');
 
@@ -1885,6 +1943,10 @@
 
             // Spectral fitting type selector
             $('.dropdown-menu.index_type').on('click', 'li', function() {
+
+                if ($(this).attr('id').includes('axis')) {
+                    return
+                }
 
                 $('.dropdown-menu.index_type li.active').removeClass('active');
                 $(this).addClass('active');
@@ -1924,6 +1986,10 @@
             // Light curve data plot selector
             $('.dropdown-menu.xaxis-type').on('click', 'li', function() {
 
+                if ($(this).attr('id').includes('axis')) {
+                    return
+                }
+                
                 $('.dropdown-menu.xaxis-type li.active').removeClass('active');
                 $(this).addClass('active');
 
@@ -1982,11 +2048,14 @@
                 // Reload the data and update the plots
                 getLightCurveData();
                 // prepareLightCurveData();
-
             });
 
             // Ancillary data plot selector
             $('.dropdown-menu.ancillary-data').on('click', 'li', function() {
+
+                if ($(this).attr('id').includes('axis')) {
+                    return
+                }
 
                 $('.dropdown-menu.ancillary-data li.active').removeClass('active');
                 $(this).addClass('active');
@@ -2183,7 +2252,6 @@
                 // });
             });
 
-
             $('.dropdown-menu.ancillary-data li a').click(function(event) {
 
                 event.preventDefault();
@@ -2203,26 +2271,33 @@
 
                 event.preventDefault();
 
-              // Get the id of the button that was clicked
-              id = $(this).attr("id");
-              
-              if (id.includes('csv')) {
-                download_table_as_csv('data_table')
-              } else if (id.includes('json')) {
-                window.open(URL_light_curve_data,'_newtab');
-              } else {
+                // Get the id of the button that was clicked
+                id = $(this).attr("id");
 
-                var dummy = document.createElement("textarea");
-                document.body.appendChild(dummy);
-                dummy.value = 'https://fermi.gsfc.nasa.gov/ssc/data/access/lat/LightCurveRepository/' + URL_light_curve_data;
-                dummy.select();
+                if (id.includes('csv')) {
 
-                document.execCommand("copy");
-                document.body.removeChild(dummy);
+                    download_table_as_csv('data_table')
 
-                alert('API link copied to clipboard:\r\n\r\n' + URL_light_curve_data)
-                
-              }                            
+                } else if (id.includes('json')) {
+
+                    window.open(URL_light_curve_data,'_newtab');
+
+                } else {
+
+                    var dummy = document.createElement("textarea");
+                    document.body.appendChild(dummy);
+                    dummy.value = 'https://fermi.gsfc.nasa.gov/ssc/data/access/lat/LightCurveRepository/' + URL_light_curve_data;
+                    dummy.select();
+
+                    document.execCommand("copy");
+                    document.body.removeChild(dummy);
+
+                    // alert('API link copied to clipboard:\r\n\r\n' + 'https://fermi.gsfc.nasa.gov/ssc/data/access/lat/LightCurveRepository/' + URL_light_curve_data)
+
+                    $('#api_link_text').text('https://fermi.gsfc.nasa.gov/ssc/data/access/lat/LightCurveRepository/' + URL_light_curve_data)
+                    $('#api_link_dialog').modal('show');
+
+                }                            
             });
 
             $('#show_tooltip').click( function(){
@@ -2244,7 +2319,6 @@
                     chart1.tooltip.defaultFormatter = defaultFormatter1;
                     chart2.tooltip.defaultFormatter = defaultFormatter2;
                 }
-
             });
      
             $('#show_upper_limits').click( function(){
@@ -2273,7 +2347,6 @@
                     }
 
                 }
-
             });
 
             $('#show_error_bars').click( function(){
@@ -2286,7 +2359,6 @@
                 } else {
                     chart1.series[2].hide()
                 }
-
             });
 
             $('#show_data_line').click( function(){
@@ -2300,7 +2372,6 @@
 
                 chart1.series[0].userOptions.lineWidth = data_line_width
                 chart1.series[0].update()
-
             });
 
             $('#show_nonconvergant_fits').click( function(){
@@ -2310,9 +2381,7 @@
             	// Reload the light curve data
             	// getLightCurveData()
                 prepareLightCurveData()
-
             });
-
 
             $('#show_unconstrained_fits').click( function(){
 
@@ -2321,21 +2390,19 @@
             	// Reload the light curve data
             	// getLightCurveData()
                 prepareLightCurveData()
-
             });
-
 
             $('[data-toggle="tooltip"]').tooltip({
                 delay: {"show": 300, "hide": 100}
             }); 
 
             
-
-            // getCatalogData();
-            // getLightCurveData();
-            
             // Check if a passphrase cookie exists and get the data if it does, or luanch the magic word model if it doesn't
-            checkCookie()
+            // checkCookie()
+
+            getCatalogData();
+            getLightCurveData();
+            
 
         });
 
@@ -2582,7 +2649,8 @@
                     <div class="panel-heading">
                         <h3 class="panel-title">Data Download</h3>
                      </div>
-                     <div class="panel-body" style="height:105px">
+<!--                      <div class="panel-body" style="height:105px">
+ -->                     <div class="panel-body">
 
                         <BR>
                          <center>
@@ -2596,6 +2664,12 @@
                                     <li id="copy_api"><a href="#">Copy API Link</a></li>
                                 </ul>
                             </div>
+
+                        <BR>
+                        <BR>
+                        <a href="table_description.html" target="_blank" onclick="window.open(this.href,'targetWindow','width=800px, height=1175px'); return false;">JSON File Description</a>
+                        <p>
+
                         </center>
 
                     </div>
@@ -2603,19 +2677,37 @@
                 <!-- Download panel ends here -->
                                                                             
                 <!-- Related resources start here -->      
-                <div class="panel panel-default" style="height: 225px;">
+                <div class="panel panel-default" style="height: 188px;">
                     <div class="panel-heading">
-                        <h3 class="panel-title">Related Resources</h3>
+                        <h3 class="panel-title">Light Curve Repository Links</h3>
+                     </div>
+                        <center>
+                            <table class="table table-striped">
+                            <!-- <table class="table"> -->
+                              <tbody>         
+                                    <tr><td><a href="index.html">The Light Curve Repository Sky Map</a></td></tr>      
+                                    <tr><td><a href="about.html" target="_blank">The Light Curve Repository Usage Notes</a></td></tr>      
+                                    <tr><td><a href="table_description.html" target="_blank" onclick="window.open(this.href,'targetWindow','width=800px, height=1175px'); return false;"> The Light Curve Repository Data Description</a></td></tr>
+                                    <tr><td><a href="FAQ.html" target="_blank">The Light Curve Repository FAQ</a></td></tr>
+                              </tbody>
+                            </table>  
+                        </center>
+                </div>
+                <!-- Related resources ends here -->     
+
+                <!-- Related resources start here -->      
+                <div class="panel panel-default" style="height: 188px;">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">Additional Information</h3>
                      </div>
                         <center>
                             <table class="table table-striped">
                             <!-- <table class="table"> -->
                               <tbody>           
                                     <tr><td><a href="https://fermi.gsfc.nasa.gov/ssc/">The Fermi Science Support Center</a></td></tr>
-                                    <tr><td><a href="https://fermi.gsfc.nasa.gov/ssc/data/access/lat/FAVA/">Fermi All-Sky Variability Analysis (FAVA)</a></td></tr>           
-                                    <tr><td><a href="https://fermi.gsfc.nasa.gov/ssc/data/analysis/scitools/">Fermi LAT & GBM Analysis Tutorials</a></td></tr>
+                                    <tr><td><a href="https://fermi.gsfc.nasa.gov/ssc/data/analysis/documentation/Cicerone/">Fermi LAT & GBM Analysis Guide</a></td></tr>
                                     <tr><td><a href="https://fermi.gsfc.nasa.gov/ssc/data/access/">Fermi LAT & GBM Data Access</a></td></tr>
-                                    <tr><td><a href="about.html">About the Light Curve Repository</a></td></tr>      
+                                    <tr><td><a href="https://fermi.gsfc.nasa.gov/ssc/data/access/lat/FAVA/">Fermi All-Sky Variability Analysis (FAVA)</a></td></tr>           
                               </tbody>
                             </table>  
                         </center>
@@ -2625,7 +2717,7 @@
                 <!-- Citation request start here -->    
                 <div class="panel panel-default">   
                     <div class="panel-heading">
-                        Please reference <a href="">Kocevski et al. 2021</a> for use of any results presented in the Fermi LAT Light Curve Repository.
+                      Please reference <a href="https://www.astronomerstelegram.org/?read=15110">Kocevski et al. 2021</a> for use of any results presented in the Fermi LAT Light Curve Repository. Also be sure to consult the <a href="about.html">LCR Usage Notes</a> for important details and caveats about the LCR analysis.
                     </div>
                 </div>
                 <!--  Citation request ends here -->   
@@ -2647,7 +2739,7 @@
                                 <div class="btn-group" role="group">
                                     <button class="btn btn-default dropdown-toggle flux-type" type="button" data-toggle="dropdown">Photon Flux <span class="caret"></span></button>
                                     <ul class="dropdown-menu flux-type">
-                                        <li id="y-axis" class="disabled"><a href="#">Y-Axis:</a></li>
+                                        <li id="y-axis" class="disabled"><a href="javascript:void(0)">Y-Axis:</a></li>
                                         <li id="photon" class="active"><a href="javascript:void(0)">Photon Flux </a></li>
                                         <li id="energy"><a href="javascript:void(0)">Energy Flux </a></li>
                                     </ul>
@@ -2690,7 +2782,7 @@
                                 <div class="btn-group" role="group">
                                     <button style="min-width:125px" class="btn btn-default dropdown-toggle ancillary-data" type="button" data-toggle="dropdown">Photon Index <span class="caret"></span></button>
                                     <ul class="dropdown-menu ancillary-data">
-                                        <li id="y-axis" class="disabled"><a href="#">Y-Axis:</a></li>
+                                        <li id="y-axis" class="disabled"><a href="javascript:void(0)">Y-Axis:</a></li>
                                         <li id="photon_index" class="active"><a href="#">Photon Index</a></li>
                                         <li id="ts"><a href="">TS</a></li>
                                         <li id="fit_convergence"><a href="">Fit Convergence</a></li>
@@ -2787,11 +2879,13 @@
                     <div class="panel panel-default">
                         <div class="panel-heading"><h3 class="panel-title">Likelihood Fit Data Table</h3></div>
                         <div class="panel-body">
-                            <a href="https://fermi.gsfc.nasa.gov/ssc/data/access/lat/LightCurveRepository/table_description.html">Table and JSON File Description</a>
+                            <!-- <a href="https://fermi.gsfc.nasa.gov/ssc/data/access/lat/LightCurveRepository/table_description.html">Table and JSON File Description</a> -->
                             <center>
+                                <a href="table_description.html" target="_blank" onclick="window.open(this.href,'targetWindow','width=800px, height=1175px'); return false;">Table Data Description</a> | <a href="about.html" target="_blank">Analysis Description</a>
+                                <p>
                                 <table class="table table-striped table-condensed table-bordered data-table" id="data_table" style="width:1000px;"></table>  
-                            </center>
 
+                            </center>
                         </div>  
                     </div>
                 </div>
@@ -2811,7 +2905,7 @@
             
                 <p>
                     <hr>
-                    Fermi LAT Light Curve Repository - Support Contact:<a href="mailto:daniel.kocevski@nasa.gov"> Daniel Kocevski</a>
+                    Fermi LAT Light Curve Repository - Support Contact:<a href="mailto:fermilcr@athena.gsfc.nasa.gov"> fermilcr@athena.gsfc.nasa.gov</a>
                 </p>
 
             </div>
@@ -2822,115 +2916,39 @@
     <!-- Main ends here -->
     </div>
 
+
     <!-- Magic word dialog modal view starts here -->
-    <div id="magic_word_dialog" class="modal fade">
-        <div class="modal-dialog" style="width:800px; margin: auto; margin-top:10%">
+    <div id="api_link_dialog" class="modal fade">
+        <div class="modal-dialog" style="width:500px; margin: auto; margin-top:10%">
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                    <h4 class="modal-title" style="text-align: center;">Welcome to the Fermi LAT Light Curve Repository</h4>
+                    <h4 class="modal-title" style="text-align: center;">API Data Link</h4>
                 </div>
 
-                <div class="modal-body center-block" style="text-align: center; height:200px; margin-top:5%; margin-bottom:5%">
+
+                <div class="modal-body center-block" style="text-align: center; height:250px; margin-top:5%; margin-bottom:5%">
                     <center>
-                        <!-- <span style="font-size: 50px;" class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span> -->
+                        <!-- <span style="font-size: 50px;" class="glyphicon glyphicon-copy" aria-hidden="true"></span> -->
                         <img width="75px" src="./img/spaceship.png">
                     </center>
-                    
-                    <BR>
-
-                    This page is currently under developement.<BR>A public announcement will be made when the light curve data is available.<BR>Feedback on the light curve repository data portal is certainly welcomed!
-                    
-                    <BR>
-                    <BR>
                 
-                    <form id="magic_word_form" name='MagicWordForm' style="display:visible">
-                        <input id="magic_word" type="text" class="input-small" placeholder="">
-                        </form>
+                    <BR>
 
+                    The JSON data URL has been copied to the clipboard:
+                    <BR>
+                    <BR>
+
+                    <div id="api_link_text" style="word-break: break-all; word-wrap: break-word;font-family:'Courier New';font-weight:500;">
+                    </div>
+                    
                 </div> <!-- /.modal-body -->
 
-                <div class="modal-footer">             
-                    <div id="SaveButtonDiv" style="float: right;">
-                        <button type="button" id="submitForm" class="btn btn-primary" style="width:60px; color:white;font-size: 12px;margin:10px">Ok</button>
-                    </div>  
-<!--                     <div style="float: right;"> 
-                        <button type="button" id="dismissForm" class="btn btn-default" data-dismiss="modal" style="font-size: 12px;margin-top:10px">Close</button>
-                    </div>  -->
-                </div> <!-- /.modal-footer -->
 
             </div> <!-- /.modal-content -->
         </div> <!-- /.modal-dialog -->
     </div> <!-- /.modal -->  
 
-
-
-    <!-- Magic word dialog modal view starts here -->
-    <div id="exampleModalCenter" class="modal fade">
-        <div class="modal-dialog" style="width:800px; margin: auto; margin-top:10%">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                    <h4 class="modal-title" style="text-align: center;">Welcome to the Fermi LAT Light Curve Repository</h4>
-                </div>
-
-                <div class="modal-body center-block" style="text-align: center; height:200px; margin-top:10%">
-
-                    
-                    This page is currently under developement.<BR>Please enter the passphrase to view the draft page:
-                    
-                    <BR>
-                    <BR>
-               
-
-                </div> <!-- /.modal-body -->
-
-                <div class="modal-footer">             
-                    <div style="float: right;"> 
-                        <button type="button" id="dismissForm" class="btn btn-default" data-dismiss="modal" style="font-size: 12px;margin-top:10px">Close</button>
-                    </div> 
-                </div> <!-- /.modal-footer -->
-
-            </div> <!-- /.modal-content -->
-        </div> <!-- /.modal-dialog -->
-    </div> <!-- /.modal -->  
-
-
-
-	<!-- Info modal -->
-<!-- 	<div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
-	  <div class="modal-dialog modal-dialog-centered" role="document">
-	    <div class="modal-content">
-	      <div class="modal-header">
-	        <h5 class="modal-title" id="exampleModalLongTitle">Modal title</h5>
-	        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-	          <span aria-hidden="true">&times;</span>
-	        </button>
-	      </div>
-	      <div class="modal-body">
-	        ...
-	      </div>
-	      <div class="modal-footer">
-	        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-	        <button type="button" class="btn btn-primary">Save changes</button>
-	      </div>
-	    </div>
-	  </div>
-	</div> -->
-
-
-
-
-    <!-- tippy -->
-<!--     <script src="https://unpkg.com/@popperjs/core@2"></script>
-    <script src="https://unpkg.com/tippy.js@6"></script>
-
-    <script>
-	    tippy('#ts_min_button', {
-			theme: 'light',
-        	content: 'Set the minimum detction significance. Time intervals with a detection signifiance below this level will result in the reporting of an upper limit'
-    	});
-	</script> -->
 
 </body>
 

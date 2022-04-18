@@ -1,129 +1,215 @@
 <!DOCTYPE html>
-<html lang="en">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
 
 <head>
-
-    <!-- Bootstrap compiled and minified CSS -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
-        integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
-
     <meta charset="utf-8">
     <title>Fermi LAT Light Curve Repository</title>
+
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <link rel="icon" type="image/png" href="./img/favicon2.png">
+
+     <!-- Reset css -->
+    <link rel="stylesheet" hrmouseef="./css/reset.css" type="text/css" />
+
+    <!-- NASA theme -->
+    <link rel="stylesheet" href="./css/NASA.css">
+
+    <!-- Bootstrap compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+    <!-- Bootstrap Optional theme -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+
+    <!-- Bootstrap compiled and minified JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+    <style>
+      table {
+        table-layout: fixed;
+        width: 100%; 
+  /*      border-collapse: collapse;
+        table-layout: fixed;
+        width: 310px;
+  */    }
+      th, td {
+        /*border: solid 1px #666;*/
+        width: 100%;
+        word-wrap: break-word;
+      }
+    </style>
+
 </head>
 
 <body>
-    <div class="panel panel-default" style="width:840px; margin: 20px; margin-bottom: 40px;">
-        <div class="panel-heading">
-            <h3 class="panel-title">Table Description</h3>
-        </div>
 
-        <table class="table table-striped" style="border-collapse: separate;">
-            <colgroup>
-                <col span="1" style="width: 25%;">
-                <col span="1" style="width: 75%;">
-            </colgroup>
+    <div style="margin-bottom:40px; padding:10px 20px 0px 20px;">
+
+
+        <!-- LCR header starts here -->
+<!--         <div>
+            <div style="float: left; padding-top:0px; padding-left:0px"><img middle; style="width: 75%; height: 75%" src="./img/Fermi_Small.png"></div>
+            <div style="margin-left:25px;padding-left: 25px; padding-bottom:10px; padding-top: 0px">
+                <h3>Fermi LAT Light Curve Repository (LCR)</h3>
+            </div>
+        </div> -->
+        <!-- Header ends here -->
+
+        <table>
             <tr>
-                <td>Date:</td>
-                <td>Mid point of time bin in UTC.</td>
-            </tr>
-            <tr>
-                <td>Julian date:</td>
-                <td>Mid point of time bin in JD.</td>
-            </tr>
-            <tr>
-                <td>MET:</td>
-                <td>Mid point of time bin in Mission Elapsed Time (MET).</td>
-            </tr>
-            <tr>
-                <td>TS:</td>
-                <td><a href="https://ui.adsabs.harvard.edu/abs/1996ApJ...461..396M/abstract">Test Statistic.</a></td>
-            </tr>
-            <tr>
-                <td>Photon Flux or<BR> Energy Flux:</td>
-                <td>Average integrated photon flux or energy flux (depending on the user's selection) of events with energies from 0.1 to 100 GeV. Units in photons/cm^2/s for photon flux, and in MeV/cm^2/s for energy flux.</td>
-            </tr>
-            <tr>
-                <td>Photon Index:</td>
-                <td>Average photon index, if the spectral model for the source in the FGL catalog used by the LCR is a power-law. Average alpha, if the spectral model for the source in the FGL catalog used by the LCR is a logparabola (beta is fixed to the catalog value).</td>
-            </tr>
-            <tr>
-                <td>Fit Tolerance:</td>
-                <td>Relative fit tolerance.</td>
-            </tr>
-            <tr>
-                <td>MINUIT Return Code:</td>
-                <td>Anything other than '0' means that the analysis did not converge. Please read the <a href="https://fermi.gsfc.nasa.gov/ssc/data/access/lat/LightCurveRepository/about.html">caveats</a> about non-convergent analyses.</td>
-            </tr>
-            <tr>
-                <td>Analysis Log:</td>
-                <td>Complete LAT analysis runtime output of data within the time invertal of the bin.</td>
+                <td style="width:60px; height:60px">
+                    <img middle src="./img/Fermi_Small.png">
+
+                </td>                
+                <td>
+                    <div style="margin-top:-15px; margin-left:10px">
+                        <h3>Fermi Light Curve Repository Data Description</h3>
+                    </div>
+                </td>
             </tr>
         </table>
+
+        <p>
+
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">Source Report Table Description</h3>
+            </div>
+            <div class="panel-body">
+
+                <table style="border-collapse: separate; border-spacing: 10px;">
+                    <colgroup>
+                        <col span="1" style="width: 25%;">
+                        <col span="1" style="width: 75%;">
+                    </colgroup>
+                    <tr>
+                        <td>Date:</td>
+                        <td>Mid point of time bin in UTC.</td>
+                    </tr>
+                    <tr>
+                        <td>Julian date:</td>
+                        <td>Mid point of time bin in JD.</td>
+                    </tr>
+                    <tr>
+                        <td>MET:</td>
+                        <td>Mid point of time bin in Mission Elapsed Time (MET).</td>
+                    </tr>
+                    <tr>
+                        <td>TS:</td>
+                        <td><a href="https://ui.adsabs.harvard.edu/abs/1996ApJ...461..396M/abstract">The likelihood Test Statistic.</a></td>
+                    </tr>
+                    <tr>
+                        <td>Photon Flux:</td>
+                        <td>Average integrated photon flux with energies from 0.1 to 100 GeV. Units in photons/cm^2/s.</td>
+                    </tr>
+                    <tr>
+                        <td>Photon Flux Error:</td>
+                        <td>1-sigma symmetric gaussian equivalent statistical uncertainty based on the inverse-Hessian at the optimum of the log-likelihood surface. Units in photons/cm^2/s.</td>
+                    </tr>
+                    <tr>
+                        <td>Energy Flux:</td>
+                        <td>Average integrated energy flux with energies from 0.1 to 100 GeV. Units in MeV/cm^2/s.</td>
+                    </tr>   
+                    <tr>
+                        <td>Energy Flux Error:</td>
+                        <td>1-sigma symmetric gaussian equivalent statistical uncertainty based on the inverse-Hessian at the optimum of the log-likelihood surface. Units in MeV/cm^2/s.</td>
+                    </tr>   
+                    <tr>
+                        <td>Photon Index:</td>
+                        <td>Average photon index, if the spectral model for the source in the FGL catalog used by the LCR is a
+                            power-law. Average alpha, if the spectral model for the source in the FGL catalog used by the LCR is
+                            a logparabola (beta is fixed to the catalog value).</td>
+                    </tr>
+                    <tr>
+                        <td>Photon Index Error:</td>
+                        <td>1-sigma symmetric gaussian equivalent photon index error </td>
+                    </tr>                    
+                    <tr>
+                        <td>Fit Tolerance:</td>
+                        <td>Relative fit tolerance.</td>
+                    </tr>
+                    <tr>
+                        <td>MINUIT Return Code:</td>
+                        <td>Anything other than '0' means that the analysis did not converge. Please read the <a href="https://fermi.gsfc.nasa.gov/ssc/data/access/lat/LightCurveRepository/about.html">caveats</a> about non-convergent analyses.</td>
+                    </tr>
+                    <tr>
+                        <td>Analysis Log:</td>
+                        <td>Complete LAT analysis runtime output of data within the time invertal of the bin.</td>
+                    </tr>
+                </table>
+                <BR>
+
+            </div>
+        </div>
+
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">JSON File Description</h3>
+            </div>
+        <div class="panel-body">
+            Some of the objects below are provided as arrays of 2-tuples where the first element is the center of the bin time interval (in MET).
+
+            <table style="border-collapse: separate; border-spacing: 10px;">
+                <colgroup>
+                    <col span="1" style="width: 25%;">
+                    <col span="1" style="width: 75%;">
+                </colgroup>
+                <tr>
+                    <td>ts:</td>
+                    <td><a href="https://ui.adsabs.harvard.edu/abs/1996ApJ...461..396M/abstract">The likelihood Test Statistic.</a></td>
+                </tr>
+                <tr>
+                    <td>flux:</td>
+                    <td>Average integrated photon flux or energy flux of photons with energies from 0.1 to 100 GeV. Units in photons/cm^2/s if photon flux is selected, MeV/cm^2/s if energy flux is selected.</td>
+                </tr>
+                <tr>
+                    <td>flux_upper_limits:</td>
+                    <td>95% Photon flux upper limits, in photons/cm^2/s, or energy flux upper limits in MeV/cm^2/s.</td>
+                </tr>
+                <tr>
+                    <td>flux_error:</td>
+                    <td>1-sigma symmetric gaussian equivalent statistical uncertainty in photons/cm^2/s if photon flux is selected, MeV/cm^2/s if energy flux is selected.</td>
+                </tr>
+                <tr>
+                    <td>photon_index:</td>
+                    <td>Photon index if source spectral shape is power-law, alpha if it is logparabola.</td>
+                </tr>
+                <tr>
+                    <td>photon_index_error:</td>
+                    <td>1-sigma symmetric gaussian equivalent photon index/alpha statistical uncertainty.</td>
+                </tr>
+                <tr>
+                    <td>fit_tolerance:</td>
+                    <td>Relative fit tolerance.</td>
+                </tr>
+                <tr>
+                    <td>fit_convergence:</td>
+                    <td>MINUIT return code. Anything other than '0' means that the analysis did not converge. Please read the <a href="https://fermi.gsfc.nasa.gov/ssc/data/access/lat/LightCurveRepository/about.html">caveats</a> about non-convergent analyses.</td>
+                </tr>
+                <tr>
+                    <td>dlogl:</td>
+                    <td>Delta log-likelihood between a fixed index and free index fit. The difference in degrees of freedom between these two hypothesis is of 1 for both power-law and logparabola spectral models (beta is fixed to the catalog value).</td>
+                </tr>
+                <tr>
+                    <td>EG:</td>
+                    <td>Isotropic diffuse background Normalization.</td>
+                </tr>
+                <tr>
+                    <td>GAL:</td>
+                    <td>Galactic diffuse background Prefactor.</td>
+                </tr>
+                <tr>
+                    <td>bin_id:</td>
+                    <td>Time bin number.</td>
+                </tr>
+            </table>
+        </div>
     </div>
 
 
-    
-    <div class="panel panel-default" style="width:840px; margin: 20px; margin-bottom: 40px;">
-        <div class="panel-heading">
-            <h3 class="panel-title">JSON File Description</h3>
-            <h5 class="panel-subtitle">Some of the objects below are provided as arrays of 2-tuples where the first element is the center of the bin time interval (in MET).</h5>
-        </div>
-        
-        <table class="table table-striped">
-            <colgroup>
-                <col span="1" style="width: 25%;">
-                <col span="1" style="width: 75%;">
-            </colgroup>
-            <tr>
-                <td>ts:</td>
-                <td><a href="https://ui.adsabs.harvard.edu/abs/1996ApJ...461..396M/abstract">Test Statistic.</a></td>
-            </tr>
-            <tr>
-                <td>flux:</td>
-                <td>Average integrated photon flux or energy flux (depending on the user's selection) of events with energies from 0.1 to 100 GeV. Units in photons/cm^2/s for photon flux, and in MeV/cm^2/s for energy flux.</td>
-            </tr>
-            <tr>
-                <td>flux_upper_limits:</td>
-                <td>95% Photon flux upper limits, in photons/cm^2/s, or energy flux upper limits in MeV/cm^2/s.</td>
-            </tr>
-            <tr>
-                <td>flux_error:</td>
-                <td>Photon flux uncertainty, in photons/cm^2/s, or energy flux uncertainty in MeV/cm^2/s.</td>
-            </tr>
-            <tr>
-                <td>photon_index:</td>
-                <td>Photon index if source spectral shape is a power-law, alpha if it is a logparabola.</td>
-            </tr>
-            <tr>
-                <td>photon_index_error:</td>
-                <td>Photon index/alpha statistical uncertainty.</td>
-            </tr>
-            <tr>
-                <td>fit_tolerance:</td>
-                <td>Relative fit tolerance.</td>
-            </tr>
-            <tr>
-                <td>fit_convergence:</td>
-                <td>MINUIT return code. Anything other than '0' means that the analysis did not converge. Please read the <a href="https://fermi.gsfc.nasa.gov/ssc/data/access/lat/LightCurveRepository/about.html">caveats</a> about non-convergent analyses.</td>
-            </tr>
-            <tr>
-                <td>dlogl:</td>
-                <td>Delta log-likelihood between a fixed index and free index fit. The difference in degrees of freedom between these two hypothesis is of 1 for both power-law and logparabola spectral models (beta is fixed to the catalog value).</td>
-            </tr>
-            <tr>
-                <td>EG:</td>
-                <td>Isotropic diffuse background Normalization.</td>
-            </tr>
-            <tr>
-                <td>GAL:</td>
-                <td>Galactic diffuse background Prefactor.</td>
-            </tr>
-            <tr>
-                <td>bin_id:</td>
-                <td>Time bin number.</td>
-            </tr>
-        </table>
-    </div>
 </body>
 
 </html>
