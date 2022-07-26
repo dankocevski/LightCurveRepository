@@ -47,6 +47,8 @@
     <!-- Load test data -->
     <!-- <script type="text/javascript" src="./data/photon_flux_error.json"></script> -->
 
+    <!-- Additional supporting libraries -->
+    <script type="text/javascript" charset="UTF-8" src="./js/ephemeris.js"></script>
 </head>
 
 <!-- custom css -->
@@ -116,7 +118,7 @@
 
     }
 
-    .tooltip.top .tooltip-arrow{
+    .tooltip.top .tooltip-arrow {
         bottom:0;
         left:50%;
         margin-left:-5px;
@@ -126,52 +128,48 @@
     }
 
 
-.tooltip2 {
-  position: relative;
-  display: inline-block;
-  /*border-bottom: 1px dotted black;*/
+    .tooltip2 {
+      position: relative;
+      display: inline-block;
+      /*border-bottom: 1px dotted black;*/
 
-}
+    }
 
-.tooltip2 .tooltiptext {
-  visibility: hidden;
-  width: 120px;
-  /*background-color: black;*/
-  /*color: #fff;*/
-  background-color: WhiteSmoke;
-  color: #333;
-  text-align: center;
-  border-radius: 6px;
-  padding: 5px 5px 5px 5px;
-  border: 1px;
-  border-style: solid;
-  border-color: gray;
+    .tooltip2 .tooltiptext {
+      visibility: hidden;
+      width: 120px;
+      /*background-color: black;*/
+      /*color: #fff;*/
+      background-color: WhiteSmoke;
+      color: #333;
+      text-align: center;
+      border-radius: 6px;
+      padding: 5px 5px 5px 5px;
+      border: 1px;
+      border-style: solid;
+      border-color: gray;
 
-/*   font-size: 1em !important;
-   color: #333 !important;
-   font-family: Arial !important;*/
-   font-weight: 500;
+    /*   font-size: 1em !important;
+       color: #333 !important;
+       font-family: Arial !important;*/
+       font-weight: 500;
 
-  /* Position the tooltip */
-  position: absolute;
-  z-index: 1;
-}
+      /* Position the tooltip */
+      position: absolute;
+      z-index: 1;
+    }
 
-.tooltip2 .tooltiptext {
-  width: 200px;
-  bottom: 120%;
-  left: 50%; 
-  margin-left: -100px; /* Use half of the width (120/2 = 60), to center the tooltip */
-}
+    .tooltip2 .tooltiptext {
+      width: 200px;
+      bottom: 120%;
+      left: 50%; 
+      margin-left: -100px; /* Use half of the width (120/2 = 60), to center the tooltip */
+    }
 
-.tooltip2:hover .tooltiptext {
-  visibility: visible;
-}
-
-
-
+    .tooltip2:hover .tooltiptext {
+      visibility: visible;
+    }
 </style>
-
 
 <body id="body-plain">
 
@@ -191,6 +189,7 @@
         var chart1;
         var chart2;
 
+        var catalog_data
         var data;
         var flux;
         var flux_error;
@@ -199,6 +198,7 @@
         var photon_index_interval;
         var ancillary_data;
         var responseText;
+        var flux_ratio;
 
         // Setting global light curve defaults 
         var cadence = 'weekly'
@@ -253,7 +253,6 @@
                 }
                 return oAddClass.apply(this, arguments);
             }
-
         })(jQuery);
 
         // A function to set cookie data
@@ -311,6 +310,27 @@
             link.click();
             document.body.removeChild(link);
         }
+
+        function convertMET2dateObj(MET) {
+
+            // Account for leap seconds
+            if (MET>157766400) {MET=MET-1}  // 2005 leap second
+            if (MET>252460801) {MET=MET-1}  // 2008 leap second
+            if (MET>362793601) {MET=MET-1}  // 2012 leap second
+            if (MET>457401601) {MET=MET-1}  // 2015 leap second
+            if (MET>504921601) {MET=MET-1}  // 2016 leap second
+
+            // Convert seconds to milliseconds
+            var MET = MET * 1000
+
+            // Define the date @ MET = 0
+            var date0 = new Date("January 01, 2001 00:00:00 UTC");
+
+            // Get the new date at the specified MET
+            var date = new Date(+date0 + MET)
+
+            return date
+        }        
 
         function MET2date(MET) {
 
@@ -400,13 +420,22 @@
             }
         }
 
-        function median_from_matrix(data) {
+        function medianFromMatrix(data) {
             
             var values = new Array;
             for (var i = 0; i < data.length; i++) { values.push(data[i][1]) }
 
             return median(values)
         }              
+
+        function maxFromMatrix(data) {
+            
+            var values = new Array;
+            for (var i = 0; i < data.length; i++) { values.push(data[i][1]) }
+
+            return Math.max( ...values )
+        } 
+
 
         // function defaultFormatter() {
 
@@ -434,6 +463,45 @@
         //     return tooltip_string
 
         // }
+
+        function angularDistance(lat1, lon1, lat2, lon2) {
+
+            const φ1 = lat1 * Math.PI/180; // φ, λ in radians
+            const φ2 = lat2 * Math.PI/180;
+            const Δφ = (lat2-lat1) * Math.PI/180;
+            const Δλ = (lon2-lon1) * Math.PI/180;
+
+            const a = Math.sin(Δφ/2) * Math.sin(Δφ/2) +
+                      Math.cos(φ1) * Math.cos(φ2) *
+                      Math.sin(Δλ/2) * Math.sin(Δλ/2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+
+            const d = c * 57.2958; // in degrees
+
+            return d
+        }
+
+        function calculateSunPosition(dateObj) {
+
+            var observers_longitude = 139.74;
+            var observers_latitude = 35.65;
+
+            var ephem = new Ephemeris();
+            var jd = ephem.JulianDay(dateObj);
+
+            var sun = ephem.Sun(dateObj);
+            var sun_longitude = sun.longitude;
+            var sun_distance = sun.distance;
+            var sun_ra = sun.ra;
+            var sun_dec = sun.dec;
+            var sun_eci = ephem.to_eci(sun_ra,sun_dec,sun_distance);
+            var sun_horizontal = ephem.to_horizontal(dateObj,observers_longitude,observers_latitude,sun_ra,sun_dec);
+
+            // return both ra and dec in decimal degrees
+            sun_ra = (sun_ra / 24.0) * 360.
+
+            return [sun_ra, sun_dec]
+        }
 
         function createScatterPlot() {
 
@@ -562,8 +630,9 @@
                     tickPosition: "inside",
                     gridLineWidth: 0,
                     min: 0,
-                    max: median_from_matrix(flux)*10,
-                    // softMax: median_from_matrix(flux)*10,
+                    // max: medianFromMatrix(flux)*10,
+                    // softMax: medianFromMatrix(flux)*10,
+                    max: maxFromMatrix(flux_forPlotting),
                     labels: {
                         formatter: function() {
 
@@ -755,7 +824,9 @@
                         contextButton: {
                             menuItems: ["downloadPNG", "downloadJPEG", "downloadPDF", "downloadSVG", 'downloadCSV','downloadXLS']
                         }
-                    }
+                    },
+                    width: 3200,
+                    height: 600
                 }
             });
 
@@ -1038,7 +1109,6 @@
                 chart2.tooltip.defaultFormatter = function(){return false}
 
             } 
-
         }
 
         function fillDoughnutPlots() {
@@ -1330,9 +1400,10 @@
             $.ajax({url: URL, success: function(responseText){
 
                 // Get the data
-                var data;
+                // var data;
                 try {
-                    data = JSON.parse(responseText);
+                    catalog_data = JSON.parse(responseText)[0];
+                    console.log()
                 } catch (error) {
                     console.log('Error parsing query response.')
                     // $('#main').hide()
@@ -1340,7 +1411,7 @@
                 }
 
                 // Update the side table with the results
-                $.each( data[0], function( key, value ) {
+                $.each( catalog_data, function( key, value ) {
 
                     // console.log(key + ": " + value );
 
@@ -1371,8 +1442,8 @@
 
                 if (spectrumType.includes('PowerLaw')) {
 
-                    var PL_Index = String(-1*parseFloat(data[0]['PL_Index']).toPrecision(2))
-                    var Unc_PL_Index = String(parseFloat(data[0]['Unc_PL_Index']).toPrecision(2)) 
+                    var PL_Index = String(-1*parseFloat(catalog_data['PL_Index']).toPrecision(2))
+                    var Unc_PL_Index = String(parseFloat(catalog_data['Unc_PL_Index']).toPrecision(2)) 
 
                     document.getElementById('SpectralIndex_label1').innerHTML = 'Photon Index &Gamma;:'
                     document.getElementById('SpectralIndex1').innerHTML = PL_Index + ' &plusmn; ' + Unc_PL_Index
@@ -1382,11 +1453,11 @@
 
                 } else if  (spectrumType.includes('LogParabola')) {
 
-                    LP_Index = String(-1*parseFloat(data[0]['LP_Index']).toPrecision(3))
-                    Unc_LP_Index = String(parseFloat(data[0]['Unc_LP_Index']).toPrecision(2)) 
+                    LP_Index = String(-1*parseFloat(catalog_data['LP_Index']).toPrecision(3))
+                    Unc_LP_Index = String(parseFloat(catalog_data['Unc_LP_Index']).toPrecision(2)) 
 
-                    LP_beta = String(-1*parseFloat(data[0]['LP_beta']).toPrecision(2))
-                    Unc_LP_beta = String(parseFloat(data[0]['Unc_LP_beta']).toPrecision(2)) 
+                    LP_beta = String(-1*parseFloat(catalog_data['LP_beta']).toPrecision(2))
+                    Unc_LP_beta = String(parseFloat(catalog_data['Unc_LP_beta']).toPrecision(2)) 
 
                     document.getElementById('SpectralIndex_label1').innerHTML = 'Photon Index &alpha;:'
                     document.getElementById('SpectralIndex_label2').innerHTML = 'Photon Index &beta;:'
@@ -1400,8 +1471,8 @@
 
                 } else if  (spectrumType.includes('PLSuperExpCutoff')) {
 
-                    PLEC_Index = String(-1*parseFloat(data[0]['PLEC_Index']).toPrecision(2))
-                    Unc_PLEC_Index = String(parseFloat(data[0]['Unc_PLEC_Index']).toPrecision(2)) 
+                    PLEC_Index = String(-1*parseFloat(catalog_data['PLEC_Index']).toPrecision(2))
+                    Unc_PLEC_Index = String(parseFloat(catalog_data['Unc_PLEC_Index']).toPrecision(2)) 
 
                     document.getElementById('SpectralIndex_label1').innerHTML = 'Photon Index &Gamma;:'
                     document.getElementById('SpectralIndex1').innerHTML = PLEC_Index + ' &plusmn; ' + Unc_PLEC_Index
@@ -1439,6 +1510,7 @@
                 // Get the data
                 try {
                     data = JSON.parse(responseText);
+
                 } catch (error) {
                     console.log('Error parsing query response.')
                     console.log(error)
@@ -1467,6 +1539,9 @@
                 // Make a deep copy of the original data array
                 data_original = JSON.parse(JSON.stringify(data))
 
+                // Scrub the data for bad data points
+                // cleanData()
+
                 // Fill the html table
                 fillTable()
 
@@ -1479,8 +1554,15 @@
             }});
         }
     
+        function cleanData() {
+
+            console.log(data['ts'].length)
+            console.log(data['photon_index'].length)
+        } 
+
         function prepareLightCurveData() {
 
+            console.log('Preparing light curve data')
 
             // Extact some useful arrays
             ts = data['ts']
@@ -1489,18 +1571,26 @@
             flux_upper_limits = data['flux_upper_limits']
             fit_convergence = data['fit_convergence']        
             photon_index = data['photon_index']     
+            flux_ratio = []
+            ts_detections = []
 
+            for (i = 0; i < ts.length; i++) { 
+                if (parseFloat(ts[i][1]) >= parseFloat(ts_min)) {
+                    ts_detections.push(ts[i][1])
+                }
+            }
 
             // Correct the flux error precision
             for (i = 0; i < flux_error.length; i++) { 
                 flux_error[i][1] = parseFloat(flux_error[i][1].toPrecision(3))
                 flux_error[i][2] = parseFloat(flux_error[i][2].toPrecision(3))
-            }
 
+                flux_ratio.push( (parseFloat(data['flux'][i][1]) - parseFloat(data['flux_error'][i][1]) )  / parseFloat(data['flux'][i][1]) )
+            }
 
             // Find all of the nonconvergant fits
             nonconvergant_fits = []
-            if (show_nonconvergant_fits == false) {
+            if (show_nonconvergant_fits === false) {
                 for (i = 0; i < ts.length; i++) { 
                     if (fit_convergence[i][1] > 0) {
                         nonconvergant_fits.push(mets[i])
@@ -1510,10 +1600,17 @@
 
             // Find all of the unconstrained fits
             unconstrained_fits = []
-            if (show_unconstrained_fits == false) {
+            if (show_unconstrained_fits === false) {
                 for (i = 0; i < photon_index.length; i++) { 
                     if (photon_index[i][1] === 5) {
                         unconstrained_fits.push(photon_index[i][0])
+                    }
+                }
+
+                for (i = 0; i < flux.length; i++) { 
+                    var flux_error_rounded = data['flux'][i][1].toExponential(2) - data['flux_error'][i][1] 
+                    if (flux_error_rounded === 0) {
+                        unconstrained_fits.push(flux[i][0])
                     }
                 }
             }
@@ -1612,8 +1709,6 @@
                         }
 
                     }
-
-
                 })                 
             // }                     
 
@@ -1716,6 +1811,7 @@
             <th id="flux_error_header" style="text-align: center; min-width:150px">' + flux_error_header + '</th> \
             <th style="text-align: center;"><div class="tooltip2">Photon Index<span class="tooltiptext">Spectral photon index</span></div></th> \
             <th style="text-align: center; min-width:100px"><div class="tooltip2">Photon Index Error<span class="tooltiptext">1-sigma symmetric gaussian equivalent photon index error</span></div></th> \
+            <th style="text-align: center;"><div class="tooltip2">Sun Distance<span class="tooltiptext">Angular distance to the Sun</span></div></th> \
             <th style="text-align: center;"><div class="tooltip2">Fit Tolerance<span class="tooltiptext">Relative fit tolerance</span></div></th> \
             <th style="text-align: center; min-width:100px"><div class="tooltip2">MINUIT Return Code<span class="tooltiptext">MINUIT fit convergance</span></div></th> \
             <th style="text-align: center;">Analysis Log</th> \
@@ -1726,8 +1822,18 @@
             // Loop through each data entry and add columns to the corresponding row entry
             var j_detections = 0
             var k_nondetections = 0
+
             for (var i=0, size=data['ts'].length; i<size; i++) {
 
+                // Show the row by default
+                hideThisRow = false;
+
+                if (show_nonconvergant_fits == false) {
+                    if (data['fit_convergence'][i][1] > 0) {
+                        hideThisRow = true
+                    }
+                }
+               
                 var met = data['ts'][i][0]
                 var date = MET2date(met)
                 var date = String(date).slice(4,15)
@@ -1752,6 +1858,19 @@
                 var flux_error_string;
                 var photon_index_string;
                 var photon_index_error_string;
+        
+                // Calculate the Sun position
+                var dateObj = convertMET2dateObj(met)
+                var sun_position_equatorial = calculateSunPosition(dateObj)
+
+                // Calculate the distance to the Sun
+                var source_ra = parseFloat(catalog_data['RAJ2000']);
+                var source_dec = parseFloat(catalog_data['DEJ2000']);
+                var sun_ra = sun_position_equatorial[0];
+                var sun_dec = sun_position_equatorial[1];
+
+                var sun_distance = angularDistance(source_ra, source_dec, sun_ra, sun_dec)
+                sun_distance = sun_distance.toFixed(2)
 
                 if (ts >= parseFloat(ts_min)) {
 
@@ -1776,8 +1895,21 @@
                             photon_index_error_string =  '-'
                         }
 
-                    j_detections = j_detections + 1
+                    if (show_unconstrained_fits == false) {
 
+                        var flux = data['flux'][j_detections][1].toExponential(2)
+                        var flux_error = flux - data['flux_error'][j_detections][1]
+
+                        if (flux_error === 0) {
+                            hideThisRow = true
+                        }
+
+                        if (data['photon_index'][j_detections][1] === 5) {
+                            hideThisRow = true
+                        }
+                    }   
+
+                    j_detections = j_detections + 1
 
                 } else {
 
@@ -1790,6 +1922,12 @@
                     k_nondetections = k_nondetections + 1
                 }
 
+
+                if (hideThisRow === true) {
+                    console.log('hiding this row!')
+                    continue
+                }
+
                 row[++j] = '<tr>';
 
                 row[++j] ='<td id="date" style="text-align: center;">' + date + '</td>';
@@ -1800,6 +1938,7 @@
                 row[++j] ='<td id="flux_error" style="text-align: center;">' + flux_error_string + '</td>';
                 row[++j] ='<td id="photon_index" style="text-align: center;">' + photon_index_string + '</td>';
                 row[++j] ='<td id="photon_index_error" style="text-align: center;">' + photon_index_error_string + '</td>';
+                row[++j] ='<td id="sun_distance" style="text-align: center;">' + sun_distance + '</td>';
                 row[++j] ='<td id="fit_tolerance" style="text-align: center;">' + fit_tolerance + '</td>';
                 row[++j] ='<td id="fit_convergence" style="text-align: center;">' + fit_convergence + '</td>';
                 row[++j] ='<td id="log" style="text-align: center;"><a href="' + log_link + '" onclick="window.open(this.href,\'targetWindow\'); return false;">' + log_filename + '</a></td>';
@@ -1853,8 +1992,7 @@
 
             // $(window).on('load',function(){
             //  $('#magic_word_dialog').modal('show');
-            // });  
-                
+            // });           
 
             $("#submitForm").on('click', function() {
                 $("#magic_word_form").submit();
@@ -2021,24 +2159,15 @@
                     chartType = 'linear';
                     xtitle = 'Mission Elapsed Time (seconds)'
 
-              //    pointFormat_x1 = 'MET = {point.x}'
-                    // pointFormat_chart1 = pointFormat_x1 + '<br>' + pointFormat_y1
-
                 } else if (xaxis_type_label.includes('MJD')) {
 
                     chartType = 'linear';
                     xtitle = 'Modified Julian Date'
 
-              //    pointFormat_x1 = 'MJD = {point.x}'
-                    // pointFormat_chart1 = pointFormat_x1 + '<br>' + pointFormat_y1
-
                 } else if (xaxis_type_label.includes('JD')) {
 
                     chartType = 'linear';
                     xtitle = 'Julian Date'
-
-                    // pointFormat_x1 = 'JD = {point.x}'
-                    // pointFormat_chart1 = pointFormat_x1 + '<br>' + pointFormat_y1
                 }
 
                 // Add a loading message to the charts
@@ -2378,8 +2507,9 @@
 
             	show_nonconvergant_fits = this.checked 
 
-            	// Reload the light curve data
-            	// getLightCurveData()
+                // Reload the light curve data
+                data = JSON.parse(JSON.stringify(data_original))
+                fillTable()
                 prepareLightCurveData()
             });
 
@@ -2387,15 +2517,15 @@
 
             	show_unconstrained_fits = this.checked 
 
-            	// Reload the light curve data
-            	// getLightCurveData()
+                // Reload the light curve data
+                data = JSON.parse(JSON.stringify(data_original))
+                fillTable()
                 prepareLightCurveData()
             });
 
             $('[data-toggle="tooltip"]').tooltip({
                 delay: {"show": 300, "hide": 100}
             }); 
-
             
             // Check if a passphrase cookie exists and get the data if it does, or luanch the magic word model if it doesn't
             // checkCookie()
@@ -2494,19 +2624,17 @@
                             <div class="col-sm-6" style="margin-left:0px; margin-top:10px">
                                 <p>Minimum Detection Significance:</p>
                             </div>
-
-                            <div class="col-sm-5" style="margin-left:0px; margin-top:6px">
-                                <div class="dropdown">
-                                    <button style="width:110px" id="ts_min_button" class="btn btn-default dropdown-toggle ts_min" type="button" data-toggle="dropdown">TS = 4 (2&sigma;)  <span class="caret"></span></button>
-                                    <ul class="dropdown-menu ts_min" style="min-width:115px">
-                                        <li id="ts4" class="active"><a href="#">TS = 4 (2&sigma;)</a></li>
-                                        <li id="ts3"><a href="#">TS = 3 </a></li>
-                                        <li id="ts2"><a href="#">TS = 2 </a></li>
-                                        <li id="ts1"><a href="#">TS = 1 (1&sigma;)</a></li>
-                                    </ul>
-                                </div>
-                            </div>  
-
+                                <div class="col-sm-5" style="margin-left:0px; margin-top:6px">
+                                    <div class="dropdown">
+                                        <button style="width:110px" id="ts_min_button" class="btn btn-default dropdown-toggle ts_min" type="button" data-toggle="dropdown">TS = 4 (2&sigma;)  <span class="caret"></span></button>
+                                        <ul class="dropdown-menu ts_min" style="min-width:115px">
+                                            <li id="ts4" class="active"><a href="#">TS = 4 (2&sigma;)</a></li>
+                                            <li id="ts3"><a href="#">TS = 3 </a></li>
+                                            <li id="ts2"><a href="#">TS = 2 </a></li>
+                                            <li id="ts1"><a href="#">TS = 1 (1&sigma;)</a></li>
+                                        </ul>
+                                    </div>
+                                </div> 
                         </div>   
 
                         <div class="row-small-gutter" style="margin-top:60px"> 
@@ -2554,13 +2682,14 @@
 
                         <div class="row-small-gutter" style="margin-top:30px">
                             <div class="col-sm-12">
-                                <label class="checkbox-inline" style="margin-right:5px"><input type="checkbox" value="" id="show_nonconvergant_fits">Show Non-Convergent Fits</label>
+                                <div class="tooltip2"><span class="tooltiptext">Show timebins for which the likelihood fit did not successfully converge</span>
+                                    <label class="checkbox-inline" style="margin-right:5px"><input type="checkbox" value="" id="show_nonconvergant_fits">Show Non-Convergent Fits</label>
+                                </div>
                             </div>
                             <div class="col-sm-12">
-                                <label class="checkbox-inline" style="margin-right:5px"><input type="checkbox" value="" id="show_unconstrained_fits">Show Unconstrained Fits</label>
-
-
-
+                                <div class="tooltip2"><span class="tooltiptext">Show timebins for which the photon flux or index were unconstrained by the likelihood fit </span>
+                                    <label class="checkbox-inline" style="margin-right:5px"><input type="checkbox" value="" id="show_unconstrained_fits">Show Unconstrained Fits</label>
+                                </div>
                             </div>
 
                         </div>

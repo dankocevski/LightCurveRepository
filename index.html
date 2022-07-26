@@ -54,7 +54,8 @@
 
     <!--Plugin JavaScript file-->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ion-rangeslider/2.3.1/js/ion.rangeSlider.min.js"></script>
-  
+
+
     <!-- Moment.js -->
     <script charset="UTF-8" src="./js/moment.js"></script>
 <!--  -->
@@ -317,10 +318,60 @@
        left: -9999px !important;
     }
 
+    .customSlider {
+      -webkit-appearance: none;
+      width: 100%;
+      height: 15px;
+      border-radius: 5px;   
+      background: transparent;
+      outline: none;
+      opacity: 0.7;
+      -webkit-transition: .2s;
+      transition: opacity .2s;
+      visibility: hidden;
+    }
 
-/*    .timeline.label {
-        font-weight: normal !important;
-    }  */ 
+    .customSlider::-webkit-slider-thumb {
+/*      -webkit-appearance: none;
+      appearance: none;
+      width: 25px;
+      height: 25px;
+      border-radius: 50%; 
+      background: #04AA6D;
+      cursor: pointer;*/
+
+      top: 35px;
+      width: 16px;
+      height: 18px;
+      background-color: transparent;
+      /*background-color: "#2c6c9f";*/
+
+    }
+
+    .customSlider::-moz-range-thumb {
+      width: 25px;
+      height: 25px;
+      border-radius: 50%;
+      background: #04AA6D;
+      cursor: pointer;
+    }
+
+    #mydiv {
+      position: absolute;
+      z-index: 9;
+      background-color: #f1f1f1;
+      text-align: center;
+      border: 1px solid #d3d3d3;
+    }
+
+    #mydivheader {
+      padding: 10px;
+      cursor: move;
+      z-index: 10;
+      background-color: #2196F3;
+      color: #fff;
+    }
+
 
 </style>
 
@@ -391,6 +442,20 @@
         var user_double_clicked = false
         var lock_selection = false
         var variability_index_cut = 21.67;
+        var mouseDown = false
+
+        var showSkyActivity = true;
+        var data_sky_activity;
+        var shouldUpdateSkyActivity = false;
+        var overlaysActive = false;
+
+        var MET_sundate;
+        var MJD_sundate;
+
+        var Signif_Avg = []
+        var TSs = []
+
+
 
         var months = {'1':'Jan', '2':'Feb', '3':'Mar', '4':'Apr', '5':'May', '6':'Jun', '7':'Jul', '8':'Aug', '9':'Sep', '10':'Oct', '11':'Nov', '12':'Dec'}
         // var months = {'1':'January', '2':'Feburary', '3':'March', '4':'April', '5':'May', '6':'June', '7':'July', '8':'August', '9':'September', '10':'October', '11':'November', '12':'December'}
@@ -841,6 +906,7 @@
 
         function redraw() {
             
+
             var m = Celestial.metrics(), // Get the current map size in pixels
 
             // empty quadtree, will be used for proximity check
@@ -854,6 +920,12 @@
 
             // Display the 3FGL data
             if (typeof data_FGL !== 'undefined' && show_FGL === true) {
+
+                // console.log('Rendering ' + data_FGL.length + ' 4FGL Sources...')
+                // console.log(arguments.callee.caller.toString())
+
+                Signif_Avg = []
+                TSs = []
 
                 for (i=0; i<data_FGL.length; i++) {
 
@@ -944,12 +1016,44 @@
 
                             // object radius in pixel, could be varable depending on e.g. magnitude
                             // var r = Math.pow(parseInt(source.Signif_Avg) * 0.2, 0.3);
-                            if ($("#marker_size_varindex")[0].checked === true) {
-                                var r = Math.pow(parseInt(source.Variability_Index) * 1, 0.225)/1.5;
-                            } else {
+
+                            var r;
+
+
+                            if ($("#marker_size_ts")[0].checked === true && typeof data_sky_activity !== 'undefined') {
+
+                                // console.log('using time resolved ts values!')
+                                if (data_sky_activity.hasOwnProperty(source.Source_Name)) {
+                                    var r = Math.pow(parseInt(data_sky_activity[source.Source_Name]) * 1, 0.4);
+                                } else {
+                                    var r = Math.pow(parseInt(source.Signif_Avg) * 0.2, 0.4);
+                                }
+
+                                // try {
+                                //     console.log('using time resolved ts values!')
+                                //     r = Math.pow(parseInt(data_sky_activity[source.Source_Name]) * 0.2, 0.4);
+                                //     // r = Math.pow(parseInt(source.Signif_Avg) * 0.2, 0.4);
+
+                                //     TSs.push(data_sky_activity[source.Source_Name])
+
+                                //     r2 = Math.pow(parseInt(source.Signif_Avg) * 0.2, 0.4);
+                                //     Signif_Avg.push(source.Signif_Avg)
+
+                                // } catch (error) {
+                                //     // console.log('using average significance!')
+                                //     r = Math.pow(parseInt(source.Signif_Avg) * 0.2, 0.4);
+                                //     Signif_Avg.push(r)
+
+
+                                // }
+
+                            } else if ($("#marker_size_varindex")[0].checked === true) {
+                                r = Math.pow(parseInt(source.Variability_Index) * 1, 0.225)/1.5;
+
+                            } else if ($("#marker_size_sig")[0].checked === true) {
                                 // var r = Math.pow(parseInt(source.Signif_Avg) * 1, 0.25)/1.25;
-                                var r = Math.pow(parseInt(source.Signif_Avg) * 0.2, 0.4);
-                            }
+                                r = Math.pow(parseInt(source.Signif_Avg) * 0.2, 0.4);
+                            } 
 
 
                             // draw on canvas
@@ -978,7 +1082,9 @@
 
                     }      
 
-                }             
+                } 
+
+                // console.log('Done.')            
             }
 
             if (typeof data_2FAV !== 'undefined' && show_2FAV === true) {
@@ -1693,21 +1799,18 @@
                 var ra_urlEncoded = encodeURIComponent(query_ra);
                 var dec_urlEncoded = encodeURIComponent(query_dec);
                 URL = URL + "&ra=" + ra_urlEncoded + "&dec=" + dec_urlEncoded
-
             }
 
             if (isNaN(query_radius) !== true) {
                 
                 var radius_urlEncoded = encodeURIComponent(query_radius);
                 URL = URL + "&radius=" + radius_urlEncoded
-
             }
 
             if (query_keyword.length != 0) {
 
                 var keyword_urlEncoded = encodeURIComponent(query_keyword);
                 URL = URL + "&keyword=" + keyword_urlEncoded
-
             }
 
             // Print out the final URL
@@ -1718,9 +1821,11 @@
 
                 // Get the data
                 try {
+
                     data_FGL = JSON.parse(responseText);
                     console.log("4FGL data length = " + data_FGL.length)
                 } catch (error) {
+
                     console.log('Error parsing query response.')
                     // $('#main').hide()
                     return;
@@ -1737,13 +1842,6 @@
                     // Fill the primary table
                     fillTable(data_FGL);
 
-                    // Redraw the map
-                    Celestial.redraw()
-
-
-                    // Show the map spinner
-                    $('#map_loading').hide()
-
                     // Fill the doghnut plot
                     // fillDoughnutPlots(data_FGL);
 
@@ -1756,8 +1854,10 @@
                 //     }
                 // }
 
-                return 
+            // Show the map spinner
+                $('#map_loading').hide()
 
+                return 
             }});
         }
 
@@ -1920,6 +2020,63 @@
             }});
         }
 
+        function getSkyActivity(MET, latest=false) {
+
+            // Show the map spinner
+            $('#map_loading').show()
+
+            // Setup the URL
+            URL = "queryDB.php?typeOfRequest=skyActivity&met=" + MET + "&cadence=daily"; 
+
+            if (latest === true) {
+                URL = URL + "&latest"
+            }
+
+            // Print out the final URL
+            console.log("http://localhost/~kocevski/LightCurveRepository/Production/" + URL);
+
+            // Perform an ajax request
+            $.ajax({url: URL, success: function(responseText){
+
+                // Get the data
+                try {
+                    console.log('Retrieving sky activity data.')
+                    data_sky_activity = JSON.parse(responseText);
+                } catch (error) {
+                    console.log('Error parsing query response.')
+                    // $('#main').hide()
+                    return;
+                }
+
+                if (Object.keys(data_sky_activity).length < 1000) {
+
+                    // alert('Your search found no results!')
+                    // $('#alert_dialog').modal('show');
+                    alert("The requested date is outside of the current Light Curve Repository analysis window.")
+
+                    // Reset the slider to the previously time for which data was available
+                    $('#input_sundate')[0].value = input_sundate_previous
+                    setSunDateSlider()
+
+                } else {
+
+                    console.log('data length = ', Object.keys(data_sky_activity).length)
+
+                    // Redraw the map
+                    Celestial.redraw()
+
+                    // Save the last working url
+                    input_sundate_previous = $('#input_sundate')[0].value
+                }
+
+                // Show the map spinner
+                $('#map_loading').hide()
+
+                return 
+
+            }});
+        }
+
         function fillTimeline(data, name, key) {
 
             if (name.includes('IceCube')) {
@@ -2063,8 +2220,6 @@
         }
 
         function signalAnimationFinish() {
-
-            console.log('animation done.')
             isMapAnimating = false
         }
 
@@ -2433,7 +2588,6 @@
 
             // Join the row array into one long string and place it inside the table element
             // $('#dataTable_4FGL').html(row.join('')); 
-            console.log('done.')
             document.querySelector('#dataTable_4FGL').innerHTML = row.join(''); 
             
             // Update the table range display
@@ -2483,8 +2637,6 @@
                 $("#search_button")[0].click();
 
             }
-
-            
         }
 
         // Fill the 2FAV table
@@ -3080,9 +3232,29 @@
             var year = date.getUTCFullYear();
             var month = date.getUTCMonth() + 1;    // Adding a month because the javascript date object starts with month 0?
 
+            var hours = date.getUTCHours();
+            var minutes = date.getUTCMinutes();
+            var seconds = date.getUTCSeconds();
+
             // Get the julian date from the date components
             // var julianDate = Math.floor((1461 * (year + 4800 + (month - 14) / 12)) / 4 + (367 * (month - 2 - 12 * ((month - 14) / 12))) / 12 - (3 * ((year + 4900 + (month - 14) / 12) / 100)) / 4 + day - 32075);
-            var julianDate = (1461 * (year + 4800 + (month - 14) / 12)) / 4 + (367 * (month - 2 - 12 * ((month - 14) / 12))) / 12 - (3 * ((year + 4900 + (month - 14) / 12) / 100)) / 4 + day - 32075
+            // var julianDate = (1461 * (year + 4800 + (month - 14) / 12)) / 4 + (367 * (month - 2 - 12 * ((month - 14) / 12))) / 12 - (3 * ((year + 4900 + (month - 14) / 12) / 100)) / 4 + day - 32075
+
+            var julianDate; 
+            with (Math) {  
+              hours = hours + (minutes / 60) + (seconds/3600);
+              GGG = 1;
+              if (year <= 1585) GGG = 0;
+              julianDate = -1 * floor(7 * (floor((month + 9) / 12) + year) / 4);
+              S = 1;
+              if ((month - 9)<0) S=-1;
+              A = abs(month - 9);
+              J1 = floor(year + S * floor(A / 7));
+              J1 = -1 * floor((floor(J1 / 100) + 1) * 3 / 4);
+              julianDate = julianDate + floor(275 * month / 9) + day + (GGG * J1);
+              julianDate = julianDate + 1721027 + 2 * GGG + 367 * year - 0.5;
+              julianDate = julianDate + (hours / 24);
+            }
 
             return julianDate
         }
@@ -3283,14 +3455,10 @@
                     }
 
                     if (selectedTabID.includes('4FGL') && perform_search === true) {
-
-                        console.log('frak')
                         $(".pagination").hide()
                         $("#table_row_selector").css("visibility", "hidden");      
 
                     } else {
-
-                        console.log('this')
                         $(".pagination").show()
                         $("#table_row_selector").css("visibility", "visible");  
                         resetPagination()                      
@@ -3414,10 +3582,26 @@
 
             // Record the current MET and MJD values
             MET_current = MET
-            MJD_current = convertMET2MJD(MET_current)
+            MJD_current = parseInt(convertMET2MJD(MET_current))
+
+            MET_sundate = MET_current
+            MJD_sundate = MJD_current
+
+            // Set the mission time window
+            MET_mission_start = 239587201
+            MET_mission_stop = MET_current
+
+            MET_mission_half = MET_mission_start + ((MET_mission_stop-MET_mission_start)/2.0)
+            MJD_mission_half = parseInt(convertMET2MJD(MET_mission_half))
+
+            // Set the default previously good MET for the sky activity data retrieval
+            input_sundate_previous = MET_mission_half
+
+            // Define the latest available MET for the daily cadence
+            MET_latest_daily = Math.floor((MET_current - MET_mission_start ) / 259200) * 259200 + MET_mission_start
 
             // Set the default slide values
-            MET_start = 239587201
+            MET_start = MET_mission_start
             MET_stop = MET_current
 
             // Get the currently set data format
@@ -3426,8 +3610,9 @@
             // var MET
             if (date_format.includes('MET')) {
 
-                $("#input_sundate")[0].value = parseInt(MET_current)
                 $("#input_to")[0].value = MET_current
+                $("#input_sundate")[0].value = parseInt(MET_mission_half)
+                input_sundate_previous = parseInt(MET_mission_half)
 
             } else if (date_format.includes('MJD')) {
 
@@ -3437,7 +3622,8 @@
 
                 // Set the input range
                 $("#input_to")[0].value = parseInt(MJD_current)
-                $("#input_sundate")[0].value = parseInt(MJD_current)
+                $("#input_sundate")[0].value = parseInt(MJD_mission_half)
+                input_sundate_previous = parseInt(MJD_mission_half)
 
             } else {
 
@@ -3484,9 +3670,6 @@
             // Convert the MJD to a date string
             var dateObj = convertMET2dateObj(MET)
 
-            console.log('Setting Sun/Moon position for: ' + MET + ', ' + MJD)
-            console.log(dateObj.toGMTString())
-
             // Calculate the sun position
             var sun_position_equatorial = calculateSunPosition(dateObj)
             var sun_position_galactic = calculateGalacticCoordinates(sun_position_equatorial[0],sun_position_equatorial[1])
@@ -3511,9 +3694,6 @@
             
             // Check if the cookie contains the passphrase data
             passphrase = getCookieData("passphrase");
-
-            console.log("Cookie stored passphrase = " + passphrase)
-
             if (passphrase == null) {
 
                 // Show the passphrase modal if the cookie doesn't contain the passphrase data
@@ -3774,6 +3954,97 @@
             }
         };
 
+        function setSunDateSlider() {
+
+            input_sundate = parseFloat($('#input_sundate')[0].value)
+
+            // Get the currently set date format
+            var date_format = $('.dropdown-toggle.date-format')[0].innerText
+
+            var sun_date_met;
+            var sun_date_mjd;
+
+            // Get the MET
+            if (date_format.includes('MJD')) {
+
+                sun_date_mjd = $("#input_sundate")[0].value
+                sun_date_met = convertMJD2MET(parseInt(sun_date_mjd))
+
+            } else {
+
+                sun_date_met = $("#input_sundate")[0].value
+                sun_date_mjd = convertMET2MJD(parseInt(sun_date_met))                  
+            }
+
+            // Make sure the MET is an integer
+            sun_date_met = parseInt(sun_date_met);
+            sun_date_mjd = parseInt(sun_date_mjd);
+
+            // Create a timelime marker at the set date
+            var mjd_min = 54683
+            var mjd_max = MJD_current
+
+            // var left_percentage = 100 * (MJD_sundate-mjd_min)/(mjd_max-mjd_min)
+            var left_percentage = 100 * (sun_date_mjd - mjd_min)/(mjd_max - mjd_min) 
+            left_percentage = left_percentage.toFixed(2)
+
+            var irs_line_width = 1161
+            var irs_width = 1176
+            left_label_absolute = ((parseFloat(left_percentage)/100.) * irs_line_width) + (irs_width - irs_line_width)
+
+            // Set the width of the sundate bar to represent the duration over which the sky activity is measured (only really precentable for 30 day cadence)
+            // var sundate_bar_width = 30 / (mjd_max - mjd_min) * irs_line_width
+
+            var sun_date_label = convertMET2Date(sun_date_met)
+
+            if ($('.irs-grid-sundate').length === 0) {
+
+                // Add the label
+                // $('.irs').append('<span class="irs-single-aux" style="visibility: visible; position:absolute; margin-left:-47.5px; left: ' + left_percentage + '%;">Frak</span>')
+                $('.irs:last').append('<span class="irs-single-aux" id="sundate-label" style="visibility: visible; position:absolute; margin-left:-52.5px; left: ' + left_label_absolute + 'px; z-index:0;">' + sun_date_label + '</span>')
+                $('.irs:last').append('<span class="irs-handle aux type_last" id="sundate-handle" style="visibility: visible; position:absolute; margin-left:-9px; left: ' + left_label_absolute + 'px; z-index:1;"><i></i><i></i><i></i></span>')
+
+                // <span class="irs-handle aux type_last" id="sundate-handle" style="visibility: visible; position:absolute; margin-left:-9px; left:100%; z-index:1;"><i></i><i></i><i></i></span>
+
+                // Add the bar below the label
+                $('.irs-line').append('<span class="irs-grid-sundate" id="sundate-bar" style="left:' + left_percentage + '%; background-color:rgba(230, 172, 0, 1); width:1px; height:200px; top:0px; position:absolute; z-index:0;"</span>')
+                // $('.irs-line').append('<span class="irs-grid-sundate" id="sundate-bar-width" style="left:' + left_percentage + '%; background-color:rgba(230, 172, 0, 0.5); width:' + sundate_bar_width + 'px; height:200px; margin-left:-5px; top:0px; position:absolute; z-index:0;"</span>')
+
+                var handle = document.getElementById("sundate-handle");
+                // handle.style.left = left_percentage - 0.6 + '%';
+                handle.style.left = parseFloat(left_percentage) + 0.1 + '%';
+                // $('.irs:last').append(handle)
+
+                // handle.style.marginTop = "-1px";
+                // $('.irs-line').append(handle)
+
+            } else {
+
+                // sliderRangeWidth = 1160;
+                // handleOffset = 9
+                // barOffset = -9
+                // labelOffset = 5
+                // sliderRangeLeftEdgePagePosition = 400;
+                // sliderRangeRightEdgePagePosition = sliderRangeWidth + sliderRangeLeftEdgePagePosition
+
+                // if ((mousePosition >= sliderRangeLeftEdgePagePosition + handleOffset) && (mousePosition < (sliderRangeRightEdgePagePosition + handleOffset))) {
+
+                //     // Update the position of the sun date elements
+                //     document.getElementById("sundate-handle").style.left = Math.round(mousePosition)-sliderRangeLeftEdgePagePosition + 'px'
+
+
+                $('.irs-single-aux').css('left',left_label_absolute)
+                $('.irs-single-aux').text(sun_date_label)
+                $('.irs-grid-sundate').css('left',left_percentage+'%')
+
+                var handleOffset = 6
+                $('#sundate-handle').css('left',left_label_absolute - handleOffset)
+
+
+            }
+        };
+
+
         // Query the database when the page is finished loading
         $(function() {
 
@@ -3799,6 +4070,7 @@
 
             // Display the map
             Celestial.display(config);
+
 
             // Get the intial map scaling
             scale_initial = Celestial.mapProjection.scale()
@@ -3870,7 +4142,6 @@
                     $('#usagetip').hide();
 
                 }
-
             });
 
             $("#search_button").on('click', function() {
@@ -3908,8 +4179,6 @@
 
                 // Remove any search paramerers from the url
                 window.history.replaceState(null, null, window.location.pathname);
-
-
             });
 
             $('.dropdown-menu.transform').on('click', 'li', function() {
@@ -3976,7 +4245,6 @@
                 if (show_tooltip === false) {
                     selection.style.visibility = "hidden";
                     tooltip_map.style.visibility = "hidden";
-                    console.log('hiding stuff')
 
                     // Check to see if another row element is already selected. If so, de-select it.
                     if ( (previousRowElement != null) && (!previousRowElement.is($(this))) ) {
@@ -4039,9 +4307,8 @@
                     // Hide the 2FAV data in the timeline
                     $('.irs-grid-pol.2FAV').remove()
 
-                    if ((show_2FLGC === false) && (show_2FAV === false) && (show_IceCube === false)) {
-                        
-                        // Hide the timeline
+                    // Hide the timeline
+                    if ((show_2FLGC === false) && (show_2FAV === false) && (show_IceCube === false) && (showSkyActivity === false)) {
                         $('#timeline').hide()
                     }
 
@@ -4092,9 +4359,8 @@
                     // Hide the 2FLGC data in the timeline
                     $('.irs-grid-pol.2FLGC').remove()
 
-                    if ((show_2FLGC === false) && (show_2FAV === false) && (show_IceCube === false)) {
-
-                        // Hide the timeline
+                    // Hide the timeline
+                    if ((show_2FLGC === false) && (show_2FAV === false) && (show_IceCube === false) && (showSkyActivity === false)) {
                         $('#timeline').hide()
                     }
 
@@ -4121,21 +4387,26 @@
                     // Show the spinner while the data is being loaded
                     $('#timeline_spinner').show()
 
-                    // // Asynchronous update the timeline slider dates 
-                    // setTimeout(() => { 
+                    // if ($('.irs-bar').is(":hidden")) {
 
-                    //     // Convert from MJD to calender date
-                    //     var date_string = convertMJD2Date(date_from)
-                    //     console.log(date_string)
-                    //     $('.irs-from')[0].innerHTML = date_string
+                    //     // Show the timeline elements
+                    //     $('.irs-from').show()
+                    //     $('.irs-to').show()
 
-                    //     // Convert from MJD to calender date
-                    //     var date_string = convertMJD2Date(date_to)
-                    //     console.log(date_string)
-                    //     $('.irs-to')[0].innerHTML = date_string
+                    //     $('.irs-handle.from').show()
+                    //     $('.irs-handle.to').show()
 
+                    //     $('.irs-bar').show()
 
-                    // }, 300);
+                    // }
+
+                    $('.irs-from').show()
+                    $('.irs-handle.from').show()
+
+                    $('.irs-to').show()
+                    $('.irs-handle.to').show()
+
+                    $('.irs-bar').show()
 
                 }
             });
@@ -4162,9 +4433,8 @@
                     // Hide the IceCube data in the timeline
                     $('.irs-grid-pol.IceCube').remove()
 
-                    if ((show_2FLGC === false) && (show_2FAV === false) && (show_IceCube === false)) {
-                        
-                        // Hide the timeline
+                    // Hide the timeline
+                    if ((show_2FLGC === false) && (show_2FAV === false) && (show_IceCube === false) && (showSkyActivity === false)) {
                         $('#timeline').hide()
                     }
 
@@ -4226,9 +4496,6 @@
                 min_time = timeline_slider.result['min']
                 max_time = timeline_slider.result['max']
 
-                console.log('from_time = ' + from_time)
-
-
                 if (new_date_format_label.includes('MET')) {
 
                     // Convert the relevant times from MJD to MET
@@ -4255,6 +4522,9 @@
                         $('#input_sundate')[0].value = parseInt(convertMJD2MET(sun_input))
 
                     }
+
+                    // Recreate the sundate slider
+                    setSunDateSlider()
 
                     $('#timeline_label').text('Mission Elapsed Time')
                 }
@@ -4286,6 +4556,9 @@
                         $('#input_sundate')[0].value = parseInt(convertMET2MJD(sun_input))
 
                     } 
+
+                    // Recreate the sundate slider
+                    setSunDateSlider()
 
                     $('#timeline_label').text('Modified Julian Date')
                 }
@@ -4319,7 +4592,21 @@
             // Create the timeline slider
             $(".js-range-slider").ionRangeSlider({
 
+                type: "double",
+                min: 54683,
+                max: MJD_current,
+                from: 54683,
+                to: MJD_current,
+                grid: true,
+                grid_num: 12,
+                prettify_enabled: false,
+                grid_snap: false,
+                drag_interval: false,
+                // prettify: convertMJD2Date,
+
                 onStart: function (data) {
+
+                    console.log('OnStart')
 
                     // Called right after range slider instance initialised
             
@@ -4346,10 +4633,15 @@
                     // var date_string = convertMJD2Date(data.to)
                     // $('.irs-to')[0].innerHTML = date_string
 
-                    // console.log($('.irs-to')[0].innerHTML)
-
                     date_to = data.to
                     date_from = data.from
+
+                    data.from_pretty = 'frak'
+
+                    // $('.irs-to').clone().append($('.irs-to').parent())
+                    // $('.irs-to').css('left',50)
+
+                    setSunDateSlider() 
 
                 },
             
@@ -4415,7 +4707,6 @@
                         $('.form-control.input.to')[0].value = data.to 
 
                     }
-
                 },
             
                 onFinish: function (data) {
@@ -4433,19 +4724,17 @@
                     if (show_2FAV === true) {
                         fillTable_2FAV(data_2FAV)
 
-                    // Reset the pagination if the 2FAV tab is active
-                    var activeTabID = $(".nav-tabs.tables > li.active")[0].id
+                        // Reset the pagination if the 2FAV tab is active
+                        var activeTabID = $(".nav-tabs.tables > li.active")[0].id
 
-                    if (activeTabID.includes('2FAV')) {
-                        resetPagination()
-                    }
-
+                        if (activeTabID.includes('2FAV')) {
+                            resetPagination()
+                        }
 
                     }
   
                     // Called then action is done and mouse is released
                     console.log('onFinish')
-
                 },
             
                 onUpdate: function (data) {
@@ -4506,8 +4795,7 @@
 
                     // Called when slider is changed using Update public method
                     console.log('onUpdate')
-
-                },
+                },              
             });
 
             // // Change the timeline background
@@ -4518,7 +4806,6 @@
             $('.irs-grid').append('<span class="irs-grid-text js-grid-text-0" style="left:-40px;top:-60px;">10</span>')
             $('.irs-grid').append('<span class="irs-grid-pol" style="left:-11px;top:200%; background-color: rgb(166, 166, 166); transform:rotate(270deg)"></span>')
             $('.irs-grid').append('<span class="irs-grid-pol" style="left:-11px;top:-200%; background-color: rgb(166, 166, 166); transform:rotate(270deg)"></span>')
-    
 
             // Add an mouse click event listener for the data tables
             $('.data-table').on('click', 'tbody tr', function(event) {
@@ -4557,9 +4844,6 @@
 
                     // Determine which table is currently being displayed
                     var activeTabID = $(".nav-tabs.tables > li.active")[0].id
-
-                    console.log($(this))
-
                     var sourceName
 
                     if (activeTabID.includes('4FGL')) {
@@ -4814,12 +5098,52 @@
                 changeTable($(this)); 
             })
 
-            // Add an event lister for the 4FGL marker size checkbox
+            // Add an event lister for the time-resolved significane checkbox
             $(".map-overlay.markersize").change(function() {
                 
                 // Prevent more than one checkbox to be selected at any given time
                 $(".map-overlay.markersize").prop('checked', false);
                 $(this).prop('checked', true);
+
+                if ($(this).attr("id") === 'marker_size_ts') {
+
+                    // Show the timeline
+                    if ((show_2FLGC === false) && (show_2FAV === false) && (show_IceCube === false)) {
+                        $('#timeline').show()
+                    }
+                    
+                    // // Show the timeline
+                    // $('#timeline').show()
+
+                    // getSkyActivity(MET_latest_daily, latest=true)
+                    // setSunMoonPositions(MET_current)
+
+                    getSkyActivity(MET_mission_half)
+                    setSunMoonPositions(MET_mission_half)
+
+                    // setTimeout(function(){
+
+                    //     var slider = $(".js-range-slider").data("ionRangeSlider");
+
+                    //     $('.irs-from').hide()
+                    //     $('.irs-handle.from').hide()
+
+                    //     $('.irs-to').hide()
+                    //     $('.irs-handle.to').hide()
+
+                    //     $('.irs-bar').hide()
+                    //     // $('.irs-line').css("background-color", "rgb(44, 108, 159)");
+                    //     // $('.irs-line').css("opacity", "0.10000000149011612");
+                    //     $('.irs-grid-pol').css('background-color', '#a6a6a6');
+
+
+                    //     slider.callOnUpdate()
+
+
+                    // },200);
+
+                }
+
 
                 // Redraw the map
                 Celestial.redraw()
@@ -5136,6 +5460,9 @@
                     $('.irs-grid').append('<span class="irs-grid-pol" style="left:-11px;top:200%; background-color: rgb(166, 166, 166); transform:rotate(270deg)"></span>')
                     $('.irs-grid').append('<span class="irs-grid-pol" style="left:-11px;top:-200%; background-color: rgb(166, 166, 166); transform:rotate(270deg)"></span>')
 
+                    // Recreate the sundate slider
+                    setSunDateSlider()
+
                     // Fill the timeline
                     if (show_2FAV === true) {
                         fillTimeline(data_2FAV, '2FAV', null);
@@ -5154,9 +5481,35 @@
 
             $('#input_to').on('input', function() {
 
+
+                to_input = parseInt($('.form-control.input.to')[0].value)
+
+                // // Get the currently set date format
+                // var date_format = $('.dropdown-toggle.date-format')[0].innerText
+
+                // if (date_format.includes('MJD')) {
+
+                //     to_input_met = convertMJD2MET(parseInt(to_input))
+
+                // } else {
+
+                //     to_input_met =  to_input                  
+                // }
+
+                // // Make sure the MET is an integer
+                // to_input_met = parseInt(to_input_met);
+
+
+                // // Make sure the input date is within the range of the current data, otherwise quit
+                // if (to_input_met < MET_mission_start || to_input_met > MET_mission_stop) {
+
+                //     alert("The requested date is outside of the current Light Curve Repository analysis window.")
+                //     return 
+                // }
+
                 let timeline_slider = $(".js-range-slider").data("ionRangeSlider");
 
-                to_input= parseInt($('.form-control.input.to')[0].value)
+
                 if ((to_input >= timeline_slider.options.min) && (to_input <= timeline_slider.options.max)) {
 
                     timeline_slider.update({
@@ -5171,6 +5524,9 @@
                     $('.irs-grid').append('<span class="irs-grid-text js-grid-text-0" style="left:-40px;top:-60px;">10</span>')
                     $('.irs-grid').append('<span class="irs-grid-pol" style="left:-11px;top:200%; background-color: rgb(166, 166, 166); transform:rotate(270deg)"></span>')
                     $('.irs-grid').append('<span class="irs-grid-pol" style="left:-11px;top:-200%; background-color: rgb(166, 166, 166); transform:rotate(270deg)"></span>')
+
+                    // Recreate the sundate slider
+                    setSunDateSlider()
 
                     // Fill the timeline
                     if (show_2FAV === true) {
@@ -5191,21 +5547,21 @@
             $('#input_sundate').on('input', function(event) {
 
 
-                let timeline_slider = $(".js-range-slider").data("ionRangeSlider");
+                // let timeline_slider = $(".js-range-slider").data("ionRangeSlider");
 
-                input_sun = parseFloat($('#input_sundate')[0].value)
+                // input_sun = parseFloat($('#input_sundate')[0].value)
 
-                console.log(input_sun, timeline_slider.options.min, timeline_slider.options.max)
+                // console.log(input_sun, timeline_slider.options.min, timeline_slider.options.max)
 
-                // if ((input_sun >= timeline_slider.options.min) && (input_sun <= timeline_slider.options.max)) {
+                // // if ((input_sun >= timeline_slider.options.min) && (input_sun <= timeline_slider.options.max)) {
 
-                    console.log('updating sun position!')
+                //     console.log('updating sun position!')
 
-                    // Update the Sun and Moon position
-                    setSunMoonPositions()
+                //     // Update the Sun and Moon position
+                //     setSunMoonPositions()
 
-                    // Redraw the map
-                    Celestial.redraw()
+                //     // Redraw the map
+                //     Celestial.redraw()
 
                 // }
 
@@ -5236,15 +5592,189 @@
 
             // Hide the page if the person clicks the close button
             $("#dismissForm").on('click', function(e) {
-                $('#main').hide()
+                // $('#main').hide()
             });
+
+            $("#set_date_button").on('click', function() {
+
+                // Get the input date
+                input_sundate = parseFloat($('#input_sundate')[0].value)
+
+                // Get the currently set date format
+                var date_format = $('.dropdown-toggle.date-format')[0].innerText
+
+                // Convert everything to MET
+                var sun_date_met;
+                var sun_date_mjd;
+
+                if (date_format.includes('MJD')) {
+
+                    sun_date_mjd = $("#input_sundate")[0].value
+                    sun_date_met = convertMJD2MET(parseInt(sun_date_mjd))
+
+                } else {
+
+                    sun_date_met = $("#input_sundate")[0].value                    
+                }
+
+                // Make sure the MET is an integer
+                sun_date_met = parseInt(sun_date_met);
+
+
+                // Make sure the input date is within the range of the current data, otherwise quit
+                if (sun_date_met < MET_mission_start || sun_date_met > MET_mission_stop) {
+
+                    // alert("The requested date is outside of the current Fermi mission window.")
+                    alert("The requested date is outside of the current Light Curve Repository analysis window.")
+
+                    if (date_format.includes('MJD')) {
+                        $('#input_sundate')[0].value = parseInt(MJD_sundate)
+                    } else {
+                        $('#input_sundate')[0].value = MET_sundate
+                    }
+
+                } else {
+
+                    MET_sundate = sun_date_met
+                    MJD_sundate = sun_date_mjd
+
+                    // Update the Sun and Moon position
+                    setSunMoonPositions()
+
+                    // Redraw the map
+                    Celestial.redraw()
+
+                    // Create the Sun/Moon date slider
+                    setSunDateSlider()
+
+                    // Update the sky activity
+                    if ($("#marker_size_ts")[0].checked === true) {
+                        getSkyActivity(MET_sundate)
+                    }
+
+                event.preventDefault();
+
+                }
+            });
+
+
+            // document.getElementById("sundate-handle").addEventListener("mousedown", function(e) {
+
+            //     e.preventDefault();
+
+            //     console.log('mousedown')
+            //     e.stopPropagation();
+
+            //     mouseDown = true;
+            //     // updateDragger(e);
+
+            //     return false;
+            // });
+
+            document.addEventListener("mousedown", function(e) {
+
+                if (e.srcElement.offsetParent.id === 'sundate-handle') {
+
+                // if ($(e.target).hasClass('sundate-handle')) {
+
+                    e.preventDefault();
+                    e.stopPropagation();
+
+                    mouseDown = true;
+                    // updateDragger(e);
+
+                    return false;
+               
+                }
+
+            });
+
+
+            document.addEventListener("mousemove", function(e) {
+
+                e.preventDefault();
+
+                if (mouseDown) {
+                    updateDragger(e);
+                }
+            });
+
+            document.addEventListener("mouseup", function() {
+
+                mouseDown = false;
+
+                if (shouldUpdateSkyActivity) {
+                    getSkyActivity(MET_sundate)
+                    shouldUpdateSkyActivity = false;
+                }
+
+            });
+
+            function updateDragger(event) {
+
+                var handlePosition= document.getElementById("sundate-handle").offsetLeft;
+                var mousePosition = event.pageX
+
+                sliderRangeWidth = 1160;
+                handleOffset = 9
+                barOffset = -9
+                labelOffset = 5
+                sliderRangeLeftEdgePagePosition = 400;
+                sliderRangeRightEdgePagePosition = sliderRangeWidth + sliderRangeLeftEdgePagePosition
+
+                if ((mousePosition >= sliderRangeLeftEdgePagePosition + handleOffset) && (mousePosition < (sliderRangeRightEdgePagePosition + handleOffset))) {
+
+                    // Update the position of the sun date elements
+                    document.getElementById("sundate-handle").style.left = Math.round(mousePosition)-sliderRangeLeftEdgePagePosition + 'px'
+                    document.getElementById("sundate-bar").style.left = Math.round(mousePosition)-sliderRangeLeftEdgePagePosition + barOffset + 'px'
+                    document.getElementById("sundate-label").style.left = Math.round(mousePosition)-sliderRangeLeftEdgePagePosition + labelOffset + 'px'
+
+                    // Update the sun date slider label
+                    mousePositionRelative = mousePosition - (sliderRangeLeftEdgePagePosition + handleOffset)
+                    mousePositionPercentage = mousePositionRelative / sliderRangeWidth
+
+                    // Create a timelime marker at the set date
+                    var mjd_min = 54683
+                    var mjd_max = MJD_current
+
+                    MJD_sundate = mousePositionPercentage * (mjd_max-mjd_min) + mjd_min
+                    MET_sundate = convertMJD2MET(MJD_sundate)
+                    var label_sundate = convertMET2Date(MET_sundate)
+
+                    $("#sundate-label").text(label_sundate)
+
+
+                    // Get the current date format
+                    var date_format = $('.dropdown-toggle.date-format')[0].innerText
+
+                    // Update the Sun date input field
+                    if (date_format.includes('MET')) {
+
+                        // Extract the current MJD and convert it into a date
+                        $("#input_sundate")[0].value = parseInt(MET_sundate)
+
+                    } else if (date_format.includes('MJD')) {
+
+                        // Extract the current MJD and convert it into a date
+                        $("#input_sundate")[0].value = parseInt(MJD_sundate)
+
+                    }
+
+                    // Update the Sun and Moon positions accordingly
+                    setSunMoonPositions()
+
+                    // Redraw the map
+                    Celestial.redraw()
+
+                    shouldUpdateSkyActivity = true;
+
+                }
+            }
 
             // Check to see if the passphrase data is stored in a cookie
             // checkCookie();
             get4FGLData();
 
-             
- 
 
         });
 
@@ -5261,7 +5791,7 @@
             <div id="nasa-banner-plain">
 
                 <!-- Left - Logo -->
-                <div class="nasa-logo">
+                <div class="nasa-logo" id="nasa_logo">
                     <a href="http://www.nasa.gov/"><img src="http://fermi.gsfc.nasa.gov/ssc/inc/img/nasa_logo.gif" width="140" height="98" border="0" alt="NASA Logo"></a>
                 </div>
             
@@ -5430,17 +5960,7 @@
                             <label class="checkbox-inline"><input , class="map-overlay moon" type="checkbox" id="moon" value="">Moon</label>
                         </div>                            
                       </div>                  
-                      <div style="margin-top:70px">
-                        <label for="name">4FGL Marker Size:</label>
-                      </div>
-                      <div class="row-small-gutter">
-                        <div class="col-sm-6">
-                            <label class="checkbox-inline"><input class="map-overlay markersize" type="checkbox" id="marker_size_varindex" value="" checked>Variability Index</label>
-                        </div>
-                        <div class="col-sm-5">
-                            <label class="checkbox-inline" id="lines-ecliptic-show"><input class="map-overlay markersize" type="checkbox" value="" id="marker_size_sig">Significance</label>
-                        </div>
-                      </div>
+
                       <div style="margin-top:30px">
                         <label>4FGL Marker Label:</label>
                       </div>
@@ -5464,9 +5984,24 @@
                       </div>
                       <div class="row-small-gutter">
                         <div class="col-sm-12">
-                            <label class="checkbox-inline" title="Changes the color of non-variabile sources to gray"><input class="map-overlap show_only_variable" type="checkbox" id="show_only_variable_sources" value="" checked><span>Gray Non-Variable Sources</label>
+                            <label class="checkbox-inline" title="Changes the color of non-variabile sources to gray"><input class="map-overlap show_only_variable" type="checkbox" id="show_only_variable_sources" value="" checked><span>Hide Non-Variable Sources</label>
                         </div>
-                      </div>                  
+                      </div>       
+                      <div style="margin-top:30px">
+                        <label for="name">4FGL Marker Size:</label>
+                      </div>
+                      <div class="row-small-gutter">
+                        <div class="col-sm-6">
+                            <label class="checkbox-inline"><input class="map-overlay markersize" type="checkbox" id="marker_size_varindex" value="" checked>Variability Index</label>
+                        </div>
+                        <div class="col-sm-10">
+                            <label class="checkbox-inline" id="map-overlay markersize"><input class="map-overlay markersize" type="checkbox" value="" id="marker_size_sig">Average Significance</label>
+                        </div>
+                        <BR>
+                        <div class="col-sm-12">
+                            <label class="checkbox-inline"><input class="map-overlay markersize" type="checkbox" id="marker_size_ts" value="">Time-resolved Significance (3 day)</label>
+                        </div>                                              
+                      </div>                                 
 <!--                       <div style="margin-top:30px">
                         <label for="name">4FGL Table:</label>
                       </div>
@@ -5583,16 +6118,6 @@
 
                     <div id="timeline" style="height:250px; border-width:1px; padding:45px 45px 15px 45px; margin-top:10px; border:solid lightgray 1px;">
                         <input type="text" class="js-range-slider" id="js-range-slider-id" name="my_range" value=""
-                            data-type="double"
-                            data-min="54683"
-                            data-max="58945"
-                            data-from="54683"
-                            data-to="58945"
-                            data-grid="true"
-                            data-grid-num="12"
-                            data-prettify-enabled="false"
-                            data-grid-snap="false"
-                            data-drag-interval="false"
                         />
 
                         <img id="timeline_spinner" src="./img/loading_apple.gif" width="30px" style="margin-top:-30px; margin-left:572px; position: relative; z-index:999; float:left; display:none">
@@ -5607,8 +6132,9 @@
                             <center>
                             <form class="form-inline" id="time_range_selector" action="javascript:void(0)">
                                 <div class="form-group">
-                                    <label style="margin-right:5px; font-weight: normal !important;">Sun/Moon Date: </label>
+                                    <label style="margin-right:5px; font-weight: normal !important;">Date: </label>
                                     <input style="width:100px" type="value" id="input_sundate" class="form-control input sun date" value="">
+                                    <button style="margin-left:5px; width:75px" class="btn btn-default date-set" id="set_date_button" type="button" data-toggle="dropdown">Set</button>
                                 </div>
 
                             </form>
@@ -5628,6 +6154,7 @@
                                     <input style="width:100px" type="value" id="input_to" class="form-control input to" value="58945">
                                 </div>
                                 <div class="form-group" style="margin-left:10px">
+                                    <!-- <label style="margin-right:5px; font-weight: normal !important;">Format: </label> -->
                                     <div class="dropdown">
                                         <button style="margin-left:5px; width:75px" class="btn btn-default btn dropdown-toggle date-format" type="button" data-toggle="dropdown">MJD <span class="caret"></span></button>
                                         <ul class="dropdown-menu date-format" style="width:10px; margin-left:-80px;">
@@ -5741,7 +6268,9 @@
         </div>
         <!-- Catalog table panel ends here-->  
 
-    
+        <!-- <span class="irs-handle aux type_last" id="sundate-handle" style="visibility: visible; position:absolute; margin-left:-17.5px; left:100%; z-index:1000;"><i></i><i></i><i></i></span> -->
+        <!-- <span class="irs-handle aux type_last" id="sundate-handle" style="visibility: visible; position:absolute; margin-left:-9px; left:100%; z-index:1;"><i></i><i></i><i></i></span> -->
+
 
         </div>
         <!-- Content ends here -->
@@ -5797,6 +6326,38 @@
 <!--                     <div style="float: right;"> 
                         <button type="button" id="dismissForm" class="btn btn-default" data-dismiss="modal" style="font-size: 12px;margin-top:10px">Close</button>
                     </div>  -->
+                </div> <!-- /.modal-footer -->
+
+            </div> <!-- /.modal-content -->
+        </div> <!-- /.modal-dialog -->
+    </div> <!-- /.modal -->  
+
+
+    <!-- Alert modal view starts here -->
+    <div id="alert_dialog" class="modal fade">
+        <div class="modal-dialog" style="width:700px; height: 200px;margin: auto; margin-top:10%">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title" style="text-align: center;">Data Unavailable</h4>
+                </div>
+                <div class="modal-body center-block" style="text-align: center; height:200px; margin-top:5%; margin-bottom:5%">                    
+                    <center>
+                        <!-- span style="font-size: 50px;" class="glyphicon glyphicon-remove-circle" aria-hidden="true"></span> -->
+                        <img width="75px" src="./img/spaceship.png">
+                    </center>     
+                    <BR>               
+                    <h4>Oops!</h4>
+                    <p>
+                    <!-- Light curve data is unavailable for the specified time. -->
+                    The requested date is outside of the current Light Curve Repository analysis window.
+                    <BR>
+                    <BR>
+                </div> <!-- /.modal-body -->
+                <div class="modal-footer">             
+                    <div id="okButtonDiv" style="float: right;">
+                        <button type="button" id="dismissForm" data-dismiss="modal" class="btn btn-danger" style="width:60px; color:white;font-size: 12px;margin:5px">OK</button>
+                    </div>
                 </div> <!-- /.modal-footer -->
 
             </div> <!-- /.modal-content -->

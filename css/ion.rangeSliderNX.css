@@ -45,6 +45,7 @@ Build date: 2019-12-19 16:51:02
 }
 .irs-handle.type_last {
   z-index: 2;
+  position: absolute;
 }
 .irs-min,
 .irs-max {
@@ -68,6 +69,14 @@ Build date: 2019-12-19 16:51:02
   cursor: default;
   white-space: nowrap;
 }
+.irs-single-aux {
+  position: absolute;
+  display: block;
+  top: -25px;
+  left: 0;
+  cursor: default;
+  white-space: nowrap;
+}
 .irs-grid {
   position: absolute;
   display: none;
@@ -79,6 +88,7 @@ Build date: 2019-12-19 16:51:02
 .irs-with-grid .irs-grid {
   display: block;  
 }
+
 .irs-grid-pol {
   position: absolute;
   /*top: -10px;*/
@@ -90,6 +100,19 @@ Build date: 2019-12-19 16:51:02
   background-color: #000000; 
 
 }
+
+.irs-grid-sundate {
+  position: absolute;
+  /*top: -10px;*/
+  top:50px;
+  left: 0;
+  width: 1px;
+  height: 20px;
+  background: #000;
+  background-color: #000000; 
+
+}
+
 .irs-grid-pol.small {
   top:50px;
   height: 4px;
@@ -252,6 +275,20 @@ Build date: 2019-12-19 16:51:02
   padding: 1px 5px;
   background-color: #2c6c9f;
   border-radius: 4px;
+  z-index: 1;
+}
+.irs--flat .irs-single-aux {
+  color: white;
+  width:95px;
+  font-size: 14px;
+  line-height: 1.333;
+  text-shadow: none;
+  text-align:center;
+  padding: 1px 5px;
+  /*background-color: #2c6c9f;*/
+  background-color:rgba(230, 172, 0, 1);
+  border-radius: 4px;
+  z-index: 100;
 }
 .irs--flat .irs-from:before,
 .irs--flat .irs-to:before,
@@ -267,6 +304,20 @@ Build date: 2019-12-19 16:51:02
   overflow: hidden;
   border: 3px solid transparent;
   border-top-color: #2c6c9f;
+}
+.irs--flat .irs-single-aux:before {
+  position: absolute;
+  display: block;
+  content: "";
+  bottom: -6px;
+  left: 50%;
+  width: 0;
+  height: 0;
+  margin-left: -3px;
+  overflow: hidden;
+  border: 3px solid transparent;
+  /*border-top-color: #2c6c9f;*/
+  border-top-color:rgba(230, 172, 0, 1);
 }
 .irs--flat .irs-grid-pol {
   background-color: #e1e4e9;

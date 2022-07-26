@@ -182,6 +182,50 @@
         echo json_encode($data);
     } 
 
+    // Return detailed information on a limited number of sources to be displayed in the data table
+    if ($typeOfRequest === 'skyActivity') { 
+
+        // Establish the database connection
+        $db = new SQLite3('./db/lc_repository_v2.db');
+
+        $met = $_GET['met']; 
+        $cadence = $_GET['cadence']; 
+
+        // Prepare the query statement 
+
+        if (isset($_GET['latest'])) {
+            $queryStatement = $db->prepare('SELECT source_name, ts, tmin FROM lightcurve_data_v2 WHERE ts IS NOT NULL AND CAST(tmin as int) < ( select tmin+((tmax-tmin)/2.) from lightcurve_data_v2 where source_name = "4FGL J0001.2-0747" and cadence="daily" and TS is not NULL order by tmax DESC limit 1) AND cast(tmax as int) > ( select tmin+((tmax-tmin)/2.) from lightcurve_data_v2 where source_name = "4FGL J0001.2-0747" and cadence="daily" and TS is not NULL order by tmax DESC limit 1) and cadence == "daily"');
+        } else {
+            $queryStatement = $db->prepare('SELECT source_name, ts FROM lightcurve_data_v2 WHERE ts IS NOT NULL AND CAST(tmin as int) < :met AND cast(tmax as int) > :met and cadence == :cadence');
+        }
+
+        // Bind the statement parameters
+        $queryStatement->bindValue(':met', $met, SQLITE3_TEXT);
+        $queryStatement->bindValue(':cadence', $cadence, SQLITE3_TEXT);
+
+        if (isset($_GET['verbose'])) {
+            echo  $queryStatement;
+            echo "<BR><BR>";
+        }
+
+        // Establish the database connection
+        $results = $queryStatement->execute();
+
+        // Create an array to store the results
+        $data = array();
+
+        // Loop through each row and create an associative array (i.e. dictionary) where the column name is the key
+        while ($row = $results->fetchArray(SQLITE3_ASSOC)) {
+
+            $data[$row['source_name']] = $row['ts'];
+            // $data[$row['source_name']] = $row['tmin'];
+
+        }  
+
+        // Encode the PHP associative array into a JSON associative array
+        echo json_encode($data);       
+    }
+
     // Return light curve data for one source
     if ($typeOfRequest === 'lightCurveData') { 
 
@@ -202,15 +246,15 @@
 
             if (($flux_type === "photon") or ($flux_type === "energy")) {
 
-                    // Fixed index values
-                    $flux = $flux_type . '_flux';
-                    $flux_error = $flux_type . '_flux_error';
+                // Fixed index values
+                $flux = $flux_type . '_flux';
+                $flux_error = $flux_type . '_flux_error';
 
-                    // Free index values
-                    $flux2 = $flux_type . '_flux2';
-                    $flux_error2 = $flux_type . '_flux_error2';
+                // Free index values
+                $flux2 = $flux_type . '_flux2';
+                $flux_error2 = $flux_type . '_flux_error2';
 
-                    $flux_upper_limit = $flux_type . '_flux_upper_limit';
+                $flux_upper_limit = $flux_type . '_flux_upper_limit';
 
             }
 
