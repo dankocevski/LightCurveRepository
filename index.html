@@ -464,6 +464,8 @@
         // D3-Celestial sky map. Copyright 2015 Olaf Frohn https://github.com/ofrohn, see LICENSE 
         var config = {
             width: 0,     // Default width, 0 = full parent width; height is determined by projection
+            // width: 600,
+            // height:1200,
             projection: "aitoff",  // Map projection used: airy, aitoff, armadillo, august, azimuthalEqualArea, azimuthalEquidistant, baker, berghaus, boggs, bonne, bromley, collignon, craig, craster, cylindricalEqualArea, cylindricalStereographic, eckert1, eckert2, eckert3, eckert4, eckert5, eckert6, eisenlohr, equirectangular, fahey, foucaut, ginzburg4, ginzburg5, ginzburg6, ginzburg8, ginzburg9, gringorten, hammer, hatano, healpix, hill, homolosine, kavrayskiy7, lagrange, larrivee, laskowski, loximuthal, mercator, miller, mollweide, mtFlatPolarParabolic, mtFlatPolarQuartic, mtFlatPolarSinusoidal, naturalEarth, nellHammer, orthographic, patterson, polyconic, rectangularPolyconic, robinson, sinusoidal, stereographic, times, twoPointEquidistant, vanDerGrinten, vanDerGrinten2, vanDerGrinten3, vanDerGrinten4, wagner4, wagner6, wagner7, wiechel, winkel3
             transform: "galactic", // Coordinate transformation: equatorial (default), ecliptic, galactic, supergalactic
             center: [0,0],       // Initial center coordinates in equatorial transformation [hours, degrees, degrees],
@@ -4074,7 +4076,6 @@
             // Display the map
             Celestial.display(config);
 
-
             // Get the intial map scaling
             scale_initial = Celestial.mapProjection.scale()
 
@@ -4082,9 +4083,14 @@
             canvas = document.querySelector("canvas")            
             canvas.id = "map_canvas"
 
+            // Explicitely set the canvas width and height
+            // $('#map_canvas').width("1284px")
+            // $('#map_canvas').height("642px")
+
             canvas.onmousedown = function(event) {
+
                 isMouseDown = true;
-            }
+            };
 
             canvas.onmouseup = function(event) {
 
@@ -5689,9 +5695,7 @@
                     return false;
                
                 }
-
             });
-
 
             document.addEventListener("mousemove", function(e) {
 
@@ -5710,7 +5714,6 @@
                     getSkyActivity(MET_sundate)
                     shouldUpdateSkyActivity = false;
                 }
-
             });
 
             function updateDragger(event) {
@@ -6099,14 +6102,15 @@
         <!-- sidebar ends here -->
 
         <!-- Content starts here -->
-        <div class="col-xs-7" style="width:1330px; margin-left:-15px">
+        <div class="col-xs-7" style="width:1350px; margin-left:-15px">
 
         <!-- Catalog Map panel starts here-->  
             <div class="panel panel-default">
                 <div class="panel-heading"><h3 class="panel-title">Catalog Map</h3></div>
                 <div id="map_panel" class="panel-body" style="margin-top:0px; margin-bottom:0px;">
                     <div id="map_container" style="overflow:hidden; border:0px">
-                        <div id="celestial-map" style="width:100%; border:0px solid lightgray;padding-left:5px"></div>
+                        <!-- <div id="celestial-map" style="width:100%; border:0px solid lightgray;padding-left:5px"></div> -->
+                        <div id="celestial-map" style="width:1300px; border:0px solid lightgray;padding-left:5px"></div>
                     </div>
                     <div id="celestial-form"></div>
                     <div id="cursor_coordinates" style="margin-top:-30px; margin-left:10px">RA: --, Dec: --</div>

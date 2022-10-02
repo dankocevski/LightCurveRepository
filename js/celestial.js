@@ -34,6 +34,7 @@ Celestial.display = function(config) {
     parentElement = "#" + cfg.container;
     var st = window.getComputedStyle(parent, null);
     if (!parseInt(st.width) && !cfg.width) parent.style.width = px(parent.parentNode.clientWidth); 
+    console.log(parent.parentNode.clientWidth)
   } else { 
     parentElement = "body"; 
     parent = null; 
@@ -72,10 +73,13 @@ Celestial.display = function(config) {
       culture = (cfg.culture !== "" && cfg.culture !== "iau") ? cfg.culture : "";
   
   if (canvas[0].length === 0) canvas = d3.select(parentElement).append("canvas");
-  //canvas.attr("width", width).attr("height", height);
+  // canvas.attr("width", width).attr("height", height);
   canvas.style("width", px(width)).style("height", px(height)).attr("width", width * pixelRatio).attr("height", height * pixelRatio);
   var context = canvas.node().getContext("2d");  
   context.setTransform(pixelRatio,0,0,pixelRatio,0,0);
+  
+  // Explicteiyly set the canvas style - DK
+  // canvas.style.height=height+"px";
 
   // var graticule = d3.geo.graticule().minorStep([15,10]);
     var graticule = d3.geo.graticule().minorStep([10,10]);
@@ -90,10 +94,10 @@ Celestial.display = function(config) {
     canvas.call(zoom);
     // d3.select(parentElement).on('dblclick', function () { zoomBy(1.5625); return false; });
     // d3.select(parentElement).on('dblclick', function () { zoomBy(1); return false; });
-    canvas.attr("style", "cursor: default!important");
+    canvas.attr("style", "cursor: default!important; width: " + width + "px");
 
   } else {
-    canvas.attr("style", "cursor: default!important");
+    canvas.attr("style", "cursor: default!important; width: " + width + "px");
   }
 
   setClip(proj.clip);
