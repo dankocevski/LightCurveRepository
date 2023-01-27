@@ -560,9 +560,10 @@
                 // graticule: { show: true, stroke: "#cccccc", width: 0.6, opacity: 0.8,      // Show graticule lines
                 graticule: { show: true, stroke: "#C0C0C0", width: 1, opacity: 1,      // Show graticule lines
                   // grid values: "outline", "center", or [lat,...] specific position
-                  lon: {pos: ["center"], fill: "darkgray", font:  "14px Helvetica, Arial, 'Helvetica Neue', sans-serif"},
+                  // lon: {pos: ["center"], fill: "darkgray", font:  "14px Helvetica, Arial, 'Helvetica Neue', sans-serif"},
                   // grid values: "outline", "center", or [lon,...] specific position
-                  lat: {pos: ["180"], fill: "darkgray", font:  "14px Helvetica, Arial, 'Helvetica Neue', sans-serif"}},
+                  // lat: {pos: ["180"], fill: "darkgray", font:  "14px Helvetica, Arial, 'Helvetica Neue', sans-serif"}},
+                  },
                 equatorial: { show: true, stroke: "#66cccc", width: 1.3, opacity: 0.7 },    // Show equatorial plane
                 ecliptic: { show: true, stroke: "#66cc66", width: 1.3, opacity: 0.7 },      // Show ecliptic plane
                 galactic: { show: true, stroke: "#cc6666", width: 1.3, opacity: 0.7 },     // Show galactic plane
@@ -1862,6 +1863,21 @@
                 // Redraw the map
                 Celestial.redraw()
 
+                // Check if the MET url parameter has been set
+                var searchParams = new URLSearchParams(window.location.search);
+                var userSuppliedMET = searchParams.get('MET');
+                if (userSuppliedMET != null) {
+
+                    console.log('user specified MET = ' + userSuppliedMET)
+
+                    getSkyActivity(userSuppliedMET)
+
+                    $('.dropdown-toggle.date-format')[0].innerText = 'MET'
+                    $("#input_sundate")[0].value = userSuppliedMET
+                    setSunMoonPositions(userSuppliedMET)
+
+                }
+
                 return 
             }});
         }
@@ -2076,6 +2092,22 @@
 
                 // Show the map spinner
                 $('#map_loading').hide()
+
+                var searchParams = new URLSearchParams(window.location.search);
+                var userSuppliedMET = searchParams.get('MET');
+
+                var checkbox1 = document.getElementById("marker_size_ts");
+                checkbox1.setAttribute("checked", "true");
+
+                // config.lines['galactic'].show = false;
+                // config.lines['equatorial'].show = false;
+                // config['mw'].show = true;
+                // Celestial.apply(config)
+
+                // var link = document.getElementById('link');
+                // link.setAttribute('download', userSuppliedMET + '.png');
+                // link.setAttribute('href', canvas.toDataURL("image/png").replace("image/png", "image/octet-stream"));
+                // link.click();
 
                 return 
 
@@ -6092,7 +6124,7 @@
             <!-- Citation request start here -->    
             <div class="panel panel-default">   
                 <div class="panel-heading">
-                    Please reference <a href="https://www.astronomerstelegram.org/?read=15110">Kocevski et al. 2021</a> for use of any results presented in the Fermi LAT Light Curve Repository. Also be sure to consult the <a href="about.html">LCR Usage Notes</a> for important details and caveats about the LCR analysis.
+                    Please reference <a href="https://arxiv.org/abs/2301.01607">Abdollahi et al. 2023</a> for use of any results presented in the Fermi LAT Light Curve Repository. Also be sure to consult the <a href="about.html">LCR Usage Notes</a> for important details and caveats about the LCR analysis.
                 </div>
             </div>
             <!--  Citation request ends here -->    
@@ -6371,7 +6403,7 @@
         </div> <!-- /.modal-dialog -->
     </div> <!-- /.modal -->  
 
-
+    <a id="link"></a>
 
 </body>
 </html>
