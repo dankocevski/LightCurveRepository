@@ -1874,6 +1874,9 @@
 
                 if (ts >= parseFloat(ts_min)) {
 
+                    var met_flux = data['flux'][j_detections][0]
+                    if (data['flux'][j_detections] === string2) {
+
                     var flux = data['flux'][j_detections][1].toExponential(2)
                     var flux_error = flux - data['flux_error'][j_detections][1]
                     // var flux_error_string = flux_error.toExponential(2)
@@ -1913,13 +1916,28 @@
 
                 } else {
 
-                    var flux_upper_limit = data['flux_upper_limits'][k_nondetections][1]
-                    flux_error_string = '-'
-                    flux_string = '< ' + flux_upper_limit.toExponential(2)
-                    photon_index_string = '-'
-                    photon_index_error_string = '-'
+                    // Gaurd against non-existing upper limits (e.g. ts < ts_min, but flux upper limits don't exist)
+                    var met_upper_limit = data['flux_upper_limits'][k_nondetections][0]
 
-                    k_nondetections = k_nondetections + 1
+                    if (met === met_upper_limit) {
+                        var flux_upper_limit = data['flux_upper_limits'][k_nondetections][1]
+                        flux_error_string = '-'
+                        flux_string = '< ' + flux_upper_limit.toExponential(2)
+                        photon_index_string = '-'
+                        photon_index_error_string = '-'
+
+                        k_nondetections = k_nondetections + 1
+
+                    // Skip this time bin (e.g. don't iterate k_nondetections)
+                    } else {
+                        console.log('this bin missing!')
+                        flux_error_string = '-'
+                        flux_string = '-'
+                        photon_index_string = '-'
+                        photon_index_error_string = '-'
+                    }
+
+
                 }
 
 
