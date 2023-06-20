@@ -1874,9 +1874,6 @@
 
                 if (ts >= parseFloat(ts_min)) {
 
-                    var met_flux = data['flux'][j_detections][0]
-                    if (data['flux'][j_detections] === string2) {
-
                     var flux = data['flux'][j_detections][1].toExponential(2)
                     var flux_error = flux - data['flux_error'][j_detections][1]
                     // var flux_error_string = flux_error.toExponential(2)
@@ -1936,7 +1933,6 @@
                         photon_index_string = '-'
                         photon_index_error_string = '-'
                     }
-
 
                 }
 
