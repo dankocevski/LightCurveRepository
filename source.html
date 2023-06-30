@@ -1913,25 +1913,34 @@
 
                 } else {
 
-                    // Gaurd against non-existing upper limits (e.g. ts < ts_min, but flux upper limits don't exist)
-                    var met_upper_limit = data['flux_upper_limits'][k_nondetections][0]
+                    if (k_nondetections < data['flux_upper_limits'].length) {
 
-                    if (met === met_upper_limit) {
-                        var flux_upper_limit = data['flux_upper_limits'][k_nondetections][1]
-                        flux_error_string = '-'
-                        flux_string = '< ' + flux_upper_limit.toExponential(2)
-                        photon_index_string = '-'
-                        photon_index_error_string = '-'
+                        // Gaurd against non-existing upper limits (e.g. ts < ts_min, but flux upper limits don't exist)
+                        var met_upper_limit = data['flux_upper_limits'][k_nondetections][0]
 
-                        k_nondetections = k_nondetections + 1
+                        if (met === met_upper_limit) {
+                            var flux_upper_limit = data['flux_upper_limits'][k_nondetections][1]
+                            flux_error_string = '-'
+                            flux_string = '< ' + flux_upper_limit.toExponential(2)
+                            photon_index_string = '-'
+                            photon_index_error_string = '-'
 
-                    // Skip this time bin (e.g. don't iterate k_nondetections)
+                            k_nondetections = k_nondetections + 1
+
+                        // Skip this time bin (e.g. don't iterate k_nondetections)
+                        } else {
+                            console.log('this bin missing!')
+                            flux_error_string = '-'
+                            flux_string = '-'
+                            photon_index_string = '-'
+                            photon_index_error_string = '-'
+                        }
+
                     } else {
-                        console.log('this bin missing!')
-                        flux_error_string = '-'
-                        flux_string = '-'
-                        photon_index_string = '-'
-                        photon_index_error_string = '-'
+
+                        console.log('No upper limit data found - ', met)
+
+
                     }
 
                 }
