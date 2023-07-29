@@ -151,6 +151,35 @@
             }
         }
 
+        if ($catalog === '3PC') {
+
+            // Open the database
+            $db = new SQLite3('./db/3PC.db');
+
+            if (isset($_GET['keyword'])) { 
+
+                // Prepare the query statement 
+                $queryStatement = $db->prepare('SELECT Source_Name, RAJ2000, DEJ2000, GLON, GLAT, assoc_new, class_new, Variability_Index, Signif_Avg FROM _3PC WHERE Source_Name LIKE :binding1 OR assoc_new LIKE :binding2 OR class_new LIKE :binding3 COLLATE NOCASE ORDER BY RAJ2000;');
+
+                // Bind the statement parameters
+                $queryStatement->bindValue(':binding1', $SearchQuery, SQLITE3_TEXT);
+                $queryStatement->bindValue(':binding2', $SearchQuery, SQLITE3_TEXT);
+                $queryStatement->bindValue(':binding3', $SearchQuery, SQLITE3_TEXT);
+
+                // Query the database
+                $results = $queryStatement->execute();
+
+            } else { 
+
+                $queryStatement = 'SELECT Source_Name, RAJ2000, DEJ2000, GLON, GLAT, assoc_new, class_new, Variability_Index, Signif_Avg  FROM _3PC ORDER BY RAJ2000;';
+
+                // Query the database
+                $results = $db->query($queryStatement);
+
+            }
+
+
+        }
         // Create an array to store the results
         $data = array();
 

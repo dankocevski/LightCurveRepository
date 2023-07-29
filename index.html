@@ -55,7 +55,6 @@
     <!--Plugin JavaScript file-->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ion-rangeslider/2.3.1/js/ion.rangeSlider.min.js"></script>
 
-
     <!-- Moment.js -->
     <script charset="UTF-8" src="./js/moment.js"></script>
 <!--  -->
@@ -291,6 +290,9 @@
       background-color: #48aec9;
     }
 
+   input:checked + .slider.purple {
+      background-color: #9b3d6b;
+    }
 
     input:checked + .slider:before {
       -webkit-transform: translateX(19px);
@@ -426,6 +428,7 @@
         var show_2FAV = false;
         var show_2FLGC = false;
         var show_IceCube = false;
+        var show_3PC = false;
         var show_tooltip = true;
         var always_show_errors = false;
         var marker_size_varindex = true;
@@ -661,6 +664,11 @@
             stroke: "rgb(215,120,18, 0.75)",
             fill: "rgb(215,120,18, 0.75)"
         };
+
+        var style_3PC = {
+            stroke: "rgb(128, 0, 128, 1)",
+            fill: "rgb(128, 0, 128, 0.75)"
+        };   
 
         var textStyle = {
             fill:"red",
@@ -1582,6 +1590,120 @@
                 endTime = d.getTime()
             }
 
+            if (typeof data_3PC !== 'undefined' && show_3PC === true) {
+
+                Signif_Avg = []
+                TSs = []
+
+                for (i=0; i<data_3PC.length; i++) {
+
+                    var coordinates;
+                    var source = data_3PC[i];
+
+                    if (config.transform.includes('equatorial')) {
+                        coordinates = [source.RAJ2000, source.DEJ2000]
+                    } else if (config.transform.includes('galactic')) {
+                        coordinates = [source.GLON, source.GLAT]
+                    }
+
+                    // If point is visible (this doesn't work automatically for points)
+                    if (Celestial.clip(coordinates)) {
+
+                        var point = Celestial.mapProjection(coordinates);
+
+                        if (point[0] >= 0 && point[0] <= map_width && point[1] >= 0 && point[1] <= map_height) { 
+
+                            // Determine what color this source should be
+                            if (perform_search === true) {
+
+                                // Position search only
+                                if (search_keyword.length == 0) {
+                                    if (search_radius > 0) {
+                                        if (source.distance <= search_radius) {
+                                            pointStyle = pointStyle_active
+                                            labelStyle = labelStyle_active
+                                            source['active'] = true
+                                        } else {
+                                            pointStyle = pointStyle_gray
+                                            labelStyle = labelStyle_gray
+                                            source['active'] = true
+                                        }        
+                                    } else {
+                                        pointStyle = pointStyle_active
+                                        labelStyle = labelStyle_active
+                                        source['active'] = true
+                                    }
+                                }
+
+                                // Keyword search only
+                                if (search_keyword.length > 0 && search_radius == 0) {
+                                    if (sourceIncludesKeyword(source, search_keyword) === true) {
+                                        pointStyle = pointStyle_active
+                                        labelStyle = labelStyle_active
+                                        source['active'] = true
+                                    } else {
+                                        pointStyle = pointStyle_hidden
+                                        labelStyle = labelStyle_hidden
+                                        source['active'] = false
+                                    }
+                                }
+
+                                // Position and keyword search
+                                if (search_keyword.length > 0 && search_radius > 0) {
+                                    if (sourceIncludesKeyword(source, search_keyword) === true && source.distance <= search_radius) {
+                                        pointStyle = pointStyle_active
+                                        labelStyle = labelStyle_active
+                                        source['active'] = true
+                                    } else { 
+                                        pointStyle = pointStyle_gray
+                                        labelStyle = labelStyle_gray
+                                        source['active'] = true
+                                    }
+                                }
+
+                            } else {
+                                pointStyle = pointStyle_active
+                                labelStyle = labelStyle_active
+                                source['active'] = true
+                            }
+
+  
+                            pointStyle = pointStyle_active
+     
+
+                            source['catalog'] = '3PC'
+                            source['xCanvas'] = point[0]
+                            source['yCanvas'] = point[1]
+
+                            // Add the point to the list of points on the canvas
+                            points.push(source)
+
+                            // object radius in pixel, could be varable depending on e.g. magnitude
+                            var r = Math.pow(parseInt(source.Signif_Avg) * 0.2, 0.4);
+
+                            // draw on canvas
+                            Celestial.setStyle(style_3PC);
+                            Celestial.context.beginPath();
+                            Celestial.context.arc(point[0],  point[1], r, 0, 2 * Math.PI);
+                            Celestial.context.closePath();
+                            Celestial.context.stroke();
+                            Celestial.context.fill();
+                        }
+
+                        if (Celestial.zoomBy() >= 16.0) {
+                            Celestial.setTextStyle(labelStyle);
+
+                            Celestial.context.fillText(source.assoc_new, point[0] + r + 7.5, point[1] + r - 7.5);
+        
+                        } 
+
+                    }      
+
+                } 
+
+                // console.log('Done.')            
+            }
+
             // Display the user search coordinates
             if (showReticale == true) {
 
@@ -2040,6 +2162,88 @@
 
             }});
         }
+
+        function get3PCData(query_ra=NaN, query_dec=NaN, query_radius=NaN, query_keyword="") {
+
+            // Show the map spinner
+            $('#map_loading').show()
+
+            console.log('Querying the 3PC database...')
+
+            // Setup the URL
+            // URL = "queryDB.php?typeOfRequest=SourceList&catalog=4FGL&magicWord=" + magicWord; 
+            URL = "queryDB.php?typeOfRequest=SourceList&catalog=3PC"; 
+
+            if (isNaN(query_ra) !== true && isNaN(query_dec) !== true) {
+
+                var ra_urlEncoded = encodeURIComponent(query_ra);
+                var dec_urlEncoded = encodeURIComponent(query_dec);
+                URL = URL + "&ra=" + ra_urlEncoded + "&dec=" + dec_urlEncoded
+            }
+
+            if (isNaN(query_radius) !== true) {
+                
+                var radius_urlEncoded = encodeURIComponent(query_radius);
+                URL = URL + "&radius=" + radius_urlEncoded
+            }
+
+            if (query_keyword.length != 0) {
+
+                var keyword_urlEncoded = encodeURIComponent(query_keyword);
+                URL = URL + "&keyword=" + keyword_urlEncoded
+            }
+
+            // Print out the final URL
+            console.log(URL);
+
+            // Perform an ajax request
+            $.ajax({url: URL, success: function(responseText){
+
+                // Get the data
+                try {
+
+                    data_3PC = JSON.parse(responseText);
+                    console.log("3PC data length = " + data_3PC.length)
+                } catch (error) {
+
+                    console.log('Error parsing query response.')
+                    // $('#main').hide()
+                    return;
+                }
+
+                // Make a backup of the data array
+                data_3PC_original = JSON.parse(JSON.stringify(data_3PC));
+
+                if (data_3PC.length === 0) {
+                    alert('Your search found no results!')
+                    
+                } else {
+
+                    // Fill the primary table
+                    fillTable_3PC(data_3PC);
+
+                    // Fill the doghnut plot
+                    // fillDoughnutPlots(data_FGL);
+
+                }
+
+                // // Check if data was successfully retrieved. If the passphrase wasn't set before, set it to the supplied magic_word
+                // if (data_FGL.length != 0) {
+                //     if (passphrase == null) {
+                //         setCookieData('passphrase', magicWord, 1)  // Cookie expires in 1 day
+                //     }
+                // }
+
+                // Hide the map spinner
+                $('#map_loading').hide()
+
+                // Redraw the map
+                Celestial.redraw()
+
+                return 
+            }});
+        }
+
 
         function getSkyActivity(MET, latest=false) {
 
@@ -2909,7 +3113,7 @@
             // $('#number_of_LAT_detections')[0].innerHTML = " - " + data.length + " Detections"
         }
 
-       // Fill the 2FAV table
+        // Fill the 2FAV table
         function fillTable_IceCube(data) {
 
             // Setup the row array
@@ -3016,6 +3220,92 @@
 
             // Update the number of detections
             $('#number_of_icecube_detections')[0].innerHTML = " - " + data.length + " Events"
+        }
+
+        function fillTable_3PC(data) {
+
+            // Setup the row array
+            var row = new Array(), j = -1;
+
+            // Create the header string
+            var header = '<tr> \
+            <th style="text-align: center; min-width:150px">Source ID</th> \
+            <th style="text-align: center;">RA</th> \
+            <th style="text-align: center;">Dec</th> \
+            <th style="text-align: center;">Gal l</th> \
+            <th style="text-align: center;">Gal b</th> \
+            <th style="text-align: center;">Association</th> \
+            <th style="text-align: center;">Class</th> \
+            <th style="text-align: center;">Variability Index</th> \
+            <th style="text-align: center;">Average Significance</th> \
+            '
+
+            table_columns = ['assoc_new', 'RAJ2000', 'DEJ2000', 'GLON', 'GLAT', 'Source_Name', 'class_new', 'Variability_Index', 'Signif_Avg']
+
+            // Start a counter to record the number of sources that pass the temporal cut
+            var number_of_displayed_sources = 0
+
+            // Loop through each data entry and add columns to the corresponding row entry
+            for (var i=0, size=data.length; i<size; i++) {
+
+                var source = data[i];
+
+                row[++j] = '<tr>';
+
+                // Loop through each of the keys in the current record
+                for (var index in table_columns) {
+
+                    var key = table_columns[index]
+
+                    if (key === 'assoc_new') {
+
+                        var assoc_new_name = source[key].replace(' ','_')
+
+                        row[++j] ='<td class="' + key + '" style="text-align: center;">';
+                        row[++j] = '<a href="https://fermi.gsfc.nasa.gov/ssc/data/access/lat/3rd_PSR_catalog/3PC_HTML/' + source[key].replace('PSR ','') + '.html" target="_blank">' + source[key] + '</a>';
+                        // row[++j] = source[key];
+
+                    } else if (key === 'GLON' || key === 'GLAT') {
+
+                        row[++j] ='<td class="' + key + '" style="text-align: center;">';
+                        row[++j] = parseFloat(source[key]).toFixed(3);
+
+
+                    } else if (key === 'Variability_Index' || key === 'Signif_Avg') {
+
+                        row[++j] ='<td class="' + key + '" style="text-align: center;">';
+                        row[++j] = parseFloat(source[key]).toFixed(2);
+
+                    } else {
+
+                        row[++j] ='<td class="' + key + '" style="text-align: center;">';
+                        row[++j] = source[key];
+                    }
+
+                    row[++j] = '</td>';
+
+                }
+
+                number_of_displayed_sources = number_of_displayed_sources + 1
+
+
+            }
+
+            // Add the header to the start of the array
+            row.unshift(header);
+
+            // Join the row array into one long string and place it inside the table element
+            $('#dataTable_3PC').html(row.join('')); 
+            // document.querySelector('#dataTable_2FLGC').innerHTML = row.join(''); 
+
+            // Hide the spinner
+            $("#loadingSpinnerImage").hide();
+
+            // Update the table range display
+            $('#table_range_3PC')[0].innerHTML = 'Showing ' + number_of_displayed_sources + ' of ' + data.length + ' Sources'
+
+            // Update the number of detections
+            // $('#number_of_3PC_detections')[0].innerHTML = " - " + data.length + " Events"
         }
 
         function fillDoughnutPlots(data) {
@@ -3456,7 +3746,7 @@
                 paginations[activeTabID] = $('.pagination').clone(true, true);
 
                 // Hide the pagination controls for the GRB and IceCube catalogs
-                if (selectedTabID.includes('2FLGC') || selectedTabID.includes('IceCube')) {
+                if (selectedTabID.includes('2FLGC') || selectedTabID.includes('IceCube') || selectedTabID.includes('3PC')) {
                     
                     // $(".pagination").css("visibility", "hidden");
                     $(".pagination").hide()
@@ -3793,8 +4083,6 @@
                             selection.style.visibility = "visible";
                             selection.style.position = "absolute";   
 
-                            // selection.style.left = (point.xCanvas) + x_canvasOffset + x_scrollOffset - x_customSelectionOffset + "px";
-                            // selection.style.top = (point.yCanvas) + y_canvasOffset + y_scrollOffset - y_customSelectionOffset  + "px";
                             selection.style.left = (point.xCanvas) + x_customSelectionOffset + "px";
                             selection.style.top = (point.yCanvas)  + y_customSelectionOffset + "px"
 
@@ -3803,9 +4091,7 @@
                                 lock_selection = true
 
                                 // Change the color of the selection
-                                // selection.style.borderColor = 'rgba(128, 0, 0, 1)'
                                 selection.style.borderColor = 'DarkRed'
-                                // selection.style.backgroundColor = 'rgba(128, 0, 0, 1)'
                                 selection.style.backgroundColor = 'transparent'
                                 selection.style.borderWidth = '2px'
                                 selection.style.opacity = "0.6"
@@ -3940,6 +4226,25 @@
                                 // Define a custom tooltip offset
                                 var x_customTooltipOffset = 55
                                 var y_customTooltipOffset = 95
+
+                                // Show the tooltip
+                                tooltip_map.style.visibility = "visible";
+                                tooltip_map.innerHTML = innerHTML;
+                                tooltip_map.style.left = (point.xCanvas) - x_customTooltipOffset + "px";
+                                tooltip_map.style.top = (point.yCanvas) - y_customTooltipOffset + "px";
+
+                            } else if (point.catalog.includes('3PC')) {
+
+                                var innerHTML =  point.assoc_new
+                                innerHTML =  innerHTML + '<BR>RA: ' + point.RAJ2000.toFixed(2).toString()
+                                innerHTML =  innerHTML + ', Dec: ' + point.DEJ2000.toFixed(2).toString()
+                                innerHTML =  innerHTML + '<BR>Variability Index: ' + parseFloat(point.Variability_Index).toFixed(2).toString()
+                                innerHTML =  innerHTML + '<BR>Classification: ' + point.class_new
+                                innerHTML =  innerHTML + '<BR>Association: ' + point.Source_Name
+     
+                                // Define a custom tooltip offset
+                                var x_customTooltipOffset = 75
+                                var y_customTooltipOffset = 105
 
                                 // Show the tooltip
                                 tooltip_map.style.visibility = "visible";
@@ -4503,6 +4808,46 @@
 
                 }
             });
+
+            $('#3PC_switch').on('click', function() {
+
+                console.log('3PC Switch clicked')
+
+                if (show_3PC === true) {
+
+                    // Hide the 2FAV data and redraw the map
+                    show_3PC = false
+                    Celestial.redraw()
+
+                    // Hide the 2FLGC table if it's visible
+                    if ($('#dataTable_3PC').is(":visible")){
+                        console.log('Changing to 4FGL')
+                        changeTable($('#4FGL'))
+                    }
+
+                    // Remove the 2FAV tab
+                    $("#3PC").remove();
+
+
+                } else {
+
+                    // Add a 2FAV tab to the list of available data tables
+                    var html = '<li id="3PC" target="event_display" class="navtab catalogs"><a href="#" onclick="return false;">3PC</a></li>'
+                    $("#catalog_tabs").append(html);
+
+                    // Reset the mousedown event binding
+                    $(".navtab.catalogs").mousedown( function() { changeTable($(this)); })
+
+                    // Get the 2FLGC data
+                    get3PCData()
+
+                    // Show the 2FLGC data and redraw the map
+                    show_3PC = true
+                    Celestial.redraw()
+
+                }
+            });
+
 
             $('.dropdown-menu.date-format').on('click', 'li', function() {
 
@@ -5629,6 +5974,7 @@
 
                 // Add the 4FGL data
                 get4FGLData()
+
             });
 
             // Hide the page if the person clicks the close button
@@ -5812,6 +6158,7 @@
             // Check to see if the passphrase data is stored in a cookie
             // checkCookie();
             get4FGLData();
+            // get3PCData();
 
 
         });
@@ -6078,6 +6425,10 @@
                             FAVA Flare Catalog (2FAV)<BR><small><a href="https://fermi.gsfc.nasa.gov/ssc/data/access/lat/fava_catalog/">Abdollahi et al. 2017</a> - 4309 Flares</small>
                             <label class="switch" style="float:right; margin-top:-12px"><input id="2FAV_switch" type="checkbox"><span class="slider round red"></span></label>
                     </li>
+                    <li class="list-group-item">
+                            3rd LAT Pulsar Catalog (3PC)<BR><small><a href="https://arxiv.org/abs/2307.11132">Smith et al. 2023</a> - 294 Pulsars</small>
+                            <label class="switch" style="float:right; margin-top:-12px"><input id="3PC_switch" type="checkbox"><span class="slider round purple"></span></label>
+                    </li>                    
                 </ul>
 
                 <!-- </div> -->
@@ -6234,6 +6585,7 @@
                 <table class="table table-striped table-condensed table-bordered data-table" id="dataTable_2FAV" style="width:1200px; display:none"></table>  
                 <table class="table table-striped table-condensed table-bordered data-table" id="dataTable_2FLGC" style="width:1200px; display:none"></table>  
                 <table class="table table-striped table-condensed table-bordered data-table" id="dataTable_IceCube" style="width:1200px; display:none"></table>  
+                <table class="table table-striped table-condensed table-bordered data-table" id="dataTable_3PC" style="width:1200px; display:none"></table>  
 
                 <img id="loadingSpinnerImage" src="./img/loading_apple.gif" width="30px" style="margin-top:100px; margin-bottom:100px;">
                 </center>
@@ -6258,6 +6610,7 @@
                         <div id="table_range_2FAV" style="display:none;" class="col-xs-4 text-center"></div>
                         <div id="table_range_2FLGC" style="display:none;" class="col-xs-4 text-center"></div>
                         <div id="table_range_IceCube" style="display:none;" class="col-xs-4 text-center"></div>
+                        <div id="table_range_3PC" style="display:none;" class="col-xs-4 text-center"></div>
 
                         <div class="col-xs-4 text-right">
 
