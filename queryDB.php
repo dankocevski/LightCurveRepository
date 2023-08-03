@@ -159,19 +159,20 @@
             if (isset($_GET['keyword'])) { 
 
                 // Prepare the query statement 
-                $queryStatement = $db->prepare('SELECT Source_Name, RAJ2000, DEJ2000, GLON, GLAT, assoc_new, class_new, Variability_Index, Signif_Avg FROM _3PC WHERE Source_Name LIKE :binding1 OR assoc_new LIKE :binding2 OR class_new LIKE :binding3 COLLATE NOCASE ORDER BY RAJ2000;');
+                // $queryStatement = $db->prepare('SELECT Source_Name, RAJ2000, DEJ2000, GLON, GLAT, assoc_new, class_new, Variability_Index, Signif_Avg FROM _3PC WHERE Source_Name LIKE :binding1 OR assoc_new LIKE :binding2 OR class_new LIKE :binding3 COLLATE NOCASE ORDER BY RAJ2000;');
+
+                $queryStatement = $db->prepare('SELECT PSRJ, RAJD, DECJD, Gl, Gb, FGLname, SigAvg, P0, PSR_Code, CHAR_Code, EDOT, D3PC FROM Catalog_3PC WHERE PSRJ LIKE :binding1 OR FGLname LIKE :binding2 COLLATE NOCASE ORDER BY CAST(RAJD AS FLOAT);');
 
                 // Bind the statement parameters
                 $queryStatement->bindValue(':binding1', $SearchQuery, SQLITE3_TEXT);
                 $queryStatement->bindValue(':binding2', $SearchQuery, SQLITE3_TEXT);
-                $queryStatement->bindValue(':binding3', $SearchQuery, SQLITE3_TEXT);
 
                 // Query the database
                 $results = $queryStatement->execute();
 
             } else { 
 
-                $queryStatement = 'SELECT Source_Name, RAJ2000, DEJ2000, GLON, GLAT, assoc_new, class_new, Variability_Index, Signif_Avg  FROM _3PC ORDER BY RAJ2000;';
+                $queryStatement = 'SELECT PSRJ, RAJD, DECJD, Gl, Gb, FGLname, SigAvg, P0, PSR_Code, CHAR_Code, EDOT, D3PC FROM Catalog_3PC ORDER BY CAST(RAJD AS FLOAT);';
 
                 // Query the database
                 $results = $db->query($queryStatement);

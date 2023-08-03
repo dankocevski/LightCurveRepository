@@ -1601,9 +1601,9 @@
                     var source = data_3PC[i];
 
                     if (config.transform.includes('equatorial')) {
-                        coordinates = [source.RAJ2000, source.DEJ2000]
+                        coordinates = [source.RAJD, source.DECJD]
                     } else if (config.transform.includes('galactic')) {
-                        coordinates = [source.GLON, source.GLAT]
+                        coordinates = [source.Gl, source.Gb]
                     }
 
                     // If point is visible (this doesn't work automatically for points)
@@ -1679,7 +1679,11 @@
                             points.push(source)
 
                             // object radius in pixel, could be varable depending on e.g. magnitude
-                            var r = Math.pow(parseInt(source.Signif_Avg) * 0.2, 0.4);
+                            if (source.SigAvg === 'nan') {
+                                var r = 1
+                            } else {
+                                var r = Math.pow(parseInt(source.SigAvg) * 0.2, 0.4);
+                            }
 
                             // draw on canvas
                             Celestial.setStyle(style_3PC);
@@ -1693,7 +1697,7 @@
                         if (Celestial.zoomBy() >= 16.0) {
                             Celestial.setTextStyle(labelStyle);
 
-                            Celestial.context.fillText(source.assoc_new, point[0] + r + 7.5, point[1] + r - 7.5);
+                            Celestial.context.fillText('PSR ' + source.PSRJ, point[0] + r + 7.5, point[1] + r - 7.5);
         
                         } 
 
@@ -3235,12 +3239,16 @@
             <th style="text-align: center;">Gal l</th> \
             <th style="text-align: center;">Gal b</th> \
             <th style="text-align: center;">Association</th> \
-            <th style="text-align: center;">Class</th> \
-            <th style="text-align: center;">Variability Index</th> \
             <th style="text-align: center;">Average Significance</th> \
+            <th style="text-align: center;">P0<BR>ms</th> \
+            <th style="text-align: center;">PSR Code</th> \
+            <th style="text-align: center;">CHAR Code</th> \
+            <th style="text-align: center;">EDOT<BR>erg/s</th> \
+            <th style="text-align: center;">D3PC<BR>kpc</th> \
             '
 
-            table_columns = ['assoc_new', 'RAJ2000', 'DEJ2000', 'GLON', 'GLAT', 'Source_Name', 'class_new', 'Variability_Index', 'Signif_Avg']
+            // table_columns = ['assoc_new', 'RAJ2000', 'DEJ2000', 'GLON', 'GLAT', 'Source_Name', 'class_new', 'Variability_Index', 'Signif_Avg']
+            table_columns = ['PSRJ', 'RAJD', 'DECJD', 'Gl', 'Gb', 'FGLname', 'SigAvg', 'P0', 'PSR_Code', 'CHAR_Code', 'EDOT', 'D3PC']
 
             // Start a counter to record the number of sources that pass the temporal cut
             var number_of_displayed_sources = 0
@@ -3257,28 +3265,54 @@
 
                     var key = table_columns[index]
 
-                    if (key === 'assoc_new') {
+                    row[++j] ='<td class="' + key + '" style="text-align: center;">';
+
+                    if (key === 'PSRJ') {
+
+                        row[++j] = 'PSR ' + source[key];
+
+                    } else if (key === 'FGLname') {
 
                         var assoc_new_name = source[key].replace(' ','_')
 
-                        row[++j] ='<td class="' + key + '" style="text-align: center;">';
                         row[++j] = '<a href="https://fermi.gsfc.nasa.gov/ssc/data/access/lat/3rd_PSR_catalog/3PC_HTML/' + source[key].replace('PSR ','') + '.html" target="_blank">' + source[key] + '</a>';
                         // row[++j] = source[key];
 
-                    } else if (key === 'GLON' || key === 'GLAT') {
-
-                        row[++j] ='<td class="' + key + '" style="text-align: center;">';
-                        row[++j] = parseFloat(source[key]).toFixed(3);
+                    } else if (key === 'RAJD' || key === 'DECJD' || key === 'Gl' || key === 'Gb' || key === 'D3PC') {
 
 
-                    } else if (key === 'Variability_Index' || key === 'Signif_Avg') {
+                        if (source[key].includes('<')) {
 
-                        row[++j] ='<td class="' + key + '" style="text-align: center;">';
-                        row[++j] = parseFloat(source[key]).toFixed(2);
+                            var d3pc = source[key].replace('<','')
+
+                            row[++j] = '<' + Number(d3pc).toFixed(3);
+
+                        } else {
+
+                            row[++j] = Number(source[key]).toFixed(3);
+                        }
+
+                    } else if (key === 'SigAvg') {
+
+                        if (source[key] === 'nan') {
+                            row[++j] = ''
+
+                        } else {
+
+                            row[++j] = Number(source[key]).toFixed(2);
+                        }
+
+                    } else if (key === 'P0') {
+
+                        var p0 = parseFloat(source[key])*1000.
+                        row[++j] = p0.toPrecision(4);
+
+                    } else if (key === 'EDOT') {
+
+                        row[++j] = Number(source[key]).toPrecision(4);
 
                     } else {
 
-                        row[++j] ='<td class="' + key + '" style="text-align: center;">';
                         row[++j] = source[key];
                     }
 
@@ -4235,22 +4269,39 @@
 
                             } else if (point.catalog.includes('3PC')) {
 
-                                var assoc_new_url = point.assoc_new.replace('PSR ','')
+                                var psrj_new_url = point.PSRJ.replace('PSR ','')
 
-                                var link_3PC = "https://fermi.gsfc.nasa.gov/ssc/data/access/lat/3rd_PSR_catalog/3PC_HTML/" + assoc_new_url + ".html"
+                                var link_3PC = "https://fermi.gsfc.nasa.gov/ssc/data/access/lat/3rd_PSR_catalog/3PC_HTML/" + psrj_new_url + ".html"
                                 var onclick_full_window = "onclick=\"window.open(this.href,'targetWindow'); return false;"
 
-                                var innerHTML =  point.assoc_new
-                                innerHTML =  innerHTML + '<BR>RA: ' + point.RAJ2000.toFixed(2).toString()
-                                innerHTML =  innerHTML + ', Dec: ' + point.DEJ2000.toFixed(2).toString()
-                                innerHTML =  innerHTML + '<BR>Variability Index: ' + parseFloat(point.Variability_Index).toFixed(2).toString()
-                                innerHTML =  innerHTML + '<BR>Classification: ' + point.class_new
-                                innerHTML =  innerHTML + '<BR>Association: ' + point.Source_Name
-                                 innerHTML =  innerHTML + '<BR><p></p><a href="' + link_3PC + '"' + onclick_full_window + '">3PC Source Page</a>' 
+                                var period =  parseFloat(point.P0)*1000
+
+                                var distance = point.D3PC;
+                                if (distance.includes('<')) {
+
+                                    distance = distance.replace('<','')
+                                    distance = '<' + Number(distance).toFixed(3);
+
+                                } else {
+
+                                    distance = Number(distance).toFixed(3);
+                                }
+
+                                var innerHTML =  'PSR ' + point.PSRJ
+                                innerHTML =  innerHTML + '<BR>RA: ' + Number(point.RAJD).toFixed(2).toString()
+                                innerHTML =  innerHTML + ', Dec: ' + Number(point.DECJD).toFixed(2).toString()
+                                innerHTML =  innerHTML + '<BR>Association: ' + point.FGLname
+                                innerHTML =  innerHTML + '<BR>Spin Down Energy: ' + Number(point.EDOT).toPrecision(3) + ' erg/s';
+                                innerHTML =  innerHTML + '<BR>Distance: ' + distance + ' kpc';
+                                innerHTML =  innerHTML + '<BR>Period: ' + period.toFixed(2).toString() + ' ms'
+                                innerHTML =  innerHTML + '<BR>PSR, CHAR Codes: ' + point.PSR_Code + ', ' + point.CHAR_Code
+                                 // innerHTML =  innerHTML + '<BR><p></p><a href="' + link_3PC + '"' + onclick_full_window + '">3PC Source Page</a>' 
+                                innerHTML =  innerHTML + '<BR><BR>3PC Source Page: <a href="' + link_3PC + '"' + onclick_full_window + '"> Link</a>' 
 
                                 // Define a custom tooltip offset
                                 var x_customTooltipOffset = 75
-                                var y_customTooltipOffset = 105
+                                // var y_customTooltipOffset = 105
+                                var y_customTooltipOffset = 150
 
                                 // Show the tooltip
                                 tooltip_map.style.visibility = "visible";
@@ -5238,6 +5289,8 @@
                     var activeTabID = $(".nav-tabs.tables > li.active")[0].id
                     var sourceName
 
+                    console.log(activeTabID)
+
                     if (activeTabID.includes('4FGL')) {
 
                         // Extract the source name
@@ -5250,16 +5303,20 @@
                         // Extract the source name
                         sourceName = $(this).find("td").eq(0).html();
                         sourceName = $(sourceName).text()
-                        console.log('sourceName = ' + sourceName)
 
                     } else if (activeTabID.includes('2FLGC')) { 
 
                         sourceName = $(this).find("td").eq(0).html();
                         sourceName = $(sourceName).text()
 
+                    } else if (activeTabID.includes('3PC')) {
+
+                        sourceName = $(this).find("td").eq(0).html();
+                        console.log(sourceName)
+
                     } else {
 
-                        console.log('sourceName = ' + sourceName)
+                        // console.log('sourceName = ' + sourceName)
                         sourceName = $(this).find("td").eq(0).html();
                         sourceName = $(sourceName).text()
 
@@ -5328,7 +5385,8 @@
                             point_source_name = point.EVENT_NUM
 
                         } else if (point.catalog.includes('3PC')) {
-                            point_source_name = point.assoc_new
+                            point_source_name = 'PSR ' + point.PSRJ
+                            console.log(point.PSRJ)
 
                         }
 
@@ -5481,22 +5539,39 @@
 
                                     } else if (point.catalog.includes('3PC')) {
 
-                                        var assoc_new_url = point.assoc_new.replace('PSR ','')
+                                        var psrj_new_url = point.PSRJ.replace('PSR ','')
 
-                                        var link_3PC = "https://fermi.gsfc.nasa.gov/ssc/data/access/lat/3rd_PSR_catalog/3PC_HTML/" + assoc_new_url + ".html"
+                                        var link_3PC = "https://fermi.gsfc.nasa.gov/ssc/data/access/lat/3rd_PSR_catalog/3PC_HTML/" + psrj_new_url + ".html"
                                         var onclick_full_window = "onclick=\"window.open(this.href,'targetWindow'); return false;"
 
-                                        var innerHTML =  point.assoc_new
-                                        innerHTML =  innerHTML + '<BR>RA: ' + point.RAJ2000.toFixed(2).toString()
-                                        innerHTML =  innerHTML + ', Dec: ' + point.DEJ2000.toFixed(2).toString()
-                                        innerHTML =  innerHTML + '<BR>Variability Index: ' + parseFloat(point.Variability_Index).toFixed(2).toString()
-                                        innerHTML =  innerHTML + '<BR>Classification: ' + point.class_new
-                                        innerHTML =  innerHTML + '<BR>Association: ' + point.Source_Name
-                                        innerHTML =  innerHTML + '<BR><p></p><a href="' + link_3PC + '"' + onclick_full_window + '">3PC Source Page</a>' 
+                                        var period =  parseFloat(point.P0)*1000
+
+                                        var distance = point.D3PC;
+                                        if (distance.includes('<')) {
+
+                                            distance = distance.replace('<','')
+                                            distance = '<' + Number(distance).toFixed(3);
+
+                                        } else {
+
+                                            distance = Number(distance).toFixed(3);
+                                        }
+
+                                        var innerHTML =  'PSR ' + point.PSRJ
+                                        innerHTML =  innerHTML + '<BR>RA: ' + Number(point.RAJD).toFixed(2).toString()
+                                        innerHTML =  innerHTML + ', Dec: ' + Number(point.DECJD).toFixed(2).toString()
+                                        innerHTML =  innerHTML + '<BR>Association: ' + point.FGLname
+                                        innerHTML =  innerHTML + '<BR>Spin Down Energy: ' + Number(point.EDOT).toPrecision(3) + ' erg/s';
+                                        innerHTML =  innerHTML + '<BR>Distance: ' + distance + ' kpc';
+                                        innerHTML =  innerHTML + '<BR>Period: ' + period.toFixed(2).toString() + ' ms'
+                                        innerHTML =  innerHTML + '<BR>PSR, CHAR Codes: ' + point.PSR_Code + ', ' + point.CHAR_Code
+                                         // innerHTML =  innerHTML + '<BR><p></p><a href="' + link_3PC + '"' + onclick_full_window + '">3PC Source Page</a>' 
+                                        innerHTML =  innerHTML + '<BR><BR>3PC Source Page: <a href="' + link_3PC + '"' + onclick_full_window + '"> Link</a>' 
 
                                         // Define a custom tooltip offset
                                         var x_customTooltipOffset = 75
-                                        var y_customTooltipOffset = 105
+                                        // var y_customTooltipOffset = 105
+                                        var y_customTooltipOffset = 150
 
                                         // Show the tooltip
                                         tooltip_map.style.visibility = "visible";
