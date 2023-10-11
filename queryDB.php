@@ -74,7 +74,7 @@
             if (isset($_GET['keyword'])) { 
 
                 // Prepare the query statement 
-                $queryStatement = $db->prepare('SELECT Source_Name, ASSOC_FGL, ASSOC1, RAJ2000, DEJ2000, GLON, GLAT, Signif_Avg, Flux1000, Unc_Flux1000, Energy_Flux100, Unc_Energy_Flux100, SpectrumType, PL_Index, LP_Index, PLEC_Index, Variability_Index, CLASS1 FROM Catalog_4FGL WHERE Source_Name LIKE :binding1 OR ASSOC1 LIKE :binding2 OR ASSOC_TEV LIKE :binding3 or CLASS1 LIKE :binding4 COLLATE NOCASE ORDER BY RAJ2000;');
+                $queryStatement = $db->prepare('SELECT Source_Name, ASSOC_FGL, ASSOC1, CAST(RAJ2000 AS SIGNED) AS RAJ2000, CAST(DEJ2000 AS SIGNED) AS DEJ2000, ROUND(GLON,2), ROUND(GLAT,2), Signif_Avg, Flux1000, Unc_Flux1000, Energy_Flux100, Unc_Energy_Flux100, SpectrumType, PL_Index, LP_Index, PLEC_Index, Variability_Index, CLASS1 FROM Catalog_4FGL WHERE Source_Name LIKE :binding1 OR ASSOC1 LIKE :binding2 OR ASSOC_TEV LIKE :binding3 or CLASS1 LIKE :binding4 COLLATE NOCASE ORDER BY RAJ2000;');
 
                 // Bind the statement parameters
                 $queryStatement->bindValue(':binding1', $SearchQuery, SQLITE3_TEXT);
@@ -87,7 +87,7 @@
 
             } else { 
 
-                $queryStatement = 'SELECT Source_Name, ASSOC_FGL, ASSOC1, RAJ2000, DEJ2000, GLON, GLAT, Signif_Avg, Flux1000, Unc_Flux1000, Energy_Flux100, Unc_Energy_Flux100, SpectrumType, PL_Index, LP_Index, PLEC_Index, Variability_Index, CLASS1 FROM Catalog_4FGL ORDER BY RAJ2000;';
+                $queryStatement = 'SELECT Source_Name, ASSOC_FGL, ASSOC1, CAST(RAJ2000 AS FLOAT) AS RAJ2000, DEJ2000, GLON, GLAT, Signif_Avg, Flux1000, Unc_Flux1000, Energy_Flux100, Unc_Energy_Flux100, SpectrumType, PL_Index, LP_Index, PLEC_Index, Variability_Index, CLASS1 FROM Catalog_4FGL ORDER BY RAJ2000;';
 
                 // Query the database
                 $results = $db->query($queryStatement);
@@ -187,6 +187,20 @@
         // Loop through each row and create an associative array (i.e. dictionary) where the column name is the key
         while ($row = $results->fetchArray(SQLITE3_ASSOC)) {
 
+            if (isset($row['RAJ2000'])) {
+                $row['RAJ2000'] = number_format($row['RAJ2000'], 3, '.', '');
+                $row['DEJ2000'] = number_format($row['DEJ2000'], 3, '.', '');
+                $row['GLON'] = number_format($row['GLON'], 3, '.', '');
+                $row['GLAT'] = number_format($row['GLAT'], 3, '.', '');
+            }
+
+            if (isset($row['RAJD'])) {
+                $row['RAJD'] = number_format($row['RAJD'], 3, '.', '');
+                $row['DECJD'] = number_format($row['DECJD'], 3, '.', '');
+                $row['Gl'] = number_format($row['Gl'], 3, '.', '');
+                $row['Gb'] = number_format($row['Gb'], 3, '.', '');
+            }
+
             if (isset($_GET['ra']) && isset($_GET['dec']) && isset($_GET['radius'])) { 
 
                 // Get the ra and dec of each source
@@ -221,17 +235,28 @@
         $met = $_GET['met']; 
         $cadence = $_GET['cadence']; 
 
-        // Prepare the query statement 
+        // Define the starting time and interval
+        $start_time = 239587201;
+        $interval = 259200;  // interval in seconds
 
+        // Calculate how many intervals have passed since the start time
+        $intervalsPassed = ceil(($met - $start_time) / $interval);
+
+        // Calculate the closest past time
+        $closestTime = $start_time + ($intervalsPassed * $interval);
+            
+        // Prepare the query statement 
         if (isset($_GET['latest'])) {
             $queryStatement = $db->prepare('SELECT source_name, ts, tmin FROM lightcurve_data_v2 WHERE ts IS NOT NULL AND CAST(tmin as int) < ( select tmin+((tmax-tmin)/2.) from lightcurve_data_v2 where source_name = "4FGL J0001.2-0747" and cadence="daily" and TS is not NULL order by tmax DESC limit 1) AND cast(tmax as int) > ( select tmin+((tmax-tmin)/2.) from lightcurve_data_v2 where source_name = "4FGL J0001.2-0747" and cadence="daily" and TS is not NULL order by tmax DESC limit 1) and cadence == "daily"');
+        
         } else {
-            $queryStatement = $db->prepare('SELECT source_name, ts FROM lightcurve_data_v2 WHERE ts IS NOT NULL AND CAST(tmin as int) < :met AND cast(tmax as int) > :met and cadence == :cadence');
-        }
+            
+            // Bind the statement parameters
+            $queryStatement = $db->prepare('SELECT source_name, ts FROM lightcurve_data_v2 WHERE ts IS NOT NULL AND tmax == :closestTime and cadence == :cadence');
+            $queryStatement->bindValue(':closestTime', $closestTime, SQLITE3_INTEGER);
+            $queryStatement->bindValue(':cadence', $cadence, SQLITE3_TEXT);
 
-        // Bind the statement parameters
-        $queryStatement->bindValue(':met', $met, SQLITE3_TEXT);
-        $queryStatement->bindValue(':cadence', $cadence, SQLITE3_TEXT);
+        }
 
         if (isset($_GET['verbose'])) {
             echo  $queryStatement;
