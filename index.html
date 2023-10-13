@@ -4355,6 +4355,8 @@
 
         function setSunDateSlider() {
 
+            console.log('Setting sun date slider!')
+
             input_sundate = parseFloat($('#input_sundate')[0].value)
 
             // Get the currently set date format
@@ -4383,14 +4385,22 @@
             var mjd_min = 54683
             var mjd_max = MJD_current
 
-            // var left_percentage = 100 * (MJD_sundate-mjd_min)/(mjd_max-mjd_min)
-            var left_percentage = 100 * (sun_date_mjd - mjd_min)/(mjd_max - mjd_min) 
-            left_percentage = left_percentage.toFixed(2)
+            // Don't ask why this is not between 0 and 100%
+            var left_percentage_label = (98.66221 * ((sun_date_mjd - mjd_min)/(mjd_max - mjd_min))) - 3.302675
+            var left_percentage = (100 * ((sun_date_mjd - mjd_min)/(mjd_max - mjd_min))) - 0
 
-            var irs_line_width = 1161
-            var irs_width = 1176
-            left_label_absolute = ((parseFloat(left_percentage)/100.) * irs_line_width) + (irs_width - irs_line_width)
+            var irs_line_width = 1180
+            var irs_width = 1180
 
+            // left_label_absolute = ((parseFloat(left_percentage)/100.) * irs_line_width) + (irs_width - irs_line_width)
+            left_label_absolute = (left_percentage/100.) * irs_line_width
+
+            console.log('left_percentage:', left_percentage)
+            console.log('left_label_absolute:', left_label_absolute)
+
+            var left_percentage_offset = left_percentage - 0.15
+
+            
             // Set the width of the sundate bar to represent the duration over which the sky activity is measured (only really precentable for 30 day cadence)
             // var sundate_bar_width = 30 / (mjd_max - mjd_min) * irs_line_width
 
@@ -4399,44 +4409,26 @@
             if ($('.irs-grid-sundate').length === 0) {
 
                 // Add the label
-                // $('.irs').append('<span class="irs-single-aux" style="visibility: visible; position:absolute; margin-left:-47.5px; left: ' + left_percentage + '%;">Frak</span>')
-                $('.irs:last').append('<span class="irs-single-aux" id="sundate-label" style="visibility: visible; position:absolute; margin-left:-52.5px; left: ' + left_label_absolute + 'px; z-index:0;">' + sun_date_label + '</span>')
-                $('.irs:last').append('<span class="irs-handle aux type_last" id="sundate-handle" style="visibility: visible; position:absolute; margin-left:-9px; left: ' + left_label_absolute + 'px; z-index:1;"><i></i><i></i><i></i></span>')
-
-                // <span class="irs-handle aux type_last" id="sundate-handle" style="visibility: visible; position:absolute; margin-left:-9px; left:100%; z-index:1;"><i></i><i></i><i></i></span>
+                $('.irs:last').append('<span class="irs-single-aux" id="sundate-label" style="visibility: visible; margin-left:0px; left: ' + left_percentage + '%; transform: translateX(-48px); z-index: 0;">' + sun_date_label + '</span>')
 
                 // Add the bar below the label
-                $('.irs-line').append('<span class="irs-grid-sundate" id="sundate-bar" style="left:' + left_percentage + '%; background-color:rgba(230, 172, 0, 1); width:1px; height:200px; top:0px; position:absolute; z-index:0;"</span>')
-                // $('.irs-line').append('<span class="irs-grid-sundate" id="sundate-bar-width" style="left:' + left_percentage + '%; background-color:rgba(230, 172, 0, 0.5); width:' + sundate_bar_width + 'px; height:200px; margin-left:-5px; top:0px; position:absolute; z-index:0;"</span>')
-
-                var handle = document.getElementById("sundate-handle");
-                // handle.style.left = left_percentage - 0.6 + '%';
-                handle.style.left = parseFloat(left_percentage) + 0.1 + '%';
-                // $('.irs:last').append(handle)
-
-                // handle.style.marginTop = "-1px";
-                // $('.irs-line').append(handle)
+                $('.irs-line').append('<span class="irs-grid-sundate" id="sundate-bar" style="position:absolute; margin-left:-2px; left:' + left_percentage + '%; background-color:rgba(230, 172, 0, 1); width:1px; height:200px; top:0px; z-index:0;"</span>')
+                
+                // Add the handle
+                $('.irs:last').append('<span class="irs-handle aux type_last" id="sundate-handle" style="visibility: visible; margin-left:-10px; left: ' + left_percentage + '%; z-index:1;"><i></i><i></i><i></i></span>')
 
             } else {
 
-                // sliderRangeWidth = 1160;
-                // handleOffset = 9
-                // barOffset = -9
-                // labelOffset = 5
-                // sliderRangeLeftEdgePagePosition = 400;
-                // sliderRangeRightEdgePagePosition = sliderRangeWidth + sliderRangeLeftEdgePagePosition
+                // Calculate a custom offset for the label for when the slider is set by the date set button
+                let offset = 0.5 * ((left_percentage - 50.)/50)
+                const offsetCorrection = (offset) => offset < 0 ? offset * 1.75 : offset * 1.0;
+                let left_percentage_corrected = left_percentage - offsetCorrection(offset)
 
-                // if ((mousePosition >= sliderRangeLeftEdgePagePosition + handleOffset) && (mousePosition < (sliderRangeRightEdgePagePosition + handleOffset))) {
-
-                //     // Update the position of the sun date elements
-                //     document.getElementById("sundate-handle").style.left = Math.round(mousePosition)-sliderRangeLeftEdgePagePosition + 'px'
-
-
-                $('.irs-single-aux').css('left',left_label_absolute)
+                $('.irs-single-aux').css('left',left_percentage_corrected+'%')              
                 $('.irs-single-aux').text(sun_date_label)
-                $('.irs-grid-sundate').css('left',left_percentage+'%')
+                $('.irs-grid-sundate').css('left',left_label_absolute)
 
-                var handleOffset = 6
+                var handleOffset = -8
                 $('#sundate-handle').css('left',left_label_absolute - handleOffset)
 
 
@@ -4905,7 +4897,6 @@
                 }
             });
 
-
             $('.dropdown-menu.date-format').on('click', 'li', function() {
 
                 $('.dropdown-menu.date-format li.active').removeClass('active');
@@ -5181,7 +5172,6 @@
                 },
             
                 onUpdate: function (data) {
-
 
                     // JD
                     if (data.to > 239587201) {
@@ -6154,7 +6144,6 @@
                 }
             });
 
-
             // document.getElementById("sundate-handle").addEventListener("mousedown", function(e) {
 
             //     e.preventDefault();
@@ -6209,10 +6198,10 @@
                 var handlePosition= document.getElementById("sundate-handle").offsetLeft;
                 var mousePosition = event.pageX
 
-                sliderRangeWidth = 1160;
+                sliderRangeWidth = 1180;
                 handleOffset = 9
                 barOffset = -9
-                labelOffset = 5
+                labelOffset = -1
                 sliderRangeLeftEdgePagePosition = 400;
                 sliderRangeRightEdgePagePosition = sliderRangeWidth + sliderRangeLeftEdgePagePosition
 
@@ -6274,7 +6263,6 @@
         });
 
   </script>
-
 
     <!-- main starts here -->       
     <div id="main" style="width:2000px;">    
@@ -6833,7 +6821,6 @@
             </div> <!-- /.modal-content -->
         </div> <!-- /.modal-dialog -->
     </div> <!-- /.modal -->  
-
 
     <!-- Alert modal view starts here -->
     <div id="alert_dialog" class="modal fade">
