@@ -4420,9 +4420,8 @@
             } else {
 
                 // Calculate a custom offset for the label for when the slider is set by the date set button
-                let offset = 0.5 * ((left_percentage - 50.)/50)
-                const offsetCorrection = (offset) => offset < 0 ? offset * 1.75 : offset * 1.0;
-                let left_percentage_corrected = left_percentage - offsetCorrection(offset)
+                let offset = 0.75 * (left_percentage - 50.)/50.
+                let left_percentage_corrected = left_percentage - offset
 
                 $('.irs-single-aux').css('left',left_percentage_corrected+'%')              
                 $('.irs-single-aux').text(sun_date_label)
