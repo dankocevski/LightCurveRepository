@@ -451,6 +451,8 @@
         var data_sky_activity;
         var shouldUpdateSkyActivity = false;
         var overlaysActive = false;
+        var latest_data_date;
+        var MET_latest_available;
 
         var MET_sundate;
         var MJD_sundate;
@@ -2318,6 +2320,35 @@
                 // link.click();
 
                 return 
+
+            }});
+        }
+
+        function getLatestAvailableDate() {
+
+            // Setup the URL
+            URL = "queryDB.php?typeOfRequest=skyActivity&latest"; 
+
+            // Print out the final URL
+            console.log("http://localhost/~kocevski/LightCurveRepository/Production/" + URL);
+
+            // Perform an ajax request
+            $.ajax({url: URL, success: function(responseText){
+
+                // Get the data
+                try {
+                    console.log('Retrieving latest available date.')
+
+                    var latest_data_date = JSON.parse(responseText);
+                    MET_latest_available = latest_data_date[0]['tmax_latest']
+
+                    console.log('Latest available data = ', MET_latest_available)
+
+                } catch (error) {
+                    console.log('Error parsing query response.')
+                    return;
+                }
+
 
             }});
         }
@@ -4409,13 +4440,13 @@
             if ($('.irs-grid-sundate').length === 0) {
 
                 // Add the label
-                $('.irs:last').append('<span class="irs-single-aux" id="sundate-label" style="visibility: visible; margin-left:0px; left: ' + left_percentage + '%; transform: translateX(-48px); z-index: 0;">' + sun_date_label + '</span>')
+                $('.irs:last').append('<span class="irs-single-aux" id="sundate-label" style="visibility: visible; margin-left:0px; left: ' + left_percentage + '%; transform: translateX(-48px); z-index: 1000;">' + sun_date_label + '</span>')
 
                 // Add the bar below the label
-                $('.irs-line').append('<span class="irs-grid-sundate" id="sundate-bar" style="position:absolute; margin-left:-2px; left:' + left_percentage + '%; background-color:rgba(230, 172, 0, 1); width:1px; height:200px; top:0px; z-index:0;"</span>')
+                $('.irs-line').append('<span class="irs-grid-sundate" id="sundate-bar" style="position:absolute; margin-left:-2px; left:' + left_percentage + '%; background-color:rgba(230, 172, 0, 1); width:1px; height:200px; top:0px; z-index:1000;"</span>')
                 
                 // Add the handle
-                $('.irs:last').append('<span class="irs-handle aux type_last" id="sundate-handle" style="visibility: visible; margin-left:-10px; left: ' + left_percentage + '%; z-index:1;"><i></i><i></i><i></i></span>')
+                $('.irs:last').append('<span class="irs-handle aux type_last" id="sundate-handle" style="visibility: visible; margin-left:-10px; left: ' + left_percentage + '%; z-index:1001;"><i></i><i></i><i></i></span>')
 
             } else {
 
@@ -5605,6 +5636,7 @@
 
                     getSkyActivity(MET_mission_half)
                     setSunMoonPositions(MET_mission_half)
+                    getLatestAvailableDate()
 
                     // setTimeout(function(){
 
@@ -6143,18 +6175,42 @@
                 }
             });
 
-            // document.getElementById("sundate-handle").addEventListener("mousedown", function(e) {
+            $("#set_latest_data").on('click', function() {
 
-            //     e.preventDefault();
+                // Get the latest available date in MET and MJD
+                MET_sundate = MET_latest_available
+                MJD_sundate = convertMET2MJD(MET_sundate)
 
-            //     console.log('mousedown')
-            //     e.stopPropagation();
+                // Get the currently set date format
+                var date_format = $('.dropdown-toggle.date-format')[0].innerText
 
-            //     mouseDown = true;
-            //     // updateDragger(e);
+                if (date_format.includes('MJD')) {
 
-            //     return false;
-            // });
+                    $("#input_sundate")[0].value = Math.round(MJD_sundate)
+
+                } else {
+
+                    $("#input_sundate")[0].value = Math.round(MET_sundate)
+
+                }
+
+                // Update the Sun and Moon position
+                setSunMoonPositions()
+                
+                // Redraw the map
+                Celestial.redraw()
+
+                // Create the Sun/Moon date slider
+                setSunDateSlider()
+
+                // Update the sky activity
+                if ($("#marker_size_ts")[0].checked === true) {
+                    getSkyActivity(MET_sundate)
+                }
+
+                event.preventDefault();
+
+            });
 
             document.addEventListener("mousedown", function(e) {
 
@@ -6619,9 +6675,11 @@
                             <center>
                             <form class="form-inline" id="time_range_selector" action="javascript:void(0)">
                                 <div class="form-group">
-                                    <label style="margin-right:5px; font-weight: normal !important;">Date: </label>
-                                    <input style="width:100px" type="value" id="input_sundate" class="form-control input sun date" value="">
-                                    <button style="margin-left:5px; width:75px" class="btn btn-default date-set" id="set_date_button" type="button" data-toggle="dropdown">Set</button>
+                                    <label style="display: inline-block; margin-right:5px; font-weight: normal !important;">Date: </label>
+                                    <input style="display: inline-block; width:100px" type="value" id="input_sundate" class="form-control input sun date" value="">
+                                    <button style="display: inline-block; margin-left:5px; width:75px" class="btn btn-default date-set" id="set_date_button" type="button" data-toggle="dropdown">Set</button>
+                                    <div style="display: inline-block;"><span style="margin-left:6px; border-left: 1px solid lightgray; height: 10px;"></span></div>
+                                    <button style="display: inline-block; margin-left:5px; width:100px" class="btn btn-default date-set" id="set_latest_data" type="button" data-toggle="dropdown">Latest Data</button>
                                 </div>
 
                             </form>

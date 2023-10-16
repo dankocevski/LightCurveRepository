@@ -231,28 +231,28 @@
 
         // Establish the database connection
         $db = new SQLite3('./db/lc_repository_v2.db');
-
-        $met = $_GET['met']; 
-        $cadence = $_GET['cadence']; 
-
-        // Define the starting time and interval
-        $start_time = 239587201;
-        $interval = 259200;  // interval in seconds
-
-        // Calculate how many intervals have passed since the start time
-        $intervalsPassed = ceil(($met - $start_time) / $interval);
-
-        // Calculate the closest past time
-        $closestTime = $start_time + ($intervalsPassed * $interval);
             
         // Prepare the query statement 
         if (isset($_GET['latest'])) {
-            $queryStatement = $db->prepare('SELECT source_name, ts, tmin FROM lightcurve_data_v2 WHERE ts IS NOT NULL AND CAST(tmin as int) < ( select tmin+((tmax-tmin)/2.) from lightcurve_data_v2 where source_name = "4FGL J0001.2-0747" and cadence="daily" and TS is not NULL order by tmax DESC limit 1) AND cast(tmax as int) > ( select tmin+((tmax-tmin)/2.) from lightcurve_data_v2 where source_name = "4FGL J0001.2-0747" and cadence="daily" and TS is not NULL order by tmax DESC limit 1) and cadence == "daily"');
-        
+            $queryStatement = $db->prepare('SELECT MAX(CAST(tmax AS REAL)) as tmax_latest FROM lightcurve_data_v2 WHERE source_name = "4FGL J0001.2-0747" AND ts IS NOT NULL AND cadence == "daily"');
+
         } else {
-            
+
+            $met = $_GET['met']; 
+            $cadence = $_GET['cadence']; 
+    
+            // Define the starting time and interval
+            $start_time = 239587201;
+            $interval = 259200;  // interval in seconds
+    
+            // Calculate how many intervals have passed since the start time
+            $intervalsPassed = ceil(($met - $start_time) / $interval);
+    
+            // Calculate the closest past time
+            $closestTime = $start_time + ($intervalsPassed * $interval);
+
             // Bind the statement parameters
-            $queryStatement = $db->prepare('SELECT source_name, ts FROM lightcurve_data_v2 WHERE ts IS NOT NULL AND tmax == :closestTime and cadence == :cadence');
+            $queryStatement = $db->prepare('SELECT source_name, ts FROM lightcurve_data_v2 WHERE ts IS NOT NULL AND tmax == :closestTime AND cadence == :cadence');
             $queryStatement->bindValue(':closestTime', $closestTime, SQLITE3_INTEGER);
             $queryStatement->bindValue(':cadence', $cadence, SQLITE3_TEXT);
 
@@ -272,8 +272,11 @@
         // Loop through each row and create an associative array (i.e. dictionary) where the column name is the key
         while ($row = $results->fetchArray(SQLITE3_ASSOC)) {
 
-            $data[$row['source_name']] = $row['ts'];
-            // $data[$row['source_name']] = $row['tmin'];
+            if (isset($_GET['latest'])) {
+                $data[] = $row;
+            } else {
+                $data[$row['source_name']] = $row['ts'];
+            }
 
         }  
 
