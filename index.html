@@ -6177,6 +6177,9 @@
 
             $("#set_latest_data").on('click', function() {
 
+                // Remove focus from the button
+                $(this).css("outline", "none").blur();
+
                 // Get the latest available date in MET and MJD
                 MET_sundate = MET_latest_available
                 MJD_sundate = convertMET2MJD(MET_sundate)
@@ -6209,7 +6212,7 @@
                 }
 
                 event.preventDefault();
-
+                
             });
 
             document.addEventListener("mousedown", function(e) {
