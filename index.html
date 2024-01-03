@@ -773,6 +773,7 @@
             ret = sign2 + h + "." +f1+f2+f3+f4;
             return ret;
         }
+        
         // Convert RA and Dec to galactic coordinates
         function calculateGalacticCoordinates(ra, dec) {
 
@@ -854,7 +855,6 @@
 
             degrees = (hms / 24.0) * 360.
         }
-
 
         function calculateSunPosition(dateObj) {
 
@@ -2249,7 +2249,6 @@
                 return 
             }});
         }
-
 
         function getSkyActivity(MET, latest=false) {
 
@@ -4175,9 +4174,13 @@
                             // Extact information from a 3FGL point
                             if (point.catalog.includes('FGL')) {
 
+                                console.log(point)
                                 var Source_Name = point.Source_Name
-                                var RAJ2000 = point.RAJ2000.toFixed(2).toString()
-                                var DEJ2000 = point.DEJ2000.toFixed(2).toString()
+                                // var RAJ2000 = point.RAJ2000.toFixed(2).toString()
+                                // var DEJ2000 = point.DEJ2000.toFixed(2).toString()
+                                var RAJ2000 = parseFloat(point.RAJ2000).toFixed(2).toString()
+                                var DEJ2000 = parseFloat(point.DEJ2000).toFixed(2).toString()
+                                var Variability_Index = parseFloat(point.Variability_Index).toFixed(2).toString()                               
                                 var CLASS1 = point.CLASS1
                                 var ASSOC1 = point.ASSOC1
 
@@ -4194,9 +4197,9 @@
                                 var onclick_full_window = "onclick=\"window.open(this.href,'targetWindow'); return false;"
 
                                 var innerHTML =  point.Source_Name
-                                innerHTML =  innerHTML + '<BR>RA: ' + point.RAJ2000.toFixed(2).toString()
-                                innerHTML =  innerHTML + ', Dec: ' + point.DEJ2000.toFixed(2).toString()
-                                innerHTML =  innerHTML + '<BR>Variability Index: ' + parseFloat(point.Variability_Index).toFixed(2).toString()
+                                innerHTML =  innerHTML + '<BR>RA: ' + RAJ2000
+                                innerHTML =  innerHTML + ', Dec: ' + DEJ2000
+                                innerHTML =  innerHTML + '<BR>Variability Index: ' + Variability_Index
                                 innerHTML =  innerHTML + '<BR>Classification: ' + point.CLASS1
                                 innerHTML =  innerHTML + '<BR>Association: ' + point.ASSOC1
                                 innerHTML =  innerHTML + '<BR><p></p><a href="' + link_lightcurve_4FGL + '"' + onclick_small_window + '">4FGL Light Curve</a>' 
@@ -4464,7 +4467,6 @@
 
             }
         };
-
 
         // Query the database when the page is finished loading
         $(function() {
