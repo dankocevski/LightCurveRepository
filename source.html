@@ -354,23 +354,62 @@
             return date
         }
 
+        // function MET2JD(MET) {
+
+        //     // Get the date associated with the MET
+        //     date = MET2date(MET)
+
+        //     // Get the date components
+        //     // var day = date.getDate() - 1;    // Subtracting a day to make results match NASA's xtime results
+        //     var day = date.getUTCDate() ;   // Subtracting a day to make results match NASA's xtime results
+        //     var year = date.getUTCFullYear();
+        //     var month = date.getUTCMonth() + 1; // Adding a month because the javascript date object starts with month 0?
+
+        //     // Get the julian date from the date components
+        //     var julianDate = Math.floor((1461 * (year + 4800 + (month - 14) / 12)) / 4 + (367 * (month - 2 - 12 * ((month - 14) / 12))) / 12 - (3 * ((year + 4900 + (month - 14) / 12) / 100)) / 4 + day - 32075);
+        //     // var julianDate = ((1461 * (year + 4800 + (month - 14) / 12)) / 4 + (367 * (month - 2 - 12 * ((month - 14) / 12))) / 12 - (3 * ((year + 4900 + (month - 14) / 12) / 100)) / 4 + day - 32075);
+
+        //     return julianDate
+        // }
+
         function MET2JD(MET) {
 
             // Get the date associated with the MET
-            date = MET2date(MET)
+            date = convertMET2dateObj(MET)
 
             // Get the date components
-            // var day = date.getDate() - 1;    // Subtracting a day to make results match NASA's xtime results
-            var day = date.getUTCDate() ;   // Subtracting a day to make results match NASA's xtime results
+            var day = date.getUTCDate();   // Subtracting a day to make results match NASA's xtime results
             var year = date.getUTCFullYear();
-            var month = date.getUTCMonth() + 1; // Adding a month because the javascript date object starts with month 0?
+            var month = date.getUTCMonth() + 1;    // Adding a month because the javascript date object starts with month 0?
+
+            var hours = date.getUTCHours();
+            var minutes = date.getUTCMinutes();
+            var seconds = date.getUTCSeconds();
 
             // Get the julian date from the date components
-            var julianDate = Math.floor((1461 * (year + 4800 + (month - 14) / 12)) / 4 + (367 * (month - 2 - 12 * ((month - 14) / 12))) / 12 - (3 * ((year + 4900 + (month - 14) / 12) / 100)) / 4 + day - 32075);
-            // var julianDate = ((1461 * (year + 4800 + (month - 14) / 12)) / 4 + (367 * (month - 2 - 12 * ((month - 14) / 12))) / 12 - (3 * ((year + 4900 + (month - 14) / 12) / 100)) / 4 + day - 32075);
+            // var julianDate = Math.floor((1461 * (year + 4800 + (month - 14) / 12)) / 4 + (367 * (month - 2 - 12 * ((month - 14) / 12))) / 12 - (3 * ((year + 4900 + (month - 14) / 12) / 100)) / 4 + day - 32075);
+            // var julianDate = (1461 * (year + 4800 + (month - 14) / 12)) / 4 + (367 * (month - 2 - 12 * ((month - 14) / 12))) / 12 - (3 * ((year + 4900 + (month - 14) / 12) / 100)) / 4 + day - 32075
+
+            var julianDate; 
+            with (Math) {  
+                hours = hours + (minutes / 60) + (seconds/3600);
+                GGG = 1;
+                if (year <= 1585) GGG = 0;
+                julianDate = -1 * floor(7 * (floor((month + 9) / 12) + year) / 4);
+                S = 1;
+                if ((month - 9)<0) S=-1;
+                A = abs(month - 9);
+                J1 = floor(year + S * floor(A / 7));
+                J1 = -1 * floor((floor(J1 / 100) + 1) * 3 / 4);
+                julianDate = julianDate + floor(275 * month / 9) + day + (GGG * J1);
+                julianDate = julianDate + 1721027 + 2 * GGG + 367 * year - 0.5;
+                julianDate = julianDate + (hours / 24);
+            }
 
             return julianDate
+
         }
+
 
         function MET2MJD(MET) {
 
