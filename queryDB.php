@@ -252,10 +252,9 @@
             $closestTime = $start_time + ($intervalsPassed * $interval);
 
             // Bind the statement parameters
-            $queryStatement = $db->prepare('SELECT source_name, ts FROM lightcurve_data_v2 WHERE ts IS NOT NULL AND tmax == :closestTime AND cadence == :cadence');
-            $queryStatement->bindValue(':closestTime', $closestTime, SQLITE3_INTEGER);
+            $queryStatement = $db->prepare('SELECT source_name, ts FROM lightcurve_data_v2 WHERE ts IS NOT NULL AND cadence == :cadence AND tmax == :closestTime');
             $queryStatement->bindValue(':cadence', $cadence, SQLITE3_TEXT);
-
+            $queryStatement->bindValue(':closestTime', $closestTime, SQLITE3_INTEGER);
         }
 
         if (isset($_GET['verbose'])) {
